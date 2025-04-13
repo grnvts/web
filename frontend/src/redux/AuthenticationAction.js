@@ -16,20 +16,24 @@ export const updateUser = (updateDate) =>{
 }
 export const loginHandler = (cridentials) => {
     return  (async (dispatch) => {
-        const response = await  ApiService.login(cridentials)
+        const response = await ApiService.login(cridentials);
         if (response) {
-            //console.log(response.data);
             const authState = {
-                ...response.data,
+                username: response.data.username,
+                email: response.data.email,
+                image: response.data.image,
+                jwtoken: response.data.jwttoken,
+                roles: response.data.roles,
                 isLoggedIn: true,
                 password: cridentials.password
-            }
+            };
             ApiService.changeAuthToken(response.data.jwttoken);
             dispatch(loginAction(authState));
         }
         return response;
-    })
+    });
 };
+
 
 export const signupHandler = (user) =>{
     return async (dispatch) => {

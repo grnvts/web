@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Configuration
-@ConfigurationProperties  // application.properties deki değerleri bu class a assign eder.
+@ConfigurationProperties  // application.properties
 public class AppConfiguration {
 	String uploadPath;
 	String appJwtSecret;

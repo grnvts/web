@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.User;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	User findByUsername(String username);
@@ -22,4 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select u from User u where u.username = :username and u.status = 1")
 	User findUserByUsernameWithStatusOne(String username);
+
+	@Query("select u from User u where u.email = :email and u.status = 1")
+	User findByEmail(@NotEmpty @Size(min = 5, max = 200) String email);
 }

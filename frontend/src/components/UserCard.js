@@ -47,4 +47,4 @@ const UserCard = (props) => {
     );
 };
 
-export default withTranslation()(UserCard); // Обернули компонент для переводов
+export default withTranslation()(UserCard);

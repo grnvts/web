@@ -1,25 +1,27 @@
 import * as alertify from 'alertifyjs';
 import "alertifyjs/build/css/alertify.css";
 import "alertifyjs/build/css/themes/default.css";
- 
+
 class AlertifyService {
-
-
     alert(message) {
-        //window.location.href = '/patients';
-        //this.props.history.push('/patients' );
-        alertify.alert(message, function () {
-            //alertify.error(message);
-        }); //.set({ title: "Attention" }).set({ transition: 'slide' }).show();
-        
+        alertify.alert(message);
     }
-    successMessage(message){
+
+    success(message) {
         alertify.success(message);
-        return true;
     }
-    errorMessage(message){
-        alertify.error(message); 
-        return true;
+
+    error(message) {
+        alertify.error(message);
+    }
+
+    // Сохраняем старые методы для обратной совместимости
+    successMessage(message) {
+        return this.success(message);
+    }
+
+    errorMessage(message) {
+        return this.error(message);
     }
 }
 

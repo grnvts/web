@@ -91,7 +91,7 @@ class BuildingSubmit extends Component {
                 errors: {
                 }
             });
-            AlertifyService.alert("Kayıt işlemi Başarılı");
+            AlertifyService.alert("Процесс регистрации Успешный");//todo мультиязычно
 
         } catch (error) {
             if (error.response) {
@@ -125,12 +125,7 @@ class BuildingSubmit extends Component {
                 <h3 className="card-header">{t('Building Create Form')}</h3>
 
                 <div className="flex-row">
-                <ProfileImage
-                    width="32" 
-                    height="32"
-                    imageSource={imageSource} 
-                    username={this.props.username} 
-                />
+
                 <span className="flex-fill"  style={{ color: "red" }}>
                     ( * ) {t('Required field')}</span>
                 </div>

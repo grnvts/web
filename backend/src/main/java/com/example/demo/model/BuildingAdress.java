@@ -38,6 +38,7 @@ public class BuildingAdress {
     private Long id;
     private String city;
     private String district;
+    private String premisesNo; //номер помещения
     private String quarter;
     private String street;
     private String buildingNo;

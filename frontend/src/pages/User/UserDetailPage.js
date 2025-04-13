@@ -18,6 +18,7 @@ const UserDetailPage = (props) => {
     const [inEditMode, setInEditMode] = useState(false);
     const { username } = useParams(); // this.props.match.params.username
     const { t } = useTranslation();
+
     const dispatch = useDispatch();
     const reduxStore = useSelector((store) => {
         return {
@@ -26,30 +27,55 @@ const UserDetailPage = (props) => {
             email: store.email,
             jwttoken: store.jwttoken,
             password: store.password,
-            image: store.image
+            image: store.image,
+            roles: store.roles
         };
     })
+    const isAdminEditingOtherUser = reduxStore.roles?.includes("ROLE_ADMIN") && reduxStore.username !== username;
+
+    useEffect(() => {
+
+        console.log("reduxStore.roles", reduxStore.roles);
+    }, [reduxStore.roles])
     //console.log(reduxStore)
     useEffect(() => {
-        loadUser();
-    }, [username, inEditMode, editable])
+        console.log("reduxStore.roles", reduxStore.roles);
+    }, []);
 
-    const loadUser = async () => { 
-        setNotFound(false)
-        setEditable(false);
-        if (reduxStore.username === username) {
-            setEditable(true);
+    useEffect(() => {
+        loadUser();
+    }, [username, inEditMode]); // Зависимость от inEditMode
+
+    const handleUserUpdated = (updatedUser) => {
+        setUser(updatedUser);
+        if (reduxStore.username === updatedUser.username) {
+            dispatch(updateUser({
+                ...reduxStore,
+                ...updatedUser
+            }));
         }
+    };
+    const loadUser = async () => {
+        setNotFound(false);
+        setEditable(false);
+
+       console.log("roles", reduxStore.roles);
+
         try {
             const response = await UserService.getUserByUsername(username);
-            setUser(response.data)
+            setUser(response.data);
 
+            // ✅ Проверка на админа или владельца профиля
+            const isOwner = reduxStore.username === username;
+            const isAdmin = reduxStore.roles && reduxStore.roles.includes("ROLE_ADMIN");
+            setEditable(isOwner || isAdmin); // 🔥 это и включает кнопки
         } catch (error) {
-            console.log(error)
+           console.log(error)
             AlertifyService.alert("User not found !!");
             setNotFound(true);
         }
-    }
+    };
+
     const showUpdateForm = (control) => {
         setInEditMode(control);
         if (!control) {
@@ -57,6 +83,20 @@ const UserDetailPage = (props) => {
             setNewImage(undefined);
         }
     }
+    const deleteUser = async () => {
+        if (!window.confirm(t("Are you sure you want to delete your account?"))) {
+            return;
+        }
+
+        try {
+            const response = await UserService.deleteUserById(user.id, reduxStore.jwttoken);
+            AlertifyService.success(t("User account deleted"));
+            props.history.push('/'); // перенаправляем на главную
+        } catch (error) {
+            AlertifyService.error("Failed to delete user");
+            console.error(error);
+        }
+    };
     const saveImage = async (e) => {
         setErrorImage(undefined)
         //data:image/jpeg;base64,/9j/4AAQSkZJRgA
@@ -76,7 +116,7 @@ const UserDetailPage = (props) => {
                     let authData= {...reduxStore, image: response.data.body.image}
                     //console.log(authData)
                     dispatch(updateUser(authData));
-                    AlertifyService.successMessage("User Image Updated..");
+                    AlertifyService.success ("User Image Updated..");
                     showUpdateForm(false)
                 }
             } catch (error) {
@@ -128,19 +168,25 @@ const UserDetailPage = (props) => {
                 />
                 {
                     editable &&
+
                     <div className="card-body">
                         {!inEditMode ?
-                            <button
-                                onClick={e => showUpdateForm(true)}
-                                className="btn btn-sm btn-success">{t('Edit')}</button>
+                            <>
+                                <button
+                                    onClick={e => showUpdateForm(true)}
+                                    className="btn btn-sm btn-success me-2">{t('Edit')}</button>
+
+                                <button
+                                    onClick={deleteUser}
+                                    className="btn btn-sm btn-danger">{t('Delete Account')}</button>
+                            </>
                             :
                             <button
                                 onClick={e => showUpdateForm(false)}
                                 className="btn btn-sm btn-danger">{t('Cancel')} </button>
-
                         }
-
                     </div>
+
                 }
                 { inEditMode &&
                     <div className="row">
@@ -150,34 +196,34 @@ const UserDetailPage = (props) => {
                                 inEditMode={inEditMode}
                                 newImage={newImage}
                                 showUpdateForm={showUpdateForm}
+                                isAdminEditingOtherUser={isAdminEditingOtherUser}
+                                onUserUpdated={handleUserUpdated}
                             />
                         </div>
-                        <div className="col-sm-5">
-                            <h5 className="card-header text-center"><b>{t("Change Image")}</b></h5>
-                            <ul className="list-group list-group-flush ">
-                                <li className="list-group-item" style={{ color: "red" }}> png or jpeg format </li>
-                                <li className="list-group-item">
-
-                                    <Input
-                                        error={errorImage}
-                                        name="image"
-                                        type="file"
-                                        onChangeData={onChangeData}
-                                    // onChangeData={event => onChangeData("image", event)} 
-                                    />
-
-                                </li>
-                                <li className="list-group-item">
-                                    <button
-                                        onClick={saveImage}
-                                        className="btn btn-sm btn-primary">{t('Save')} </button>
-                                    <button
-                                        onClick={e => showUpdateForm(false)}
-                                        className="btn btn-sm btn-danger">{t('Cancel')} </button>
-                                </li>
-                            </ul>
-                        </div>
-
+                        {!isAdminEditingOtherUser && (
+                            <div className="col-sm-5">
+                                <h5 className="card-header text-center"><b>{t("Change Image")}</b></h5>
+                                <ul className="list-group list-group-flush ">
+                                    <li className="list-group-item" style={{ color: "red" }}> png or jpeg format </li>
+                                    <li className="list-group-item">
+                                        <Input
+                                            error={errorImage}
+                                            name="image"
+                                            type="file"
+                                            onChangeData={onChangeData}
+                                        />
+                                    </li>
+                                    <li className="list-group-item">
+                                        <button
+                                            onClick={saveImage}
+                                            className="btn btn-sm btn-primary">{t('Save')} </button>
+                                        <button
+                                            onClick={e => showUpdateForm(false)}
+                                            className="btn btn-sm btn-danger">{t('Cancel')} </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 }
 
@@ -198,3 +244,4 @@ const UserDetailPage = (props) => {
 // export default connect(mapStateToProps)(withRouter(ProfileCard)) ;
 //export default connect(mapStateToProps)(serDetailPage);
 export default withRouter(UserDetailPage) ;
+

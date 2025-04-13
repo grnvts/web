@@ -38,6 +38,8 @@ public class UserDto {
 	private Date bornDate;
 	 
 	private String image;
+
+
 	
 	public String getFullName() {
 		return this.name+" "+this.surname;

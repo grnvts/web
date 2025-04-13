@@ -17,12 +17,32 @@ class UserService {
     post(data) { 
         return ApiService.post(USER_URL,data)
     }
-    update(username,body) { 
-        return ApiService.put(USER_URL+"/"+username,body)
+    update(username, body, token) {
+        return ApiService.put(`/user/${username}`, body, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
     }
+
     loadImage(username,body) { 
         return ApiService.put(USER_URL+"/upload-image/"+username,body)
     }
+    deleteUserById = (id, token) => {
+        return fetch(`/api/user/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(async response => {
+            if (!response.ok) {
+                const data = await response.json();
+                throw data;
+            }
+            return response.json();
+        });
+    };
+
     //put(url, data) { return axios.put(API_BASE_URL + url, data); }
 
     //delete(url) { return axios.delete(API_BASE_URL + url); }

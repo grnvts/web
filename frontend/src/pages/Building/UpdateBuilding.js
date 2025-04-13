@@ -37,7 +37,7 @@ import defaultPicture from './../../assets/profile.png';
             const response = await BuildingService.get(buildingid);
            
             this.fillInState(response);
-            //AlertifyService.alert("Kayıt işlemi Başarılı");
+
 
         } catch (error) {
             if (error.response) {
@@ -76,8 +76,7 @@ import defaultPicture from './../../assets/profile.png';
         this.setState({ stateData, errors: errors });
     }
     saveBuilding = async (e) => {
-        // browser form içeriğini bir yere göndermesini engeller.
-        // browserin bizim yerimize bir şey yapmasını engellemiş oluyoruz.
+
         e.preventDefault();
         this.setState({ errors: {} })
         let {id,buildingName,buildingAdress,createdAt} = this.state;
@@ -96,7 +95,7 @@ import defaultPicture from './../../assets/profile.png';
             console.log(response)
             this.loadBuilding(this.props.match.params.buildingid);
 
-            AlertifyService.alert("Kayıt işlemi Başarılı");
+            AlertifyService.alert("Процесс регистрации Успешный");//todo lang
             this.props.history.push("/building-card/"+this.props.match.params.buildingid);
 
         } catch (error) {
@@ -115,11 +114,8 @@ import defaultPicture from './../../assets/profile.png';
  
     }
     render() {
-        let imageSource = defaultPicture;
-    
-        if(this.props.image){
-            imageSource= this.props.image;
-        }
+
+
         
         const { buildingName, buildingAdress, city,district,quarter,street,buildingNo } = this.state.errors;
         const { t } = this.props;
@@ -134,12 +130,7 @@ import defaultPicture from './../../assets/profile.png';
 
 
                 <div className="flex-row">
-                <ProfileImage
-                    width="32" 
-                    height="32" 
-                    imageSource={imageSource} 
-                    username={this.props.username} 
-                />
+
                 <span className="flex-fill"   style={{ color: "red" }}>
                     ( * ) {t('Required field')}
                 </span>

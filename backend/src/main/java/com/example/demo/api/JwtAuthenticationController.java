@@ -2,6 +2,8 @@ package com.example.demo.api;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,7 +64,10 @@ public class JwtAuthenticationController {
 			String jwt = jwtTokenUtil.generateToken(authentication);
 			String username = authenticationRequest.getUsername();
 			User user = userRepository.findByUsername(username);
-			return ResponseEntity.ok(new JwtResponse(username,jwt,user.getEmail(),user.getImage()));
+			Set<String> roleNames = user.getRoles().stream()
+					.map(role -> role.getName().name())
+					.collect(Collectors.toSet());
+			return ResponseEntity.ok(new JwtResponse(username,jwt,user.getEmail(),user.getImage(), roleNames));
 		}catch (BadCredentialsException e) {
 			ApiError error = new ApiError(401, "Unauthorized request : "+e.getMessage(), "/api/login");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);

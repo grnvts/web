@@ -1,6 +1,7 @@
 package com.example.demo.jwt.config;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class JwtResponse  implements Serializable{
 	private String jwttoken;
 	private String email;
 	private String image;
+	private Set<String> roles;
 }

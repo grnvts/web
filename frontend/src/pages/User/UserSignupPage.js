@@ -98,7 +98,6 @@ class UserSignupPage extends Component {
         return (
             <div className="col-lg-12">
                 <h3>{t('Sign Up')}</h3>
-                <hr />
                 <p className="description-p" style={{ color: "red" }}>
                     ( * ) {t('Required field')}
                 </p>
@@ -171,8 +170,9 @@ class UserSignupPage extends Component {
                         </div>
                     </div>
                     <button
-                        className="btn btn-primary "
+                        className="btn btn-dark "
                         type="button"
+
                         disabled={repeatPassword !== undefined}
                         onClick={this.onClickSignUp}>{t('Sign Up')}</button>
                 </form>

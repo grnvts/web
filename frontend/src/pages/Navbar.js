@@ -79,7 +79,9 @@ const NavbarComponent = props =>{
                 <li className="nav-item active">
                     <Link className="nav-link" to="/index">{t('HomePage')} <span className="sr-only">(current)</span></Link>
                 </li>
-
+                <li className="nav-item active">
+                    <Link className="nav-link" to="/orders">{t('Orders')} </Link>
+                </li>
                 <li className="nav-item active">
                     <Link className="nav-link" to="/users">{t('Users')} </Link>
                 </li>

@@ -6,7 +6,8 @@ const defaultState = {
     jwttoken: undefined,
     password: undefined,
     email: undefined,
-    image: undefined
+    image: undefined,
+    roles: []
 }
 
 const authReducer = (state = { ...defaultState }, action) => {

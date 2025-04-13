@@ -11,6 +11,7 @@ import UserTableRow from "../../components/UserTableRow";
 
 class UsersPage extends Component {
 
+
     constructor(props) {
         super(props)
         this.state = {
@@ -59,12 +60,13 @@ class UsersPage extends Component {
         const nextPage = this.state.page.number - 1;
         this.getUsers(nextPage, this.state.page.size);
     }
-    // onDeleteUser = (index)=>{
-    //     console.log("Delete button clicked: "+index)
-    //     const users = [...this.state.users];
-    //     users.splice(index,1);
-    //     this.setState({users})
-    // }
+
+    onDeleteUser = (index)=>{
+        console.log("Delete button clicked: "+index)
+        const users = [...this.state.users];
+        users.splice(index,1);
+        this.setState({users})
+    }
     render() {
         const { content: users, first, last, number, totalPages } = this.state.page;
         const { t } = this.props;
@@ -156,5 +158,6 @@ const mapStateToProps = (store) => {
         image: store.image
     };
 };
+
 // export default connect(mapStateToProps)(withRouter(ProfileCard)) ;
 export default connect(mapStateToProps)(withTranslation()(UsersPage));

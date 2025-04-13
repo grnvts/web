@@ -27,7 +27,7 @@ const BuildingListItem = (props) => {
     return (
         <div className="card mt-2" >
             <div className="card ">
-                <h5 className="card-header">{t("Building Name")} : {buildingName}</h5>
+                <h5 className="card-header">{t("ID")} : {buildingName}</h5>
 
                 <ul className="list-group list-group-flush">
                     <li className="list-group-item">{t("Building Adress")} : {buildingAdress}</li>

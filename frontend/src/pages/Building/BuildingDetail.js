@@ -31,7 +31,7 @@ import BuildingService from '../../Services/BuildingService';
             const response = await BuildingService.get(buildingid);
            
             this.fillInState(response);
-            //AlertifyService.alert("Kayıt işlemi Başarılı");
+
 
         } catch (error) {
             if (error.response) {
