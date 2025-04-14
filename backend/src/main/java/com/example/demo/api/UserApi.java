@@ -49,6 +49,7 @@ public class UserApi {
 	private final UserService service;
 
 	// localhost:8501/api/user/users?page=1&size=4
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users")
 	public ResponseEntity<Page<UserDto>> getAll(@RequestHeader("Authorization") String authHeader, Pageable page) {
 

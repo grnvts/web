@@ -19,6 +19,8 @@ class UserSignupPage extends Component {
             repeatPassword: "",
             name: '',
             surname: '',
+            patronymic: '',
+            phone: '',
             bornDate: new Date(), 
             errors: {
             }
@@ -88,7 +90,7 @@ class UserSignupPage extends Component {
         // });
     }
     render() {
-        const { username, email, password, repeatPassword } = this.state.errors;
+        const { username, email, password, repeatPassword, phone } = this.state.errors;
         //const {errorUsername, errorEmail, errorPassword} = errors;
         const { t, i18n } = this.props;
         const isWeekday = date => {
@@ -154,6 +156,24 @@ class UserSignupPage extends Component {
                         name="surname"
                         placeholder={t("Surname")}
                         valueName={this.state.surname}
+                        onChangeData={this.onChangeData}
+                    />
+                    <Input
+                        label={t("Patronymic")}//todo перевод + телефон
+                        type="text"
+                        name="patronymic"
+                        placeholder={t("Patronymic")}
+                        valueName={this.state.patronymic}
+                        onChangeData={this.onChangeData}
+                    />
+
+                    <Input
+                        label={t("Phone")}
+                        error={phone}
+                        type="tel"
+                        name="phone"
+                        placeholder={t("Phone (e.g. +3754467890)")}
+                        valueName={this.state.phone}
                         onChangeData={this.onChangeData}
                     />
                     <div className="form-group">

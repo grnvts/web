@@ -59,20 +59,37 @@ const UserDetailPage = (props) => {
         setNotFound(false);
         setEditable(false);
 
-       console.log("roles", reduxStore.roles);
-
         try {
-            const response = await UserService.getUserByUsername(username);
+            const response = await UserService.getUserByUsername(username, reduxStore.jwttoken);
+            if (!response.data) {
+                throw new Error("User not found");
+            }
             setUser(response.data);
 
-            // ✅ Проверка на админа или владельца профиля
             const isOwner = reduxStore.username === username;
-            const isAdmin = reduxStore.roles && reduxStore.roles.includes("ROLE_ADMIN");
-            setEditable(isOwner || isAdmin); // 🔥 это и включает кнопки
+            const isAdmin = reduxStore.roles?.includes("ROLE_ADMIN");
+
+            if (!isOwner && !isAdmin) {
+                AlertifyService.error(t("You don't have permission to view this profile"));
+                props.history.push('/index');
+                return;
+            }
+
+            setEditable(isOwner || isAdmin);
         } catch (error) {
-           console.log(error)
-            AlertifyService.alert("User not found !!");
-            setNotFound(true);
+            console.error(error);
+            if (error.response) {
+                if (error.response.status === 401) {
+                    AlertifyService.error(t("Session expired. Please login again"));
+                    props.history.push('/login');
+                } else if (error.response.status === 404) {
+                    AlertifyService.alert("User not found !!");
+                    setNotFound(true);
+                }
+            } else {
+                AlertifyService.alert("Error loading user data");
+                setNotFound(true);
+            }
         }
     };
 

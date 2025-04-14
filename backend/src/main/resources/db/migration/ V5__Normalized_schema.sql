@@ -46,15 +46,6 @@ CREATE TABLE addresses (
                            is_primary BOOLEAN DEFAULT false
 );
 
--- 5. Таблица объектов недвижимости
-CREATE TABLE buildings (
-                           id BIGSERIAL PRIMARY KEY,
-                           user_id BIGINT NOT NULL REFERENCES users(id),
-                           building_name VARCHAR(1000) NOT NULL,
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           total_floors INTEGER,
-                           construction_year INTEGER
-);
 
 -- 6. Таблица заказов
 CREATE TABLE orders (
@@ -83,3 +74,22 @@ CREATE TABLE reviews (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_addresses_user ON addresses(user_id);
+
+ALTER TABLE roles DROP COLUMN IF EXISTS user_id;
+
+-- 2. Исправляем таблицу user_roles (если она неправильно создана)
+DROP TABLE IF EXISTS user_roles;
+
+-- 3. Создаем правильную таблицу связей многие-ко-многим
+CREATE TABLE user_roles (
+                            user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                            role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+                            PRIMARY KEY (user_id, role_id)
+);
+
+-- 4. Обновляем данные (если нужно)
+INSERT INTO roles (name) VALUES
+                             ('ROLE_ADMIN'),
+                             ('ROLE_USER'),
+                             ('ROLE_BRIGADIER')
+    ON CONFLICT (name) DO NOTHING;

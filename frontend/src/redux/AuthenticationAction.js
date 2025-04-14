@@ -2,45 +2,50 @@ import ApiService from "../Services/BaseService/ApiService";
 import UserService from "../Services/UserService";
 import * as ACTIONS from "./Constants";
 
+export const logoutAction = () => ({ type: ACTIONS.LOGOUT_ACTION });
 
-export const logoutAction = () => {
-    return { type: ACTIONS.LOGOUT_ACTION };
-};
+export const loginAction = (authData) => ({
+    type: ACTIONS.LOGIN_ACTION,
+    payload: authData
+});
 
-export const loginAction = (authData) => {
-    return { type: ACTIONS.LOGIN_ACTION, payload: authData };
-};
+export const updateUser = (updateData) => ({
+    type: ACTIONS.UPDATE_ACTION,
+    payload: updateData
+});
 
-export const updateUser = (updateDate) =>{
-    return {type : ACTIONS.UPDATE_ACTION, payload: updateDate }
-}
-export const loginHandler = (cridentials) => {
-    return  (async (dispatch) => {
-        const response = await ApiService.login(cridentials);
-        if (response) {
-            const authState = {
-                username: response.data.username,
-                email: response.data.email,
-                image: response.data.image,
-                jwtoken: response.data.jwttoken,
-                roles: response.data.roles,
-                isLoggedIn: true,
-                password: cridentials.password
-            };
-            ApiService.changeAuthToken(response.data.jwttoken);
-            dispatch(loginAction(authState));
-        }
+export const loginHandler = (credentials) => async (dispatch) => {
+    try {
+        const response = await ApiService.login(credentials);
+        const { data } = response;
+
+        const authState = {
+            username: data.username,
+            email: data.email,
+            image: data.image,
+            jwttoken: data.jwttoken,
+            roles: data.roles,
+            isLoggedIn: true
+        };
+
+        ApiService.changeAuthToken(data.jwttoken);
+        dispatch(loginAction(authState));
         return response;
-    });
+    } catch (error) {
+        throw error;
+    }
 };
 
-
-export const signupHandler = (user) =>{
-    return async (dispatch) => {
+export const signupHandler = (user) => async (dispatch) => {
+    try {
         const response = await UserService.post(user);
-        const { username, password } =  {username: user.username, password: user.repeatPassword};
-        const creds = { username, password };
-        await dispatch(loginHandler(creds));
+        const credentials = {
+            username: user.username,
+            password: user.password
+        };
+        await dispatch(loginHandler(credentials));
         return response;
+    } catch (error) {
+        throw error;
     }
 };

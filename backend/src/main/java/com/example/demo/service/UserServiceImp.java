@@ -91,17 +91,21 @@ public class UserServiceImp implements UserService {
 		if(!user.getPassword().equals(user.getRepeatPassword())) {
 			HashMap<String, String> map = new HashMap<>();
 			map.put("repeatPassword", "Passwords must be same.");
-			ApiError error = new ApiError(400, "Email, Username and Password can not be empty or null", null);
+			ApiError error = new ApiError(400, "Validation Error", null);
 			error.setValidationErrors(map);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 		}
+
 		//User user = mapper.map(dto, User.class);
 		user.setCreatedDate(new Date());
 		user.setStatus(1);
 		user.setRealPassword(user.getPassword());
+
 		user.setPassword(passwordEncoder.encode(user.getRealPassword()));
-		user = repository.save(user);
-		logger.info("User is saved");
+		if(user.getPatronymic() == null) user.setPatronymic("");
+		if(user.getPhone() == null) user.setPhone("");
+
+
 
 		//////
 //		Role defaultRole = new Role();
@@ -179,11 +183,11 @@ public class UserServiceImp implements UserService {
 			throw new NotFoundException();
 		}
 
-		// ✅ Логирование входных данных
+		//  Логирование входных данных
 		logger.info("Updating user: {}, current ID: {}", username, user.getId());
 		logger.info("Incoming data: email={}, name={}, surname={}", dto.getEmail(), dto.getName(), dto.getSurname());
 
-		// ✅ Проверка email на уникальность, если он изменился
+		// Проверка email на уникальность, если он изменился
 		if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
 			User userWithEmail = repository.findByEmail(dto.getEmail());
 

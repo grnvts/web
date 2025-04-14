@@ -34,6 +34,8 @@ public class UserUpdateDto {
 	private String name;
 	
 	private String surname;
+	private String patronymic;
+	private String phone;
 
 	@NotEmpty
 	@NotNull

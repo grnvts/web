@@ -56,7 +56,6 @@ SELECT
     COALESCE(created_date, CURRENT_TIMESTAMP)
 FROM users;  -- Ваша текущая таблица пользователей
 
--- Затем вставьте с явными ID
 
 -- 4. Перенос связей пользователь-роль (если есть старая таблица `user_roles`)
 INSERT INTO user_roles (user_id, role_id)

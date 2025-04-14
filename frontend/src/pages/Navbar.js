@@ -12,14 +12,17 @@ const NavbarComponent = props =>{
     const [dropDownVisible, setDropDownVisible] = useState(false);
     const dropDownMenuArea  = useRef(null);
     let imageSource = defaultPicture;
-    const {isLoggedIn, username, image} = useSelector( store =>{
+    const {isLoggedIn, username, image, roles} = useSelector(store => {
         return {
             isLoggedIn: store.isLoggedIn,
             username: store.username,
-            image: store.image
+            image: store.image,
+            roles: store.roles || []
         };
     });
     const dispatch = useDispatch();
+
+    const isAdmin = roles.includes('ROLE_ADMIN');
     // constructor(props) {
     //     super(props);
     //     this.state = {
@@ -82,9 +85,11 @@ const NavbarComponent = props =>{
                 <li className="nav-item active">
                     <Link className="nav-link" to="/orders">{t('Orders')} </Link>
                 </li>
-                <li className="nav-item active">
-                    <Link className="nav-link" to="/users">{t('Users')} </Link>
-                </li>
+                {isAdmin && (
+                    <li className="nav-item active">
+                        <Link className="nav-link" to="/users">{t('Users')} </Link>
+                    </li>
+                )}
                 <li className="nav-item active">
                     <Link className="nav-link" to={"/building/" + username} >{t('Building')} </Link>
                 </li>

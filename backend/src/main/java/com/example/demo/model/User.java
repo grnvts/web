@@ -42,14 +42,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // Изменено на IDENTITY
 	private Long id;
 
-	@Column(name = "uname", nullable = false, length = 200)
+	// Изменяем имя столбца с uname на username (или наоборот в БД)
+	@Column(name = "username", nullable = false, length = 200, unique = true)
 	@NotEmpty
 	@NotNull
-	@UniqueData
-	private String username;
+	private String username; // Оставляем имя переменной как было
 
 	@Column(name = "name")
 	private String name;
@@ -64,8 +64,16 @@ public class User {
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "{message.username.pattern}")
 	private String password;
 
-	@Column(name = "real_password")
+	@Transient // Убираем из БД, так как это дублирование
 	private String realPassword;
+
+	@Column(name = "patronymic")
+	private String patronymic;
+
+	@Column(name = "phone", length = 20)
+	@Pattern(regexp = "^\\+?[0-9\\-\\s()]*$", message = "Invalid phone number format")
+	private String phone;
+
 
 	@Column(name = "email", unique = true)
 	@NotEmpty
@@ -76,25 +84,22 @@ public class User {
 	private String image;
 
 	@Transient
-	@NotEmpty
-	@NotNull
-	@Size(min = 8)
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "{message.username.pattern}")
-	private String repeatPassword;
+	private String repeatPassword; // Убираем валидацию, так как это временное поле
 
-	@Column(name = "bornDate")
+	@Column(name = "born_date") // Приводим в соответствие с БД
 	private Date bornDate;
 
-	@Column(name = "createdDate")
+	@Column(name = "created_at") // Приводим в соответствие с БД
 	private Date createdDate;
 
 	@Column(name = "status")
-	private int status;
+	private Integer status; // Изменяем на Integer
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JoinTable(name = "user_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
-	@OneToMany(targetEntity = Building.class, /*mappedBy = "users",*/ cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<Building> buildings;
+
 }

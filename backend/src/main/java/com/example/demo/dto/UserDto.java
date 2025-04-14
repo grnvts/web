@@ -30,7 +30,8 @@ public class UserDto {
 	private String name;
 	
 	private String surname;
-
+	private String patronymic;
+	private String phone;
 	private String email;
 
 	private String repeatPassword;
@@ -42,13 +43,15 @@ public class UserDto {
 
 	
 	public String getFullName() {
-		return this.name+" "+this.surname;
+		return this.name+" "+this.surname+" "+this.patronymic;
 	}
 	public UserDto(User user) {
 		this.id=user.getId();
 		this.username=user.getUsername();
 		this.name=user.getName();
 		this.surname=user.getSurname();
+		this.patronymic=user.getPatronymic();
+		this.phone=user.getPhone();
 		this.email=user.getEmail();
 		this.bornDate=user.getBornDate();
 		this.image=user.getImage();
