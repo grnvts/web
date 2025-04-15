@@ -20,38 +20,55 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: null,
-      isLoggedIn: null,
-      jwttoken: null,
-      email: null,
-      image: null
+      // username: null,
+      // isLoggedIn: null,
+      // jwttoken: null,
+      // email: null,
+      // image: null
     };
     // this.onLoginSuccess = this.onLoginSuccess.bind(this);
     // this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
   }
 
-  onLoginSuccess = (authState) => {
-    ApiService.changeAuthToken(authState.jwttoken);
-    localStorage.setItem("username", authState.username);
-    localStorage.setItem("jwttoken", authState.jwttoken);
-    localStorage.setItem("isLoggedIn", true);
-    this.setState({ ...authState, isLoggedIn: true });
+  // onLoginSuccess = (authState) => {
+  //   ApiService.changeAuthToken(authState.jwttoken);
+  //   localStorage.setItem("username", authState.username);
+  //   localStorage.setItem("jwttoken", authState.jwttoken);
+  //   localStorage.setItem("isLoggedIn", true);
+  //   this.setState({ ...authState, isLoggedIn: true });
+  //
+  //   return <Redirect to="/index" />
+  // }
+    onLoginSuccess = (authState) => {
+        ApiService.changeAuthToken(authState.jwttoken);
 
-    return <Redirect to="/index" />
-  }
-  onLogoutSuccess = () => {
-    ApiService.changeAuthToken(null);
-    localStorage.removeItem("jwttoken");
-    localStorage.removeItem("username");
-    localStorage.removeItem("isLoggedIn");
-    //console.log(localStorage)
-    this.setState({
-      isLoggedin: false,
-      username: null,
-      jwttoken: null
-    });
-    return <Redirect to="/login" />
-  }
+        // сохраняем в Redux
+        this.props.dispatch({
+            type: 'LOGIN_ACTION',
+            payload: authState
+        });
+
+        return <Redirect to="/index" />
+    }
+    onLogoutSuccess = () => {
+        ApiService.changeAuthToken(null);
+        this.props.dispatch({ type: 'LOGOUT_ACTION' });
+        return <Redirect to="/login" />
+    }
+
+  //   onLogoutSuccess = () => {
+  //   ApiService.changeAuthToken(null);
+  //   localStorage.removeItem("jwttoken");
+  //   localStorage.removeItem("username");
+  //   localStorage.removeItem("isLoggedIn");
+  //   //console.log(localStorage)
+  //   this.setState({
+  //     isLoggedin: false,
+  //     username: null,
+  //     jwttoken: null
+  //   });
+  //   return <Redirect to="/login" />
+  // }
   back() {
     this.props.history.push('/login');
   }

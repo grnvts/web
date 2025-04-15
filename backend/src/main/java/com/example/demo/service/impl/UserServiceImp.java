@@ -1,10 +1,9 @@
-package com.example.demo.service;
+package com.example.demo.service.impl;
 
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -12,6 +11,7 @@ import javax.validation.Valid;
 import com.example.demo.model.Role;
 import com.example.demo.model.RoleName;
 import com.example.demo.repo.RoleRepository;
+import com.example.demo.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
