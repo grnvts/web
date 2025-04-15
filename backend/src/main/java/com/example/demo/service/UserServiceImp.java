@@ -205,6 +205,9 @@ public class UserServiceImp implements UserService {
 		// Обновление остальных полей
 		user.setName(dto.getName());
 		user.setSurname(dto.getSurname());
+		user.setPatronymic(dto.getPatronymic());
+		user.setPhone(dto.getPhone());
+
 
 		// Обновление username только если пользователь редактирует сам себя
 		if (!isAdmin || userNameFromToken.equals(username)) {

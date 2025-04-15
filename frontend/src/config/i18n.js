@@ -86,6 +86,7 @@ i18n.use(initReactI18next).init({
           "Username": "Имя пользователя",
           'Born Date *': 'Дата рождения *',
           "Born Date" : "Дата рождения",
+          "Created Date" : "Дата создания",
           Login: 'Войти',
           HomePage: 'Главная страница',
           Logout: 'Выйти',

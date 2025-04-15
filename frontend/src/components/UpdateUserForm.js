@@ -19,6 +19,9 @@ class UpdateUserForm extends Component {
             email: '',
             name: '',
             surname: '',
+            patronymic: '',
+            phone: '',
+
             errors: {
             }
         };
@@ -64,24 +67,27 @@ class UpdateUserForm extends Component {
             // this.props.showUpdateForm(false)
             // this.props.history.push("/user/"+data.username)
 
-            if (response.status === 200) {
+            const updatedData = response.data; // весь ответ сервера
+            if (response.status === 200 || updatedData.statusCodeValue === 200) {
                 if (this.props.isAdminEditingOtherUser) {
-                    console.log(response.data)
                     AlertifyService.success("User updated successfully");
-                    this.props.onUserUpdated(response.data.body);
+                    const data = response.data.body || response.data; // поддержка обоих форматов
+                    this.props.onUserUpdated(data);
+                    this.props.showUpdateForm(false);;
+
                     this.props.showUpdateForm(false);
                 } else {
                     const updatedUser = {
                         ...this.props,
-                        ...response.data.body,
-                        // Если роли приходят как Set, конвертируем в массив
-                        roles: response.data.roles ? Array.from(response.data.roles) : []
+                        ...updatedData,
+                        roles: updatedData.roles ? Array.from(updatedData.roles) : []
                     };
                     this.props.dispatch(updateUser(updatedUser));
                     AlertifyService.success("Profile updated successfully");
                     this.props.showUpdateForm(false);
 
-                    // Если изменился username, обновляем токен (если он возвращается)
+
+            // Если изменился username, обновляем токен (если он возвращается)
                     if (response.data.jwttoken) {
                         ApiService.changeAuthToken(response.data.jwttoken);
                     }
@@ -115,61 +121,118 @@ class UpdateUserForm extends Component {
         this.props.dispatch(logoutAction());
     }
     render() {
-        const { t /*,user*/ } = this.props;
-        const { username,email /*,bornDate*/} = this.state.errors;
+        const {t} = this.props;
+        const {username, email, name, surname, patronymic, phone, bornDate, password, repeatPassword} = this.state;
+        const {errors} = this.state;
+        const isAdmin = this.props.isAdminEditingOtherUser;
+
         return (
             <div>
                 {this.props.inEditMode &&
                     <form>
                         <h5 className="card-header text-center">{t("Change User Info")}</h5>
+
+                        {/* Имя пользователя — только для самого себя */}
+                        {!isAdmin && (
+                            <Input
+                                label={t("Username")}
+                                error={errors.username}
+                                type="text"
+                                name="username"
+                                placeholder={t("Username")}
+                                valueName={username}
+                                onChangeData={this.onChangeData}
+                            />
+                        )}
+
                         <Input
-                        label={t("Username *")}
-                        error={username}
-                        type="text"
-                        name="username"
-                        placeholder={t("Username *")}
-                        valueName={this.state.username}
-                        onChangeData={this.onChangeData}
-                        disabled={this.props.isAdminEditingOtherUser}
-
+                            label={t("Email")}
+                            type="email"
+                            error={errors.email}
+                            name="email"
+                            placeholder={t("Email")}
+                            valueName={email}
+                            onChangeData={this.onChangeData}
                         />
-                    <Input
-                        label={t("Email *")}
-                        type="email"
-                        error={email}
-                        name="email"
-                        placeholder={t("Email *")}
-                        valueName={this.state.email}
-                        onChangeData={this.onChangeData}
-                    />
-                    <Input
-                        label={t("Name")}
-                        type="text"
-                        name="name"
-                        placeholder={t("Name")}
-                        valueName={this.state.name}
-                        onChangeData={this.onChangeData}
-                    />
-                    <Input
-                        label={t("Surname")}
-                        type="text"
-                        name="surname"
-                        placeholder={t("Surname")}
-                        valueName={this.state.surname}
-                        onChangeData={this.onChangeData}
-                    />
-                    <button
-                        className="btn btn-primary "
-                        type="button"
-                        onClick={this.onClickSave}>{t('Update')}</button>
 
+                        <Input
+                            label={t("Name")}
+                            type="text"
+                            name="name"
+                            placeholder={t("Name")}
+                            valueName={name}
+                            onChangeData={this.onChangeData}
+                        />
+
+                        <Input
+                            label={t("Surname")}
+                            type="text"
+                            name="surname"
+                            placeholder={t("Surname")}
+                            valueName={surname}
+                            onChangeData={this.onChangeData}
+                        />
+
+                        <Input
+                            label={t("Patronymic")}
+                            type="text"
+                            name="patronymic"
+                            placeholder={t("Patronymic")}
+                            valueName={patronymic}
+                            onChangeData={this.onChangeData}
+                        />
+
+                        <Input
+                            label={t("Phone")}
+                            type="text"
+                            name="phone"
+                            placeholder={t("Phone")}
+                            valueName={phone}
+                            onChangeData={this.onChangeData}
+                        />
+
+                        {/* Только сам пользователь может редактировать дату рождения и пароль */}
+                        {!isAdmin && (
+                            <>
+                                <Input
+                                    label={t("Born Date")}
+                                    type="date"
+                                    name="bornDate"
+                                    placeholder={t("Born Date")}
+                                    valueName={bornDate?.slice(0, 10)}
+                                    onChangeData={this.onChangeData}
+                                />
+
+                                <Input
+                                    label={t("Password")}
+                                    type="password"
+                                    name="password"
+                                    placeholder={t("New Password")}
+                                    valueName={password}
+                                    onChangeData={this.onChangeData}
+                                />
+                                <Input
+                                    label={t("Repeat Password")}
+                                    type="password"
+                                    name="repeatPassword"
+                                    placeholder={t("Repeat Password")}
+                                    valueName={repeatPassword}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </>
+                        )}
+
+                        <button
+                            className="btn btn-primary mt-2"
+                            type="button"
+                            onClick={this.onClickSave}>{t('Update')}</button>
                     </form>
                 }
             </div>
-        )
+        );
     }
 }
-const mapStateToProps = (store) => {
+    const mapStateToProps = (store) => {
     return {
         isLoggedIn: store.isLoggedIn,
         username: store.username,

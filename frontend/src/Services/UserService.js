@@ -17,13 +17,10 @@ class UserService {
     post(data) { 
         return ApiService.post(USER_URL,data)
     }
-    update(username, body, token) {
-        return ApiService.put(`/user/${username}`, body, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+    update(username, body) {
+        return ApiService.put(`/user/${username}`, body); // Без config!
     }
+
 
     loadImage(username,body) { 
         return ApiService.put(USER_URL+"/upload-image/"+username,body)

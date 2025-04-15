@@ -35,9 +35,10 @@ public class UserDto {
 	private String email;
 
 	private String repeatPassword;
-	
+
 	private Date bornDate;
-	 
+	private Date createdDate;
+
 	private String image;
 
 
@@ -54,6 +55,7 @@ public class UserDto {
 		this.phone=user.getPhone();
 		this.email=user.getEmail();
 		this.bornDate=user.getBornDate();
+		this.createdDate=user.getCreatedDate();
 		this.image=user.getImage();
 	}
 }

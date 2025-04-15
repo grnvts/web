@@ -1,47 +1,53 @@
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
-import { persistStore, persistReducer } from 'redux-persist';
-import SecureLS from 'secure-ls';
-import thunk from 'redux-thunk';
+import { createStore, applyMiddleware, compose } from 'redux';
 import authReducer from './AuthenticationReducer';
+import SecureLS from "secure-ls";
+import thunk from 'redux-thunk';
 import ApiService from '../Services/BaseService/ApiService';
 
-const secureLS = new SecureLS({
-  encodingType: 'aes',
-  encryptionSecret: 'your-secret-key' // Замените на реальный секретный ключ
-});
+const secureLS = new SecureLS();
 
-const persistConfig = {
-  key: 'root',
-  storage: {
-    getItem: (key) => Promise.resolve(secureLS.get(key)),
-    setItem: (key, value) => Promise.resolve(secureLS.set(key, value)),
-    removeItem: (key) => Promise.resolve(secureLS.remove(key))
-  },
-  whitelist: ['auth']
-};
 
-const rootReducer = combineReducers({
-  auth: authReducer
-});
+const getStateFromStorage = () => {
+  const auth = secureLS.get("auth");
+  //const auth = localStorage.getItem("auth");
+  let stateInLocalStorage = {
+    isLoggedIn: false,
+    username: undefined,
+    jwttoken: undefined,
+    password: undefined,
+    email: undefined,
+    image: undefined
+  };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+  if (auth) {
+    stateInLocalStorage = auth;
+    // try {
+    //   stateInLocalStorage = JSON.parse(auth);
+    // } catch (error) {    }
+  }
+  ApiService.changeAuthToken(auth.jwttoken);
+  return stateInLocalStorage;
+}
+
+const updateStateInStorage = newState => {
+  secureLS.set("auth", newState);
+  //localStorage.setItem("auth", JSON.stringify(newState));
+}
 
 const configureStore = () => {
   const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
+  //  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   const store = createStore(
-      persistedReducer,
+      authReducer,
+      getStateFromStorage(),
       composeEnhancer(applyMiddleware(thunk))
   );
 
-  const persistor = persistStore(store, null, () => {
-    const state = store.getState();
-    if (state.auth?.jwttoken) {
-      ApiService.changeAuthToken(state.auth.jwttoken);
-    }
+  store.subscribe(() => {
+    // insert data to local Storage
+    updateStateInStorage(store.getState());
   });
-
-  return { store, persistor };
-};
+  return store;
+}
 
 export default configureStore;
