@@ -1,9 +1,25 @@
 import Axios from "axios";
 import { connect } from "react-redux";
+import store from '../../redux/configureStore'; // для получения dispatch
 import { logoutAction } from "../../redux/AuthenticationAction";
 
 const API_BASE_URL = 'http://localhost:8501/api';
 const LOGIN_URL = '/login';
+
+
+
+Axios.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response?.status === 401) {
+        console.warn("❌ Token expired or unauthorized. Redirecting to login...");
+        store.dispatch(logoutAction());
+        window.location.href = '/login'; 
+      }
+      return Promise.reject(error);
+    }
+  );
+
 class ApiService {
 
     get(url) {
@@ -32,7 +48,9 @@ class ApiService {
 
     delete(url) { return Axios.delete(API_BASE_URL + url); }
 
-    login(data) { return Axios.post(API_BASE_URL + LOGIN_URL, data); }
+    login(data) {
+        return Axios.post(API_BASE_URL + '/login', data);
+      }
 
     changeAuthToken(jwt) {
         if (jwt)

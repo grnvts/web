@@ -14,6 +14,10 @@ import UsersPage from './pages/User/UsersPage';
 import BuildingComponent from './pages/Building/BuildingComponent';
 import UpdateBuilding from './pages/Building/UpdateBuilding';
 import BuildingDetail from './pages/Building/BuildingDetail';
+import CreateOrderPage from './pages/Orders/CreateOrderPage';
+import MyOrdersPage from './pages/Orders/MyOrdersPage';
+import OrderDetailPage from './pages/Orders/OrderDetailPage';
+
 
 class App extends Component {
 
@@ -104,8 +108,11 @@ class App extends Component {
             <AuthenticatedRoute path="/building/:username" component={BuildingComponent} isLoggedIn={isLoggedIn}/>
             <AuthenticatedRoute path="/update-building/:buildingid" component={UpdateBuilding} isLoggedIn={isLoggedIn}/>
             <AuthenticatedRoute path="/building-card/:buildingid" component={BuildingDetail} isLoggedIn={isLoggedIn}/>
+              <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />
+              <AuthenticatedRoute exact path="/orders/create" component={CreateOrderPage} isLoggedIn={isLoggedIn} />
+              <AuthenticatedRoute exact path="/orders/:orderId" component={OrderDetailPage} isLoggedIn={isLoggedIn} />
 
-            <Redirect to="/index" />
+              <Redirect to="/index" />
           </Switch>
       );
     }

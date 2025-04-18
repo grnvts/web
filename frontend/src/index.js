@@ -7,6 +7,8 @@ import './bootstrap-override.scss';
 import "./config/i18n";
 import { Provider } from 'react-redux';
 import configureStore from './redux/configureStore';
+import './config/i18n'; 
+
 
 const store = configureStore();
 ReactDOM.render(

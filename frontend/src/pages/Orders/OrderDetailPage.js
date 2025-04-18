@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import OrderCard from '../../components/OrderCard';
-import OrderService from '../../services/OrderService';
+import OrderService from '../../Services/OrderService';
 import { useParams } from 'react-router-dom';
-import AlertifyService from '../../services/AlertifyService';
+import AlertifyService from '../../Services/AlertifyService';
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();

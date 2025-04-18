@@ -9,25 +9,31 @@ const secureLS = new SecureLS();
 
 const getStateFromStorage = () => {
   const auth = secureLS.get("auth");
-  //const auth = localStorage.getItem("auth");
-  let stateInLocalStorage = {
-    isLoggedIn: false,
-    username: undefined,
-    jwttoken: undefined,
-    password: undefined,
-    email: undefined,
-    image: undefined
-  };
 
-  if (auth) {
-    stateInLocalStorage = auth;
-    // try {
-    //   stateInLocalStorage = JSON.parse(auth);
-    // } catch (error) {    }
+  if (auth?.jwttoken) {
+    try {
+      const payload = JSON.parse(atob(auth.jwttoken.split('.')[1]));
+      const exp = payload.exp * 1000;
+      if (Date.now() > exp) {
+        secureLS.remove("auth");
+        ApiService.changeAuthToken(null);
+        window.location.href = '/login'; // 👈 либо используем history.push("/login")
+        return {
+          isLoggedIn: false
+        };
+      }
+    } catch (e) {
+      console.error("Invalid JWT", e);
+    }
   }
-  ApiService.changeAuthToken(auth.jwttoken);
-  return stateInLocalStorage;
-}
+
+  return auth || {
+    isLoggedIn: false
+  };
+};
+
+
+
 
 const updateStateInStorage = newState => {
   secureLS.set("auth", newState);
@@ -49,5 +55,6 @@ const configureStore = () => {
   });
   return store;
 }
+
 
 export default configureStore;

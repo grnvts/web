@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import OrderForm from '../../components/OrderForm';
-import OrderService from '../../services/OrderService';
-import AlertifyService from '../../services/AlertifyService';
+import OrderService from '../../Services/OrderService';
+import AlertifyService from '../../Services/AlertifyService';
 
 const CreateOrderPage = () => {
   const [buildings, setBuildings] = useState([]);

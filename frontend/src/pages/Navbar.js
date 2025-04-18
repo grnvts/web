@@ -82,9 +82,17 @@ const NavbarComponent = props =>{
                 <li className="nav-item active">
                     <Link className="nav-link" to="/index">{t('HomePage')} <span className="sr-only">(current)</span></Link>
                 </li>
-                <li className="nav-item active">
-                    <Link className="nav-link" to="/orders">{t('Orders')} </Link>
+                <li className="nav-item dropdown">
+  <span className="nav-link dropdown-toggle" data-toggle="dropdown" style={{ cursor: 'pointer' }}>
+    {t('Orders')}
+  </span>
+                    <div className="dropdown-menu">
+                        <Link className="dropdown-item" to="/orders">{t('My Orders')}</Link>
+                        <Link className="dropdown-item" to="/orders/create">{t('Create Order')}</Link>
+                    </div>
                 </li>
+
+
                 {isAdmin && (
                     <li className="nav-item active">
                         <Link className="nav-link" to="/users">{t('Users')} </Link>

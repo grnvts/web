@@ -22,17 +22,22 @@
             };
         }
         componentDidMount() {
-            Axios.interceptors.request.use(request => {
-                this.setState({ pendingApiCall: true })
+            this.reqInterceptor = Axios.interceptors.request.use(request => {
+                this.setState({ pendingApiCall: true });
                 return request;
             });
-            Axios.interceptors.response.use(request => {
-                this.setState({ pendingApiCall: false })
-                return request;
+            this.resInterceptor = Axios.interceptors.response.use(response => {
+                this.setState({ pendingApiCall: false });
+                return response;
             }, error => {
-                this.setState({ pendingApiCall: false })
-                throw error;
+                this.setState({ pendingApiCall: false });
+                return Promise.reject(error);
             });
+        }
+
+        componentWillUnmount() {
+            Axios.interceptors.request.eject(this.reqInterceptor);
+            Axios.interceptors.response.eject(this.resInterceptor);
         }
         onChangeData = (type, event) => {
             if (this.state.error)
@@ -124,10 +129,7 @@
                         }
                     </div>
                     <div className="col-lg-3">
-                        <img style={{ height: 200 }} src="https://lovegospelmusic.com/wp-content/uploads/2020/07/Lovemusic-Income-Program-Login-Page.png" alt="" />
-
-                        {/* <img style={{ height: 200 }} src="https://images.squarespace-cdn.com/content/v1/55e06d0ee4b0718764fcc921/1507805805238-M8XG4RMCMWITZ7LJGEEF/ke17ZwdGBToddI8pDm48kETUuxmp5xHjxR_mq0kKQipZw-zPPgdn4jUwVcJE1ZvWhcwhEtWJXoshNdA9f1qD7XbdY2v8mR--EcMEe2KaFSVzNBu9Qs0q6qR3QzqKFtHJVM6oy5K0EEbGe9v0FXNpEg/slidebank+login.gif" alt="" /> */}
-                    </div>
+                        </div>
                     <div className="col"></div>
                     <div className="col-lg-12">
 
@@ -136,6 +138,5 @@
             )
         }
     }
-    // withTranslation to change language (turkısh <=> english)
-    // connect for redux
+
     export default connect()(withTranslation()(withRouter(UserLoginPage)));
