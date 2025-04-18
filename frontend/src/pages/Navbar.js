@@ -38,7 +38,7 @@ const NavbarComponent = props =>{
     //     this.props.dispatch(logoutAction());
     // }
 
-    useEffect(()=>{ 
+    useEffect(()=>{
         document.addEventListener("click", menuClickTracker)
         return () =>{
             document.removeEventListener("click",menuClickTracker);
@@ -82,17 +82,9 @@ const NavbarComponent = props =>{
                 <li className="nav-item active">
                     <Link className="nav-link" to="/index">{t('HomePage')} <span className="sr-only">(current)</span></Link>
                 </li>
-                <li className="nav-item dropdown">
-  <span className="nav-link dropdown-toggle" data-toggle="dropdown" style={{ cursor: 'pointer' }}>
-    {t('Orders')}
-  </span>
-                    <div className="dropdown-menu">
-                        <Link className="dropdown-item" to="/orders">{t('My Orders')}</Link>
-                        <Link className="dropdown-item" to="/orders/create">{t('Create Order')}</Link>
-                    </div>
+                <li className="nav-item active">
+                    <Link className="nav-link" to="/orders">{t('Orders')} </Link>
                 </li>
-
-
                 {isAdmin && (
                     <li className="nav-item active">
                         <Link className="nav-link" to="/users">{t('Users')} </Link>
@@ -104,21 +96,21 @@ const NavbarComponent = props =>{
                 {/* DropDown Menu */}
                 <li  className="naw-item dropdown ml-3" style={{ cursor: "pointer" }} ref={dropDownMenuArea}>
                     <div className="d-flex" onClick={() => setDropDownVisible(true)}>
-                        <ProfileImage 
-                            width="32" 
-                            height="32" 
-                            imageSource={imageSource} 
-                            username={username} 
+                        <ProfileImage
+                            width="32"
+                            height="32"
+                            imageSource={imageSource}
+                            username={username}
                             className="m-auto"
-                        /> 
+                        />
                         <span className="nav-link dropdown-toggle">{username} </span>
                     </div>
-                    <div className={dropdownClassName}> 
-                        <Link 
-                            className="dropdown-item" 
-                            to={"/user/" + username} 
+                    <div className={dropdownClassName}>
+                        <Link
+                            className="dropdown-item"
+                            to={"/user/" + username}
                             onClick={() => setDropDownVisible(false)}> {t("My Profile")} </Link>
-                            
+
                         <span className="dropdown-item" onClick={onLogout} style={{ cursor: "pointer" }}>
                             {t('Logout')}
                         </span>

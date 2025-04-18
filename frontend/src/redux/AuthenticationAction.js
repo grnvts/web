@@ -28,8 +28,8 @@ export const loginHandler = (credentials) => async (dispatch) => {
             isLoggedIn: true
         };
 
-        ApiService.changeAuthToken(data.jwttoken);
-        dispatch(loginAction(authState));
+        ApiService.changeAuthToken(data.jwttoken); // Устанавливаем токен
+        dispatch(loginAction(authState)); // Обновляем Redux
         return response;
     } catch (error) {
         throw error;

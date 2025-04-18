@@ -14,141 +14,130 @@ import UsersPage from './pages/User/UsersPage';
 import BuildingComponent from './pages/Building/BuildingComponent';
 import UpdateBuilding from './pages/Building/UpdateBuilding';
 import BuildingDetail from './pages/Building/BuildingDetail';
-import CreateOrderPage from './pages/Orders/CreateOrderPage';
-import MyOrdersPage from './pages/Orders/MyOrdersPage';
-import OrderDetailPage from './pages/Orders/OrderDetailPage';
-
 
 class App extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      // username: null,
-      // isLoggedIn: null,
-      // jwttoken: null,
-      // email: null,
-      // image: null
-    };
-    // this.onLoginSuccess = this.onLoginSuccess.bind(this);
-    // this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            // username: null,
+            // isLoggedIn: null,
+            // jwttoken: null,
+            // email: null,
+            // image: null
+        };
+        // this.onLoginSuccess = this.onLoginSuccess.bind(this);
+        // this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+    }
 
-  // onLoginSuccess = (authState) => {
-  //   ApiService.changeAuthToken(authState.jwttoken);
-  //   localStorage.setItem("username", authState.username);
-  //   localStorage.setItem("jwttoken", authState.jwttoken);
-  //   localStorage.setItem("isLoggedIn", true);
-  //   this.setState({ ...authState, isLoggedIn: true });
-  //
-  //   return <Redirect to="/index" />
-  // }
+    // onLoginSuccess = (authState) => {
+    //   ApiService.changeAuthToken(authState.jwttoken);
+    //   localStorage.setItem("username", authState.username);
+    //   localStorage.setItem("jwttoken", authState.jwttoken);
+    //   localStorage.setItem("isLoggedIn", true);
+    //   this.setState({ ...authState, isLoggedIn: true });
+    //
+    //   return <Redirect to="/index" />
+    // }
     onLoginSuccess = (authState) => {
         ApiService.changeAuthToken(authState.jwttoken);
-
-        // сохраняем в Redux
-        this.props.dispatch({
-            type: 'LOGIN_ACTION',
-            payload: authState
-        });
-
-        return <Redirect to="/index" />
-    }
+        localStorage.setItem("username", authState.username);
+        localStorage.setItem("jwttoken", authState.jwttoken);
+        localStorage.setItem("isLoggedIn", true);
+        this.props.history.push("/index"); // Перенаправление
+    };
     onLogoutSuccess = () => {
         ApiService.changeAuthToken(null);
         this.props.dispatch({ type: 'LOGOUT_ACTION' });
         return <Redirect to="/login" />
     }
 
-  //   onLogoutSuccess = () => {
-  //   ApiService.changeAuthToken(null);
-  //   localStorage.removeItem("jwttoken");
-  //   localStorage.removeItem("username");
-  //   localStorage.removeItem("isLoggedIn");
-  //   //console.log(localStorage)
-  //   this.setState({
-  //     isLoggedin: false,
-  //     username: null,
-  //     jwttoken: null
-  //   });
-  //   return <Redirect to="/login" />
-  // }
-  back() {
-    this.props.history.push('/login');
-  }
-  render() {
-    console.log(this.props.time)
-    // localStorage.removeItem("jwttoken");
-    // localStorage.removeItem("username");
-    // localStorage.removeItem("isLoggedIn");
-
-    let links = null;
-    const { isLoggedIn } = this.props;
-    //console.log(this.props)
-    // if not logged in
-    //if (!AuthenticationService.isUserLoggedIn() ) {
-    if (!isLoggedIn) {
-      links = (
-          <Switch>
-            <Route exact path="/login" component={(props) => <UserLoginPage {...props} onLoginSuccess={this.onLoginSuccess} />} />
-            <Route path="/signup" component={UserSignupPage} />
-            <Route exact path="/" component={(props) => <UserLoginPage {...props} onLoginSuccess={this.onLoginSuccess} />} />
-            <Redirect to="/" />
-          </Switch>
-      );
+    //   onLogoutSuccess = () => {
+    //   ApiService.changeAuthToken(null);
+    //   localStorage.removeItem("jwttoken");
+    //   localStorage.removeItem("username");
+    //   localStorage.removeItem("isLoggedIn");
+    //   //console.log(localStorage)
+    //   this.setState({
+    //     isLoggedin: false,
+    //     username: null,
+    //     jwttoken: null
+    //   });
+    //   return <Redirect to="/login" />
+    // }
+    back() {
+        this.props.history.push('/login');
     }
-    // if logged in
-    //if(AuthenticationService.isUserLoggedIn())  {
-    if (isLoggedIn) {
-      links = (
-          <Switch>
-            <AuthenticatedRoute exact path="/index" component={HomeComponent} isLoggedIn={isLoggedIn} />
-            <AuthenticatedRoute path="/user/:username" component={UserDetailPage} isLoggedIn={isLoggedIn} />
-            <AuthenticatedRoute exact path="/users" component={UsersPage} isLoggedIn={isLoggedIn} />
-            <AuthenticatedRoute path="/building/:username" component={BuildingComponent} isLoggedIn={isLoggedIn}/>
-            <AuthenticatedRoute path="/update-building/:buildingid" component={UpdateBuilding} isLoggedIn={isLoggedIn}/>
-            <AuthenticatedRoute path="/building-card/:buildingid" component={BuildingDetail} isLoggedIn={isLoggedIn}/>
-              <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />
-              <AuthenticatedRoute exact path="/orders/create" component={CreateOrderPage} isLoggedIn={isLoggedIn} />
-              <AuthenticatedRoute exact path="/orders/:orderId" component={OrderDetailPage} isLoggedIn={isLoggedIn} />
+    render() {
+        console.log(this.props.time)
+        // localStorage.removeItem("jwttoken");
+        // localStorage.removeItem("username");
+        // localStorage.removeItem("isLoggedIn");
 
-              <Redirect to="/index" />
-          </Switch>
-      );
-    }
-    return (
-        <div className="container" >
-          <div className="row">
+        let links = null;
+        const { isLoggedIn } = this.props; 
+        //console.log(this.props)
+        // if not logged in
+        //if (!AuthenticationService.isUserLoggedIn() ) {
+        if (!isLoggedIn) {
+            links = (
+                <Switch>
+                    <Route exact path="/login" component={(props) => <UserLoginPage {...props} onLoginSuccess={this.onLoginSuccess} />} />
+                    <Route path="/signup" component={UserSignupPage} />
+                    <Route exact path="/" component={(props) => <UserLoginPage {...props} onLoginSuccess={this.onLoginSuccess} />} />
+                    <Redirect to="/" />
+                </Switch>
+            );
+        }
+        // if logged in
+        //if(AuthenticationService.isUserLoggedIn())  {
+        if (isLoggedIn) {
+            links = (
+                <Switch>
+                    <AuthenticatedRoute exact path="/index" component={HomeComponent} isLoggedIn={isLoggedIn} />
+                    <AuthenticatedRoute path="/user/:username" component={UserDetailPage} isLoggedIn={isLoggedIn} />
+                    <AuthenticatedRoute exact path="/users" component={UsersPage} isLoggedIn={isLoggedIn} />
+                    <AuthenticatedRoute path="/building/:username" component={BuildingComponent} isLoggedIn={isLoggedIn}/>
+                    <AuthenticatedRoute path="/update-building/:buildingid" component={UpdateBuilding} isLoggedIn={isLoggedIn}/>
+                    <AuthenticatedRoute path="/building-card/:buildingid" component={BuildingDetail} isLoggedIn={isLoggedIn}/>
 
-            <div className="col-sm-12">
-              <BrowserRouter>
-                <NavbarComponent
-                    // isLoggedin={isLoggedin}
-                    // username={username}
-                    // jwttoken={jwttoken}
-                    onLogoutSuccess={this.onLogoutSuccess}
-                />
-                <LanguageSelector />
-                {links}
-              </BrowserRouter>
+                    <Redirect to="/index" />
+                </Switch>
+            );
+        }
+        return (
+            <div className="container" >
+                <div className="row">
 
-            </div>
+                    <div className="col-sm-12">
+                        <BrowserRouter>
+                            <NavbarComponent
+                                // isLoggedin={isLoggedin}
+                                // username={username}
+                                // jwttoken={jwttoken}
+                                onLogoutSuccess={this.onLogoutSuccess}
+                            />
+                            <LanguageSelector />
+                            {links}
+                        </BrowserRouter>
+
+                    </div>
 
 
-            {/* <UserSignupPage /> */}
-            {/* <UserLoginPage />
+                    {/* <UserSignupPage /> */}
+                    {/* <UserLoginPage />
           <LanguageSelector /> */}
-          </div>
-        </div>
-    )
-  }
+                </div>
+            </div>
+        )
+    }
 }
 const mapStateToProps = (store) => {
-  return {
-    isLoggedIn: store.isLoggedIn,
-    username: store.username,
-    jwttoken: store.jwttoken
-  };
+    return {
+        isLoggedIn: store.isLoggedIn,
+        username: store.username,
+        jwttoken: store.jwttoken
+    };
 };
 
 export default connect(mapStateToProps)(App);
