@@ -14,57 +14,47 @@ import UsersPage from './pages/User/UsersPage';
 import BuildingComponent from './pages/Building/BuildingComponent';
 import UpdateBuilding from './pages/Building/UpdateBuilding';
 import BuildingDetail from './pages/Building/BuildingDetail';
+import MyOrdersPage from "./pages/Orders/MyOrdersPage";
+import OrderDetailPage from "./pages/Orders/OrderDetailPage";
+import CreateOrderPage from "./pages/Orders/CreateOrderPage";
 
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            // username: null,
-            // isLoggedIn: null,
-            // jwttoken: null,
-            // email: null,
-            // image: null
+            username: null,
+            isLoggedIn: null,
+            jwttoken: null,
+            email: null,
+            image: null
         };
         // this.onLoginSuccess = this.onLoginSuccess.bind(this);
         // this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
 
-    // onLoginSuccess = (authState) => {
-    //   ApiService.changeAuthToken(authState.jwttoken);
-    //   localStorage.setItem("username", authState.username);
-    //   localStorage.setItem("jwttoken", authState.jwttoken);
-    //   localStorage.setItem("isLoggedIn", true);
-    //   this.setState({ ...authState, isLoggedIn: true });
-    //
-    //   return <Redirect to="/index" />
-    // }
     onLoginSuccess = (authState) => {
         ApiService.changeAuthToken(authState.jwttoken);
         localStorage.setItem("username", authState.username);
         localStorage.setItem("jwttoken", authState.jwttoken);
         localStorage.setItem("isLoggedIn", true);
-        this.props.history.push("/index"); // Перенаправление
-    };
+        this.setState({ ...authState, isLoggedIn: true });
+
+        return <Redirect to="/index" />
+    }
     onLogoutSuccess = () => {
         ApiService.changeAuthToken(null);
-        this.props.dispatch({ type: 'LOGOUT_ACTION' });
+        localStorage.removeItem("jwttoken");
+        localStorage.removeItem("username");
+        localStorage.removeItem("isLoggedIn");
+        //console.log(localStorage)
+        this.setState({
+            isLoggedin: false,
+            username: null,
+            jwttoken: null
+        });
         return <Redirect to="/login" />
     }
-
-    //   onLogoutSuccess = () => {
-    //   ApiService.changeAuthToken(null);
-    //   localStorage.removeItem("jwttoken");
-    //   localStorage.removeItem("username");
-    //   localStorage.removeItem("isLoggedIn");
-    //   //console.log(localStorage)
-    //   this.setState({
-    //     isLoggedin: false,
-    //     username: null,
-    //     jwttoken: null
-    //   });
-    //   return <Redirect to="/login" />
-    // }
     back() {
         this.props.history.push('/login');
     }
@@ -75,7 +65,7 @@ class App extends Component {
         // localStorage.removeItem("isLoggedIn");
 
         let links = null;
-        const { isLoggedIn } = this.props; 
+        const { isLoggedIn } = this.props;
         //console.log(this.props)
         // if not logged in
         //if (!AuthenticationService.isUserLoggedIn() ) {
@@ -100,6 +90,9 @@ class App extends Component {
                     <AuthenticatedRoute path="/building/:username" component={BuildingComponent} isLoggedIn={isLoggedIn}/>
                     <AuthenticatedRoute path="/update-building/:buildingid" component={UpdateBuilding} isLoggedIn={isLoggedIn}/>
                     <AuthenticatedRoute path="/building-card/:buildingid" component={BuildingDetail} isLoggedIn={isLoggedIn}/>
+                    <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />
+                    <AuthenticatedRoute exact path="/orders/create" component={CreateOrderPage} isLoggedIn={isLoggedIn} />
+                    <AuthenticatedRoute exact path="/orders/:orderId" component={OrderDetailPage} isLoggedIn={isLoggedIn} />
 
                     <Redirect to="/index" />
                 </Switch>

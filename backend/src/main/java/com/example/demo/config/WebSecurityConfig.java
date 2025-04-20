@@ -19,6 +19,9 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import com.example.demo.jwt.config.JwtAuthenticationEntryPoint;
 import com.example.demo.jwt.config.JwtRequestFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -42,6 +45,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
 	}
 
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.addAllowedOrigin("http://localhost:3000"); // Или "*", но лучше конкретно
+		configuration.addAllowedMethod("*");
+		configuration.addAllowedHeader("*");
+		configuration.setAllowCredentials(true); // если нужен jwt-cookie
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -53,11 +69,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 		return super.authenticationManagerBean();
 	}
 
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("*")
-		.allowedMethods("HEAD", "GET", "PUT", "POST",
-		"DELETE", "PATCH").allowedHeaders("*");
-	}
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry.addMapping("/**").allowedOrigins("*")
+//		.allowedMethods("HEAD", "GET", "PUT", "POST",
+//		"DELETE", "PATCH").allowedHeaders("*");
+//	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -71,6 +87,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .antMatchers(HttpMethod.POST,"/api/login").permitAll()
         .antMatchers(HttpMethod.POST,"/api/user").permitAll()
 		.antMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN")
+				.antMatchers(HttpMethod.GET, "/api/orders/my").authenticated()
+				.antMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
+				.antMatchers(HttpMethod.POST, "/api/orders").authenticated()
 		.antMatchers("/api/user/**").authenticated()
         .and()
         .authorizeRequests().anyRequest().authenticated()

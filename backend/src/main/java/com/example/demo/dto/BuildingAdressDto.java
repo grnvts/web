@@ -22,14 +22,14 @@ public class BuildingAdressDto {
     private String street;
     private String buildingNo;
     private String image;
-    
+
     public BuildingAdressDto(BuildingAdress adress) {
     	this.id = adress.getId();
     	this.city = adress.getCity();
     	this.district = adress.getDistrict();
     	this.quarter = adress.getQuarter();
     	this.street = adress.getStreet();
-    	this.buildingNo = adress.getBuildingNo(); 
+    	this.buildingNo = adress.getBuildingNo();
     	this.image = adress.getImage();
     }
 }

@@ -15,50 +15,37 @@ class UserLoginPage extends Component {
             email: null,
             password: '',
             error: null,
-            errors: {},
+            errors: {
+            },
             pendingApiCall: false
+
         };
-
-        this.requestInterceptor = null;
-        this.responseInterceptor = null;
     }
-
     componentDidMount() {
-        this.requestInterceptor = Axios.interceptors.request.use(request => {
-            this.setState({ pendingApiCall: true });
+        Axios.interceptors.request.use(request => {
+            this.setState({ pendingApiCall: true })
             return request;
         });
-
-        this.responseInterceptor = Axios.interceptors.response.use(
-            response => {
-                this.setState({ pendingApiCall: false });
-                return response;
-            },
-            error => {
-                this.setState({ pendingApiCall: false });
-                throw error;
-            }
-        );
+        Axios.interceptors.response.use(request => {
+            this.setState({ pendingApiCall: false })
+            return request;
+        }, error => {
+            this.setState({ pendingApiCall: false })
+            throw error;
+        });
     }
-
-    componentWillUnmount() {
-        // Eject Axios interceptors to prevent memory leaks
-        if (this.requestInterceptor !== null) {
-            Axios.interceptors.request.eject(this.requestInterceptor);
-        }
-        if (this.responseInterceptor !== null) {
-            Axios.interceptors.response.eject(this.responseInterceptor);
-        }
-    }
-
     onChangeData = (type, event) => {
-        if (this.state.error) this.setState({ error: null });
+        if (this.state.error)
+            this.setState({ error: null })
         const stateData = this.state;
-        stateData[type] = event;
-        this.setState({ stateData });
-    };
+        stateData[type] = event
 
+        this.setState({ stateData });
+    }
     onClickLogin = async (event) => {
+        //this.setState({ pendingApiCall: true })
+
+
         event.preventDefault();
         if (this.state.error) {
             this.setState({ error: null });
@@ -73,17 +60,19 @@ class UserLoginPage extends Component {
         } catch (error) {
             if (error.response) {
                 if (error.response.data.message) {
-                    console.log(error.response);
-                    this.setState({ error: error.response.data.message });
-                }
-            } else if (error.request) {
-                console.log(error.request);
-            } else {
-                console.log(error.message);
-            }
-        }
-    };
+                    console.log(error.response)
 
+                    this.setState({ error: error.response.data.message })
+                }
+            }
+            else if (error.request)
+                console.log(error.request);
+            else
+                console.log(error.message);
+        }
+        //this.setState({ pendingApiCall: false })
+
+    }
     render() {
         const { username, password } = this.state.errors;
         const btnEnable = this.state.username && this.state.password;
@@ -92,10 +81,11 @@ class UserLoginPage extends Component {
             <div className="container row">
                 <div className="col-lg-8">
                     <h3>{t('Login')}</h3>
+
                     <p className="description-p" style={{ color: "red" }}>
                         ( * ) {t('Required field')}
                     </p>
-                    <form>
+                    <form >
                         <Input
                             label={t("Username *")}
                             error={username}
@@ -114,32 +104,38 @@ class UserLoginPage extends Component {
                             valueName={this.state.password}
                             onChangeData={this.onChangeData}
                         />
-                        {this.state.pendingApiCall ? (
-                            <Spinner />
-                        ) : (
-                            <button
-                                className="btn btn-dark"
-                                type="button"
-                                disabled={!btnEnable}
-                                onClick={this.onClickLogin}
-                            >
-                                {t('Login')}
-                            </button>
-                        )}
+                        {
+                            this.state.pendingApiCall ? <Spinner /> :
+                                <button
+                                    className="btn btn-dark"
+                                    type="button"
+                                    disabled={!btnEnable}
+                                    onClick={this.onClickLogin}>{t('Login')}</button>
+                        }
+
                     </form>
                     <br />
-                    {this.state.error && (
+                    {this.state.error &&
                         <div className="alert alert-danger" role="alert">
                             {this.state.error}
                         </div>
-                    )}
+
+
+                    }
                 </div>
-                <div className="col-lg-3"></div>
+                <div className="col-lg-3">
+                    <img style={{ height: 200 }} src="https://lovegospelmusic.com/wp-content/uploads/2020/07/Lovemusic-Income-Program-Login-Page.png" alt="" />
+
+                    {/* <img style={{ height: 200 }} src="https://images.squarespace-cdn.com/content/v1/55e06d0ee4b0718764fcc921/1507805805238-M8XG4RMCMWITZ7LJGEEF/ke17ZwdGBToddI8pDm48kETUuxmp5xHjxR_mq0kKQipZw-zPPgdn4jUwVcJE1ZvWhcwhEtWJXoshNdA9f1qD7XbdY2v8mR--EcMEe2KaFSVzNBu9Qs0q6qR3QzqKFtHJVM6oy5K0EEbGe9v0FXNpEg/slidebank+login.gif" alt="" /> */}
+                </div>
                 <div className="col"></div>
-                <div className="col-lg-12"></div>
+                <div className="col-lg-12">
+
+                </div>
             </div>
-        );
+        )
     }
 }
-
+// withTranslation to change language (turkısh <=> english)
+// connect for redux
 export default connect()(withTranslation()(withRouter(UserLoginPage)));

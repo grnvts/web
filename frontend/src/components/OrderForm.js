@@ -3,19 +3,30 @@ import { useTranslation } from 'react-i18next';
 
 const OrderForm = ({ onSubmit }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    serviceType: '',
-    city: '',
-    street: '',
-    buildingNo: '',
-    orderDetails: '',
-    startDate: '',
-  });
+    const [formData, setFormData] = useState({
+        serviceType: '',
+        address: {
+            city: '',
+            street: '',
+            buildingNo: '',
+            apartmentNo: ''
+        },
+        orderDetails: '',
+        startDate: ''
+    });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (name.startsWith('address.')) {
+            const field = name.split('.')[1];
+            setFormData((prev) => ({
+                ...prev,
+                address: { ...prev.address, [field]: value }
+            }));
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
+    };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,43 +51,55 @@ const OrderForm = ({ onSubmit }) => {
         </select>
       </div>
 
-      <div className="form-group">
-        <label>{t('City')}</label>
-        <input
-          type="text"
-          name="city"
-          className="form-control"
-          value={formData.city}
-          onChange={handleChange}
-          required
-        />
-      </div>
+        <div className="form-group">
+            <label>{t('City')}</label>
+            <input
+                type="text"
+                name="address.city"
+                className="form-control"
+                value={formData.address.city}
+                onChange={handleChange}
+                required
+            />
+        </div>
 
-      <div className="form-group">
-        <label>{t('Street')}</label>
-        <input
-          type="text"
-          name="street"
-          className="form-control"
-          value={formData.street}
-          onChange={handleChange}
-          required
-        />
-      </div>
+        <div className="form-group">
+            <label>{t('Street')}</label>
+            <input
+                type="text"
+                name="address.street"
+                className="form-control"
+                value={formData.address.street}
+                onChange={handleChange}
+                required
+            />
+        </div>
 
-      <div className="form-group">
-        <label>{t('Building Number')}</label>
-        <input
-          type="text"
-          name="buildingNo"
-          className="form-control"
-          value={formData.buildingNo}
-          onChange={handleChange}
-          required
-        />
-      </div>
+        <div className="form-group">
+            <label>{t('Building Number')}</label>
+            <input
+                type="text"
+                name="address.buildingNo"
+                className="form-control"
+                value={formData.address.buildingNo}
+                onChange={handleChange}
+                required
+            />
+        </div>
 
-      <div className="form-group">
+        <div className="form-group">
+            <label>{t('Apartment Number')}</label>
+            <input
+                type="text"
+                name="address.apartmentNo"
+                className="form-control"
+                value={formData.address.apartmentNo}
+                onChange={handleChange}
+            />
+        </div>
+
+
+        <div className="form-group">
         <label>{t('Order Details')}</label>
         <textarea
           name="orderDetails"

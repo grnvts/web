@@ -25,47 +25,47 @@ DROP TABLE IF EXISTS owner CASCADE;
 
 
 
+--
+-- -- 4. Таблица адресов (много адресов для пользователя)
+-- CREATE TABLE addresses (
+--                            id BIGSERIAL PRIMARY KEY,
+--                            user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+--                            address_type VARCHAR(50) NOT NULL,
+--                            street VARCHAR(255) NOT NULL,
+--                            city VARCHAR(100) NOT NULL,
+--                            postal_code VARCHAR(20),
+--                            country VARCHAR(100) DEFAULT 'Беларусь',
+--                            is_primary BOOLEAN DEFAULT false
+-- );
 
--- 4. Таблица адресов (много адресов для пользователя)
-CREATE TABLE addresses (
-                           id BIGSERIAL PRIMARY KEY,
-                           user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                           address_type VARCHAR(50) NOT NULL,
-                           street VARCHAR(255) NOT NULL,
-                           city VARCHAR(100) NOT NULL,
-                           postal_code VARCHAR(20),
-                           country VARCHAR(100) DEFAULT 'Беларусь',
-                           is_primary BOOLEAN DEFAULT false
-);
 
+-- -- 6. Таблица заказов
+-- CREATE TABLE orders (
+--                         id BIGSERIAL PRIMARY KEY,
+--                         client_id BIGINT NOT NULL REFERENCES users(id),
+--                         brigadier_id BIGINT REFERENCES users(id),
+--                         address_id BIGINT NOT NULL REFERENCES addresses(id),
+--                         order_details TEXT NOT NULL,
+--                         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--                         status VARCHAR(50) DEFAULT 'NEW',
+--                         price NUMERIC(15,2),
+--                         start_date DATE,
+--                         end_date DATE
+-- );
 
--- 6. Таблица заказов
-CREATE TABLE orders (
-                        id BIGSERIAL PRIMARY KEY,
-                        client_id BIGINT NOT NULL REFERENCES users(id),
-                        brigadier_id BIGINT REFERENCES users(id),
-                        address_id BIGINT NOT NULL REFERENCES addresses(id),
-                        order_details TEXT NOT NULL,
-                        created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        status VARCHAR(50) DEFAULT 'NEW',
-                        price NUMERIC(15,2),
-                        start_date DATE,
-                        end_date DATE
-);
+-- -- 7. Таблица отзывов
+-- CREATE TABLE reviews (
+--                          id BIGSERIAL PRIMARY KEY,
+--                          order_id BIGINT NOT NULL REFERENCES orders(id),
+--                          rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+--                          comment TEXT,
+--                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
 
--- 7. Таблица отзывов
-CREATE TABLE reviews (
-                         id BIGSERIAL PRIMARY KEY,
-                         order_id BIGINT NOT NULL REFERENCES orders(id),
-                         rating INTEGER CHECK (rating BETWEEN 1 AND 5),
-                         comment TEXT,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Индексы
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_addresses_user ON addresses(user_id);
+-- -- Индексы
+-- CREATE INDEX idx_users_email ON users(email);
+-- CREATE INDEX idx_orders_status ON orders(status);
+-- CREATE INDEX idx_addresses_user ON addresses(user_id);
 
 
 

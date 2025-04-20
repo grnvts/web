@@ -10,7 +10,11 @@ class OrderService {
   }
 
   getMyOrders() {
-    return ApiService.get('/orders/my');
+    return ApiService.get('/orders/my', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
   }
 
   getOrderById(orderId) {

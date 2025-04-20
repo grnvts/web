@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.OrderStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,10 +14,12 @@ public class OrderDto {
     private String clientUsername;
     private Long brigadierId;
     private String brigadierUsername;
-    private Long buildingId;
+    private AddressDto address;
+    private Long addressId;
     private String orderDetails;
     private LocalDateTime createdDate;
-    private String status;
+    private OrderStatus status;
+    private String serviceType;
     private BigDecimal price;
     private LocalDate startDate;
     private LocalDate endDate;

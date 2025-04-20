@@ -1,25 +1,20 @@
 
-import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, { Component } from 'react';
+import { Route, Redirect } from 'react-router-dom' ;
 
-const AuthenticatedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
-    return (
-        <Route
-            {...rest}
-            render={(props) =>
-                isLoggedIn ? (
-                    <Component {...props} />
-                ) : (
-                    <Redirect to="/login" /> 
-                )
-            }
-        />
-    );
-};
-const mapStateToProps = (state) => ({
-    isLoggedIn: state.isLoggedIn // Убедитесь, что это значение верное
-});
-
-
-export default connect(mapStateToProps)(AuthenticatedRoute);
+export default class AuthenticatedRoute extends Component {
+    render() {
+        //if(AuthenticationService.isUserLoggedIn())
+        //console.log(this.props.isLoggedIn)
+        if(this.props.isLoggedIn)
+            return <Route {...this.props}/>
+        else
+            return <Redirect to="/" />
+        /*
+        if (AuthenticationService.isUserLoggedIn()) {
+            return <Route {...this.props}/>
+        } else {
+            return <Redirect to="/login"/>
+        }*/
+    }
+}

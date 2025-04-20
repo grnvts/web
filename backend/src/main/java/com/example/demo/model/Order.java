@@ -6,13 +6,13 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {//заказы
+public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,9 +25,10 @@ public class Order {//заказы
     @JoinColumn(name = "brigadier_id")
     private User brigadier;
 
-    @ManyToOne
-    @JoinColumn(name = "building_id", nullable = false)
-    private Building building;
+
+
+    @Column(name = "service_type", nullable = false)
+    private String serviceType;
 
     @Column(name = "order_details", nullable = false)
     private String orderDetails;
@@ -35,8 +36,8 @@ public class Order {//заказы
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
 
-    @Column(name = "status")
-    private String status = "NEW";
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status = OrderStatus.CREATED;
 
     private BigDecimal price;
 
@@ -45,4 +46,8 @@ public class Order {//заказы
 
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address;
 }
