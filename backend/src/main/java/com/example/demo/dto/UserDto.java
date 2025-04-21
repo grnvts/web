@@ -1,6 +1,8 @@
 package com.example.demo.dto;
 
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -40,6 +42,7 @@ public class UserDto {
 	private Date createdDate;
 
 	private String image;
+	private Set<String> roles;
 
 
 	
@@ -57,5 +60,8 @@ public class UserDto {
 		this.bornDate=user.getBornDate();
 		this.createdDate=user.getCreatedDate();
 		this.image=user.getImage();
+		this.roles = user.getRoles().stream()
+				.map(role -> role.getName().name())
+				.collect(Collectors.toSet());
 	}
 }

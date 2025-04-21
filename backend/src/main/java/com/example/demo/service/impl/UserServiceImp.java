@@ -56,7 +56,7 @@ public class UserServiceImp implements UserService {
 			pageDto = pdoUser.map(UserDto::new);
 			return pageDto;
 		}
-		//Page<User> pageList = repository.findAll(page).map(UserDto::new); 
+		//Page<User> pageList = repository.findAll(page).map(UserDto::new);
 		pageDto = repository.findAll(page).map(UserDto::new);
 		return pageDto;
 	}

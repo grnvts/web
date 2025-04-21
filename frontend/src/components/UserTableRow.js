@@ -1,13 +1,12 @@
 import defaultPicture from "./../assets/profile.png";
 import React from 'react';
-import { BACKEND_IMAGE_URL } from '../Shared/config';
 import { Link } from "react-router-dom";
 import { withTranslation } from "react-i18next";
 import ProfileImage from "./ProfileImage";
 
 const UserTableRow = (props) => {
     const { t, user } = props; // Получаем `t` из пропсов
-    const { username, name, surname, email, image } = user;
+    const { username, name, surname, email, image, roles } = user; // Добавляем `roles`
 
     return (
         <tr key={username}>
@@ -23,6 +22,7 @@ const UserTableRow = (props) => {
             <td>{name}</td>
             <td>{surname}</td>
             <td>{email}</td>
+            <td>{roles && roles.length > 0 ? roles.join(', ') : t('No Roles')}</td> {/* Отображаем роли через запятую */}
             <td>
                 <Link
                     to={'/user/' + username}
@@ -35,4 +35,4 @@ const UserTableRow = (props) => {
     );
 };
 
-export default withTranslation()(UserTableRow); // Обернули в withTranslation()
+export default withTranslation()(UserTableRow);

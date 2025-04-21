@@ -42,6 +42,7 @@ public class UserApi {
 		return ResponseEntity.ok(service.getAll(page, authHeader));
 	}
 
+
 	@GetMapping("/{username}")
 	public ResponseEntity<UserDto> getUser(@PathVariable String username) {
 		return ResponseEntity.ok(service.getUser(username));

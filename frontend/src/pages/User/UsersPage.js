@@ -15,6 +15,7 @@ class UsersPage extends Component {
                 number: 0,
                 size: 10,
             },
+            rolesFilter: '', // Фильтр по роли
             jwttoken: props.jwttoken,
             isAdmin: props.roles?.includes('ROLE_ADMIN'), // Проверяем, является ли пользователь администратором
         };
@@ -34,14 +35,12 @@ class UsersPage extends Component {
             const response = await UserService.getUsers(number, size);
             this.setState({ page: response.data });
         } catch (error) {
-            if (error.response) {
-                AlertifyService.alert(error.response.data.message);
-            } else if (error.request) {
-                AlertifyService.alert(error.request);
-            } else {
-                AlertifyService.alert(error.message);
-            }
+            AlertifyService.error('Failed to load users');
         }
+    };
+
+    handleRoleFilterChange = (e) => {
+        this.setState({ rolesFilter: e.target.value });
     };
 
     onClickNext = () => {
@@ -49,9 +48,9 @@ class UsersPage extends Component {
         this.getUsers(nextPage, this.state.page.size);
     };
 
-    onClickPrevios = () => {
-        const nextPage = this.state.page.number - 1;
-        this.getUsers(nextPage, this.state.page.size);
+    onClickPrevious = () => {
+        const prevPage = this.state.page.number - 1;
+        this.getUsers(prevPage, this.state.page.size);
     };
 
     render() {
@@ -59,8 +58,14 @@ class UsersPage extends Component {
             return <Redirect to="/index" />;
         }
 
-        const { content: users, first, last, number, totalPages } = this.state.page;
+        const { content: users, first, last } = this.state.page;
         const { t } = this.props;
+        const { rolesFilter } = this.state;
+
+        // Фильтруем пользователей по роли
+        const filteredUsers = rolesFilter
+            ? users.filter((user) => user.roles.includes(rolesFilter))
+            : users;
 
         return (
             <div className="col-sm-12">
@@ -69,23 +74,35 @@ class UsersPage extends Component {
                         <div className="d-flex justify-content-center">{t('Users')}</div>
                     </h3>
 
-                    <div className="card-header d-flex justify-content-between bd-highlight mb-3">
-                        <div className="d-flex justify-content-start">
-                            {first === false && (
-                                <button onClick={this.onClickPrevios} className="btn btn-secondary btn-sm">
+                    <div className="card-header d-flex justify-content-between">
+                        <div>
+                            <label htmlFor="roleFilter">{t('Filter by Role')}:</label>
+                            <select
+                                id="roleFilter"
+                                className="form-control"
+                                value={rolesFilter}
+                                onChange={this.handleRoleFilterChange}
+                            >
+                                <option value="">{t('All Roles')}</option>
+                                <option value="ROLE_ADMIN">{t('Admin')}</option>
+                                <option value="ROLE_USER">{t('User')}</option>
+                                <option value="ROLE_BRIGADIER">{t('Brigadier')}</option>
+                            </select>
+                        </div>
+                        <div>
+                            {!first && (
+                                <button onClick={this.onClickPrevious} className="btn btn-secondary btn-sm">
                                     {t('Previous')}
                                 </button>
                             )}
-                        </div>
-
-                        <div className="d-flex justify-content-end">
-                            {last === false && (
+                            {!last && (
                                 <button onClick={this.onClickNext} className="btn btn-secondary btn-sm">
                                     {t('Next')}
                                 </button>
                             )}
                         </div>
                     </div>
+
                     <table className="table table-hover">
                         <thead>
                             <tr>
@@ -94,11 +111,12 @@ class UsersPage extends Component {
                                 <th scope="col">{t('Name')}</th>
                                 <th scope="col">{t('Surname')}</th>
                                 <th scope="col">{t('Email')}</th>
+                                <th scope="col">{t('Roles')}</th>
                                 <th scope="col">{t('Action')}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
+                            {filteredUsers.map((user) => (
                                 <UserTableRow user={user} key={user.username} />
                             ))}
                         </tbody>
