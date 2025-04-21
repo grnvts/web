@@ -89,6 +89,7 @@ const NavbarComponent = props =>{
                     <div className="dropdown-menu">
                         <Link className="dropdown-item" to="/orders">{t('My Orders')}</Link>
                         <Link className="dropdown-item" to="/orders/create">{t('Create Order')}</Link>
+                        {isAdmin && ( <Link className="dropdown-item" to="/orders/all">{t('All Orders')}</Link>)}
                     </div>
                 </li>
                 {isAdmin && (

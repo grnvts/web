@@ -17,6 +17,9 @@ import BuildingDetail from './pages/Building/BuildingDetail';
 import MyOrdersPage from "./pages/Orders/MyOrdersPage";
 import OrderDetailPage from "./pages/Orders/OrderDetailPage";
 import CreateOrderPage from "./pages/Orders/CreateOrderPage";
+import EditOrderPage from './pages/Orders/EditOrderPage';
+import AllOrdersPage from './pages/Orders/AllOrdersPage';
+
 
 class App extends Component {
 
@@ -86,10 +89,10 @@ class App extends Component {
                 <Switch>
                     <AuthenticatedRoute exact path="/index" component={HomeComponent} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute path="/user/:username" component={UserDetailPage} isLoggedIn={isLoggedIn} />
-                    <AuthenticatedRoute exact path="/users" component={UsersPage} isLoggedIn={isLoggedIn} />
-                    <AuthenticatedRoute path="/building/:username" component={BuildingComponent} isLoggedIn={isLoggedIn}/>
-                    <AuthenticatedRoute path="/update-building/:buildingid" component={UpdateBuilding} isLoggedIn={isLoggedIn}/>
-                    <AuthenticatedRoute path="/building-card/:buildingid" component={BuildingDetail} isLoggedIn={isLoggedIn}/>
+                    <AuthenticatedRoute exact path="/users" component={UsersPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']} />
+                    
+                    <AuthenticatedRoute exact path="/orders/all" component={AllOrdersPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>               
+                    <AuthenticatedRoute path="/orders/:orderId/edit" component={EditOrderPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>
                     <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/orders/create" component={CreateOrderPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/orders/:orderId" component={OrderDetailPage} isLoggedIn={isLoggedIn} />

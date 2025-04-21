@@ -1,12 +1,14 @@
 import ApiService from './BaseService/ApiService';
 
 class OrderService {
-  getBuildings() {
-    return ApiService.get('/buildings');
-  }
+
 
   createOrder(orderData) {
     return ApiService.post('/orders', orderData);
+  }
+  
+  getAllOrders() {
+    return ApiService.get('/orders');
   }
 
   getMyOrders() {
@@ -19,6 +21,18 @@ class OrderService {
 
   getOrderById(orderId) {
     return ApiService.get(`/orders/${orderId}`);
+  }
+
+  updateOrderStatus(orderId, status) {
+    return ApiService.put(`/orders/${orderId}/status`, status);
+  }
+
+  updateOrder(orderId, updatedOrder) {
+    return ApiService.put(`/orders/${orderId}`, updatedOrder);
+  }
+
+  assignBrigadier(orderId, brigadierUsername) {
+    return ApiService.put(`/orders/${orderId}/assign-brigadier`, brigadierUsername);
   }
 }
 

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import AdminOrderForm from '../../components/AdminOrderForm';
 import OrderCard from '../../components/OrderCard';
+
 import OrderService from '../../Services/OrderService';
 import { useParams, useHistory } from 'react-router-dom';
 import AlertifyService from '../../Services/AlertifyService';
 import { useTranslation } from 'react-i18next';
 
-const OrderDetailPage = () => {
+const EditOrderPage = () => {
   const { orderId } = useParams();
   const history = useHistory();
   const [order, setOrder] = useState(null);
@@ -24,19 +26,21 @@ const OrderDetailPage = () => {
     fetchOrder();
   }, [orderId, t]);
 
-  const handleEditClick = () => {
-    history.push(`/orders/${orderId}/edit`);
+  const handleOrderSubmit = async (updatedOrder) => {
+    try {
+      await OrderService.updateOrder(orderId, updatedOrder);
+      AlertifyService.success(t('Order updated successfully'));
+      history.push(`/orders/${orderId}`);
+    } catch (error) {
+      AlertifyService.error(t('Failed to update order'));
+    }
   };
 
   return (
     <div className="container">
+      <h3>{t('Edit Order')}</h3>
       {order ? (
-        <>
-          <OrderCard order={order} />
-          <button className="btn btn-primary mt-3" onClick={handleEditClick}>
-            {t('Edit Order')}
-          </button>
-        </>
+        <AdminOrderForm onSubmit={handleOrderSubmit} initialData={order} />
       ) : (
         <p>{t('Loading...')}</p>
       )}
@@ -44,4 +48,4 @@ const OrderDetailPage = () => {
   );
 };
 
-export default OrderDetailPage;
+export default EditOrderPage;

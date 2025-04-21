@@ -51,6 +51,20 @@ const OrderForm = ({ onSubmit }) => {
         </select>
       </div>
 
+
+      <div className="form-group">
+            <label>{t('Street')}</label>
+            <input
+                type="text"
+                name="address.street"
+                className="form-control"
+                value={formData.address.street}
+                onChange={handleChange}
+                required
+            />
+        </div>
+
+        
         <div className="form-group">
             <label>{t('City')}</label>
             <input
@@ -58,18 +72,6 @@ const OrderForm = ({ onSubmit }) => {
                 name="address.city"
                 className="form-control"
                 value={formData.address.city}
-                onChange={handleChange}
-                required
-            />
-        </div>
-
-        <div className="form-group">
-            <label>{t('Street')}</label>
-            <input
-                type="text"
-                name="address.street"
-                className="form-control"
-                value={formData.address.street}
                 onChange={handleChange}
                 required
             />

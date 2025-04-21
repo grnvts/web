@@ -1,9 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const OrderStatusBadge = ({ status }) => {
   const getBadgeClass = () => {
     switch (status) {
-      case 'NEW':
+      case 'CREATED':
         return 'badge badge-primary';
       case 'IN_PROGRESS':
         return 'badge badge-warning';

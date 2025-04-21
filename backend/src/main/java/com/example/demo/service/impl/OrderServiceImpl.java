@@ -69,7 +69,10 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        if (!order.getClient().getUsername().equals(username)) {
+        // Проверяем, является ли пользователь владельцем заказа или администратором
+        if (!order.getClient().getUsername().equals(username) &&
+                !userRepository.findByUsername(username).getRoles().stream()
+                        .anyMatch(role -> role.getName().equals(RoleName.ROLE_ADMIN))) {
             throw new RuntimeException("Access denied");
         }
 
@@ -108,5 +111,91 @@ public class OrderServiceImpl implements OrderService {
         dto.setServiceType(order.getServiceType());
 
         return dto;
+    }
+    @Override
+    public void assignBrigadier(Long orderId, String brigadierUsername) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        User brigadier = userRepository.findByUsername(brigadierUsername);
+        if (brigadier == null || brigadier.getRoles().stream().noneMatch(role -> role.getName() == RoleName.ROLE_BRIGADIER)) {
+            throw new RuntimeException("Invalid brigadier");
+        }
+
+        order.setBrigadier(brigadier);
+        orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrder(Long id, OrderDto updatedOrder) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Обновляем тип услуги
+        order.setServiceType(updatedOrder.getServiceType());
+
+        // Обновляем детали заказа
+        order.setOrderDetails(updatedOrder.getOrderDetails());
+
+        // Обновляем статус
+        order.setStatus(updatedOrder.getStatus());
+
+        // Обновляем дату начала и окончания
+        if (updatedOrder.getStartDate() != null) {
+            order.setStartDate(updatedOrder.getStartDate());
+        }
+        if (updatedOrder.getEndDate() != null) {
+            order.setEndDate(updatedOrder.getEndDate());
+        }
+
+        // Обновляем цену
+        if (updatedOrder.getPrice() != null) {
+            order.setPrice(updatedOrder.getPrice());
+        }
+
+        // Обновляем адрес
+        if (updatedOrder.getAddress() != null) {
+            Address address = order.getAddress();
+            AddressDto addressDto = updatedOrder.getAddress();
+            address.setCity(addressDto.getCity());
+            address.setStreet(addressDto.getStreet());
+            address.setBuildingNo(addressDto.getBuildingNo());
+            address.setApartmentNo(addressDto.getApartmentNo());
+            addressRepository.save(address);
+        }
+
+        // Обновляем бригадира
+        if (updatedOrder.getBrigadierUsername() != null) {
+            User brigadier = userRepository.findByUsername(updatedOrder.getBrigadierUsername());
+            if (brigadier != null) {
+                order.setBrigadier(brigadier);
+            } else {
+                order.setBrigadier(null);
+            }
+        }
+
+        orderRepository.save(order);
+    }
+
+    @Override
+    public void updateOrderStatus(Long id, String status) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+    }
+
+    @Override
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 }
