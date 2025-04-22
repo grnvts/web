@@ -15,6 +15,7 @@ const OrderCard = ({ order }) => {
     address = {}, // Дефолтное значение
     price,
     createdDate,
+    brigadierUsername,
     brigadier,
     clientUsername = 'Unknown',
   } = order;
@@ -77,10 +78,26 @@ const OrderCard = ({ order }) => {
           <strong>{t('Apartment No')}:</strong> {apartmentNo || t('N/A')}
         </p>
         {!isBrigadier && (
-          <p>
-            <strong>{t('Brigadier')}:</strong> {brigadier || t('Not Assigned')}
-          </p>
-        )}
+  <p>
+    <strong>{t('Brigadier')}:</strong>{' '}
+    {roles?.includes('ROLE_ADMIN') ? (
+      brigadierUsername ? (
+        <Link
+          to={`/user/${brigadierUsername}`}
+          className="text-primary"
+          style={{ textDecoration: 'underline' }}
+        >
+          {brigadierUsername}
+        </Link>
+      ) : (
+        t('Not Assigned')
+      )
+    ) : (
+      brigadierUsername || t('Not Assigned')
+    )}
+  </p>
+)}
+
         {!isUser && (
           <p>
             <strong>{t('Client')}:</strong>{' '}

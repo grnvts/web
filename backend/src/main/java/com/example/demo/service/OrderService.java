@@ -1,7 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.OrderDto;
+import com.example.demo.dto.UserDto;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
     OrderDto createOrder(OrderDto dto, String username);
@@ -11,4 +15,6 @@ public interface OrderService {
     void assignBrigadier(Long orderId, String brigadierUsername);
     void updateOrderStatus(Long id, String status);
     List<OrderDto> getAllOrders();
+    Map<String, Long> getOrderCountPerDay(String username, LocalDate start, LocalDate end);
+    List<UserDto> getAllBrigadiers();
 }

@@ -13,6 +13,9 @@ const AdminOrderCard = ({ order }) => {
   const handleClientClick = () => {
     history.push(`/user/${order.clientUsername}`);
   };
+  const handleBridgadierClick = () => {
+    history.push(`/user/${order.brigadierUsername}`);
+  };
 
   return (
     <div className="card mb-3">
@@ -28,7 +31,15 @@ const AdminOrderCard = ({ order }) => {
           <strong>{t('Start Date')}:</strong> {order.startDate || t('N/A')}
         </p>
         <p className="card-text">
-          <strong>{t('Brigadier')}:</strong> {order.brigadier || t('Not Assigned')}
+          <strong>{t('Brigadier')}:</strong>  {' '}
+          <span
+            className="text-primary"
+            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+            onClick={handleBridgadierClick}
+          >
+            {order.brigadierUsername || t('Not Assigned')}
+          </span>
+         
         </p>
         <p className="card-text">
           <strong>{t('Client')}:</strong>{' '}

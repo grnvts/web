@@ -1,9 +1,11 @@
 package com.example.demo.service.impl;
 
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -45,50 +47,27 @@ public class UserServiceImp implements UserService {
 	private final FileService fileService;
 	private final RoleRepository roleRepository;
 
-	private String[] types = {"image/png","image/jpeg"};
+	private String[] types = { "image/png", "image/jpeg" };
+
 	@Override
 	@Transactional
 	public Page<UserDto> getAll(Pageable page, String authHeader) {
 		Page<UserDto> pageDto = null;
-		if(authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
+		if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
 			String username = getUsernameFromToken(authHeader);
 			Page<User> pdoUser = repository.findByUsernameNot(username, page);
 			pageDto = pdoUser.map(UserDto::new);
 			return pageDto;
 		}
-		//Page<User> pageList = repository.findAll(page).map(UserDto::new);
+		// Page<User> pageList = repository.findAll(page).map(UserDto::new);
 		pageDto = repository.findAll(page).map(UserDto::new);
 		return pageDto;
 	}
 
 	@Transactional
 	public ResponseEntity<?> save(@Valid User user) {
-//		if (dto.getEmail() == null || dto.getEmail().isEmpty()
-//				|| dto.getUsername() == null || dto.getUsername().isEmpty()
-//				|| dto.getPassword() == null || dto.getPassword().isEmpty()
-//				|| dto.getRepeatPassword() == null || dto.getRepeatPassword().isEmpty()) {
-//			HashMap<String, String> map = new HashMap<>();
-//			if(dto.getEmail() == null || dto.getEmail().isEmpty()) {
-//				map.put("email", "Email can not be empty");
-//				logger.error("Email can not be empty or null ");
-//			}
-//			if(dto.getUsername() == null || dto.getUsername().isEmpty()) {
-//				map.put("username", "Username can not be empty");
-//				logger.error("Username can not be empty or null ");
-//			}
-//			if(dto.getPassword() == null || dto.getPassword().isEmpty()) {
-//				map.put("password", "Password can not be empty");
-//				logger.error("Password can not be empty or null ");
-//			}
-//			if(dto.getRepeatPassword() == null || dto.getRepeatPassword().isEmpty()) {
-//				map.put("repeatpassword", "Repeat Password  can not be empty");
-//				logger.error("Repeat Password  can not be empty or null ");
-//			}
-//			ApiError error = new ApiError(400, "Null Pointer Problem", null);
-//			error.setValidationErrors(map);
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-//		}
-		if(!user.getPassword().equals(user.getRepeatPassword())) {
+		//
+		if (!user.getPassword().equals(user.getRepeatPassword())) {
 			HashMap<String, String> map = new HashMap<>();
 			map.put("repeatPassword", "Passwords must be same.");
 			ApiError error = new ApiError(400, "Validation Error", null);
@@ -96,22 +75,17 @@ public class UserServiceImp implements UserService {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 		}
 
-		//User user = mapper.map(dto, User.class);
+		// User user = mapper.map(dto, User.class);
 		user.setCreatedDate(new Date());
 		user.setStatus(1);
 		user.setRealPassword(user.getPassword());
 
 		user.setPassword(passwordEncoder.encode(user.getRealPassword()));
-		if(user.getPatronymic() == null) user.setPatronymic("");
-		if(user.getPhone() == null) user.setPhone("");
+		if (user.getPatronymic() == null)
+			user.setPatronymic("");
+		if (user.getPhone() == null)
+			user.setPhone("");
 
-
-
-		//////
-//		Role defaultRole = new Role();
-//		defaultRole.setName(RoleName.ROLE_USER);
-//		defaultRole.setUser_id(user.getId()); // можно опустить, если @ManyToMany
-//		user.getRoles().add(defaultRole);
 		Role role = roleRepository.findByName(RoleName.ROLE_USER)
 				.orElseThrow(() -> new IllegalStateException("ROLE_USER not found in DB"));
 
@@ -124,40 +98,40 @@ public class UserServiceImp implements UserService {
 		return ResponseEntity.ok(dto);
 	}
 
-
 	@Transactional
 	public UserDto getUser(String username) {
 		User user = repository.findUserByUsernameWithStatusOne(username);
 
-		if (user==null) {
+		if (user == null) {
 			logger.error("There is no user with " + username);
 			throw new NotFoundException();
-			//throw new IllegalArgumentException("There is no user with " + id);
+			// throw new IllegalArgumentException("There is no user with " + id);
 		}
 		logger.info("User is ok");
 		UserDto dto = mapper.map(user, UserDto.class);
 		return dto;
 	}
 
+	@Override
 	public Boolean deleteUser(Long id) {
-		User user = repository.getOne(id);
-
-		if (user == null)
-			throw new IllegalArgumentException("There is no user with " + id);
-		user.setStatus(0);
+		User user = repository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("There is no user with id: " + id));
+		user.setStatus(0); // Помечаем как неактивного
 		repository.save(user);
 		return true;
 	}
 
+
 	private String getUsernameFromToken(String authHeader) {
 
-		String username= null;
-		if(authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
+		String username = null;
+		if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
 			String token = authHeader.replace(TOKEN_PREFIX, "");
 			username = tokenUtil.getUsernameFromToken(token);
 		}
 		return username;
 	}
+
 	@Override
 	@Transactional
 	public ResponseEntity<?> updateUser(String authHeader, String username, UserUpdateDto dto) {
@@ -166,7 +140,8 @@ public class UserServiceImp implements UserService {
 		// Админ может редактировать другого пользователя
 		boolean isAdmin = false;
 		User adminUser = repository.findUserByUsernameWithStatusOne(userNameFromToken);
-		if (adminUser != null && adminUser.getRoles().stream().anyMatch(role -> role.getName().name().equals("ROLE_ADMIN"))) {
+		if (adminUser != null
+				&& adminUser.getRoles().stream().anyMatch(role -> role.getName().name().equals("ROLE_ADMIN"))) {
 			isAdmin = true;
 		}
 
@@ -183,7 +158,7 @@ public class UserServiceImp implements UserService {
 			throw new NotFoundException();
 		}
 
-		//  Логирование входных данных
+		// Логирование входных данных
 		logger.info("Updating user: {}, current ID: {}", username, user.getId());
 		logger.info("Incoming data: email={}, name={}, surname={}", dto.getEmail(), dto.getName(), dto.getSurname());
 
@@ -200,14 +175,11 @@ public class UserServiceImp implements UserService {
 			user.setEmail(dto.getEmail());
 		}
 
-
-
 		// Обновление остальных полей
 		user.setName(dto.getName());
 		user.setSurname(dto.getSurname());
 		user.setPatronymic(dto.getPatronymic());
 		user.setPhone(dto.getPhone());
-
 
 		// Обновление username только если пользователь редактирует сам себя
 		if (!isAdmin || userNameFromToken.equals(username)) {
@@ -224,25 +196,24 @@ public class UserServiceImp implements UserService {
 		return ResponseEntity.ok(result);
 	}
 
-
-	public  ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto){
+	public ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto) {
 		String userNameFromToken = getUsernameFromToken(authHeader);
-		if(!userNameFromToken.equals(username)){
+		if (!userNameFromToken.equals(username)) {
 			logger.error("User Names cannot match");
-			ApiError error = new ApiError(403, "User Names cannot match", "api/user/"+authHeader);
+			ApiError error = new ApiError(403, "User Names cannot match", "api/user/" + authHeader);
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 		}
 		User user = repository.findUserByUsernameWithStatusOne(username);
-		if (user==null) {
+		if (user == null) {
 			logger.error("There is no user with " + username);
 			throw new NotFoundException();
-			//throw new IllegalArgumentException("There is no user with " + id);
+			// throw new IllegalArgumentException("There is no user with " + id);
 		}
-		if(dto.getImage() != null) {
+		if (dto.getImage() != null) {
 			String oldImage = user.getImage();
 			try {
-				if(!fileService.isValidFileType(types,dto.getImage())) {
-					ApiError error = new ApiError(400, "Image Type invalid", "api/user/upload-image/"+authHeader);
+				if (!fileService.isValidFileType(types, dto.getImage())) {
+					ApiError error = new ApiError(400, "Image Type invalid", "api/user/upload-image/" + authHeader);
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 				}
 				String fileName = fileService.writeBase64StringToFile(dto.getImage());
@@ -257,4 +228,46 @@ public class UserServiceImp implements UserService {
 		logger.info("Image updated");
 		return ResponseEntity.ok(result);
 	}
+	@Override
+	public Boolean restoreUser(Long id) {
+		User user = repository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("There is no user with id: " + id));
+		user.setStatus(1); // Восстанавливаем пользователя
+		repository.save(user);
+		return true;
+	}
+	@Override
+	@Transactional
+	public ResponseEntity<?> createUserWithRoles(UserDto dto) {
+		// Проверка на уникальность username и email
+		if (repository.findByUsername(dto.getUsername()) != null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiError(400, "Username already exists", "/api/user"));
+		}
+		if (repository.findByEmail(dto.getEmail()) != null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiError(400, "Email already exists", "/api/user"));
+		}
+
+		// Создание нового пользователя
+		User user = new User();
+		user.setUsername(dto.getUsername());
+		user.setPassword(passwordEncoder.encode(dto.getPassword()));
+		user.setEmail(dto.getEmail());
+		user.setCreatedDate(new Date());
+		user.setStatus(1); // Активный статус
+
+		// Присваивание ролей
+		Set<Role> roles = dto.getRoles().stream()
+				.map(roleName -> roleRepository.findByName(RoleName.valueOf(roleName))
+						.orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName)))
+				.collect(Collectors.toSet());
+		user.setRoles(roles);
+
+		// Сохранение пользователя
+		repository.save(user);
+
+		return ResponseEntity.ok(new UserDto(user));
+	}
+
 }

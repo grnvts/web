@@ -7,16 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.dto.UploadImageDto;
 import com.example.demo.dto.UserDto;
@@ -26,6 +17,11 @@ import com.example.demo.service.UserService;
 import com.example.demo.util.ApiPaths;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +37,22 @@ public class UserApi {
 
 		return ResponseEntity.ok(service.getAll(page, authHeader));
 	}
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PutMapping("/{id}/restore")
+	public ResponseEntity<Boolean> restoreUser(@PathVariable Long id) {
+		return ResponseEntity.ok(service.restoreUser(id));
+	}
 
+
+
+
+
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/create")
+	public ResponseEntity<?> createUserWithRoles(@Valid @RequestBody UserDto dto) {
+		return service.createUserWithRoles(dto);
+	}
 
 	@GetMapping("/{username}")
 	public ResponseEntity<UserDto> getUser(@PathVariable String username) {
@@ -67,20 +78,7 @@ public class UserApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
-
-		return ResponseEntity.ok(service.deleteUser(id));
+    	return ResponseEntity.ok(service.deleteUser(id));
 	}
-
-//	@ExceptionHandler
-//	@ResponseStatus(HttpStatus.BAD_REQUEST)
-//	public ApiError handleValidationException(MethodArgumentNotValidException ex) {
-//		ApiError error = new ApiError(400, "Null Pointer Problem", null);
-//		Map<String, String> validationErrors = new HashMap<>();
-//		for (FieldError fieldError  : ex.getBindingResult().getFieldErrors()) {
-//			validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
-//		} 
-//		error.setValidationErrors(validationErrors);
-//		return error;
-//	}
 
 }

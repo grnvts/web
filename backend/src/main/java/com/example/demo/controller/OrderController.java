@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.OrderDto;
+import com.example.demo.dto.UpdateStatusRequest;
+import com.example.demo.dto.UserDto;
 import com.example.demo.jwt.config.JwtTokenUtil;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -19,12 +24,13 @@ public class OrderController {
     private final JwtTokenUtil jwtTokenUtil;
 
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody String status) {
-        orderService.updateOrderStatus(id, status);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+        orderService.updateOrderStatus(id, request.getStatus());
         return ResponseEntity.ok("Order status updated successfully");
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
@@ -35,8 +41,8 @@ public class OrderController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/assign-brigadier")
-    public ResponseEntity<?> assignBrigadier(@PathVariable Long id, @RequestBody String brigadierUsername) {
-        orderService.assignBrigadier(id, brigadierUsername);
+    public ResponseEntity<?> assignBrigadier(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        orderService.assignBrigadier(id, request.get("username"));
         return ResponseEntity.ok("Brigadier assigned successfully");
     }
     @PreAuthorize("hasRole('ADMIN')")
@@ -64,5 +70,25 @@ public class OrderController {
     public OrderDto getOrder(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
         return orderService.getOrderById(id, username);
+    }
+
+
+    @GetMapping("/brigadier/{username}/calendar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String, Long> getBrigadierOrderCalendar(
+            @PathVariable String username,
+            @RequestParam String month // формат: "2025-04"
+    ) {
+        YearMonth yearMonth = YearMonth.parse(month);
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
+        return orderService.getOrderCountPerDay(username, start, end);
+    }
+
+
+    @GetMapping("/brigadiers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserDto> getAllBrigadiers() {
+        return orderService.getAllBrigadiers(); // Реализуем в сервисе
     }
 }

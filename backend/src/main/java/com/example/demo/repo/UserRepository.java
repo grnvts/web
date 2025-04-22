@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.User;
+import com.example.demo.model.Role;
 import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotEmpty;
@@ -18,20 +19,23 @@ import javax.validation.constraints.Size;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	User findByUsername(String username);
-	
+	@Query("SELECT u FROM User u WHERE u.username <> :username")
 	Page<User> findByUsernameNot(String username, Pageable page);
 	
 	@Query("select u from User u where u.id = :id and u.status = 1")
 	Optional<User> findUserById(Long id);
 
-	@Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :username")
+	@Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :username and u.status = 1")
 	Optional<User> findByUsernameWithRoles(@Param("username") String username);
 
-	@Query("SELECT u FROM User u JOIN FETCH u.roles")
+	@Query("SELECT u FROM User u JOIN FETCH u.roles  WHERE u.username = :username and u.status = 1")
 	List<User> findAllWithRoles();
 
 	@Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :username and u.status = 1")
 	User findUserByUsernameWithStatusOne(String username);
+
+
+	List<User> findByRolesContainsOrderByUsernameAsc(Role role);
 
 
 	@Query("select u from User u where u.email = :email and u.status = 1")

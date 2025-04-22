@@ -2,19 +2,24 @@ package com.example.demo.service.impl;
 
 import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.OrderDto;
+import com.example.demo.dto.UserDto;
 import com.example.demo.model.*;
-import com.example.demo.repo.AddressRepository;
-import com.example.demo.repo.BuildingRepository;
-import com.example.demo.repo.OrderRepository;
-import com.example.demo.repo.UserRepository;
+import com.example.demo.repo.*;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private AddressRepository addressRepository;
+    private RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -198,4 +204,26 @@ public class OrderServiceImpl implements OrderService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+
+    @Override
+    public Map<String, Long> getOrderCountPerDay(String username, LocalDate start, LocalDate end) {
+        return orderRepository.countOrdersByBrigadierPerDay(username, start, end)
+                .stream()
+                .map(row -> (Object[]) row)
+                .collect(Collectors.toMap(
+                        row -> row[0].toString(),         // дата как строка
+                        row -> ((Number) row[1]).longValue() // кол-во заказов
+                ));
+    }
+    @Override
+    public List<UserDto> getAllBrigadiers() {
+        List<User> brigadiers = userRepository.findAll().stream()
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getName().name().equals("ROLE_BRIGADIER")))
+                .collect(Collectors.toList());
+
+        return brigadiers.stream().map(UserDto::new).collect(Collectors.toList());
+    }
+
 }

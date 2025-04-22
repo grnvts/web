@@ -18,28 +18,56 @@ class UserService {
         return ApiService.post(USER_URL,data)
     }
     update(username, body) {
-        return ApiService.put(`/user/${username}`, body); // Без config!
+        return ApiService.put(`/user/${username}`, body); 
     }
-
+    createUserWithRoles(data) {
+        return ApiService.post('/user/create', data);
+    }
 
     loadImage(username,body) { 
         return ApiService.put(USER_URL+"/upload-image/"+username,body)
     }
     deleteUserById = (id, token) => {
-        return fetch(`/api/user/${id}`, {
+        return fetch(`http://localhost:8501/api/user/${id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
             }
+      
+        
         }).then(async response => {
+            const contentType = response.headers.get("content-type");
             if (!response.ok) {
-                const data = await response.json();
-                throw data;
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await response.json();
+                    throw data;
+                } else {
+                    throw new Error("Unexpected server response");
+                }
             }
             return response.json();
         });
     };
 
+    restoreUser = (id, token) => {
+        if (!token) {
+            throw new Error('Authorization token is missing');
+        }
+        return fetch(`http://localhost:8501/api/user/${id}/restore`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(async (response) => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Restore user failed:', errorText);
+                throw new Error('Failed to restore user');
+            }
+            return response.json();
+        });
+    };
+    
     //put(url, data) { return axios.put(API_BASE_URL + url, data); }
 
     //delete(url) { return axios.delete(API_BASE_URL + url); }

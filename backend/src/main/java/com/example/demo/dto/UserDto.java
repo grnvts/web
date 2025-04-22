@@ -37,10 +37,11 @@ public class UserDto {
 	private String email;
 
 	private String repeatPassword;
+	private String Password;
 
 	private Date bornDate;
 	private Date createdDate;
-
+	private int status;
 	private String image;
 	private Set<String> roles;
 
@@ -60,6 +61,7 @@ public class UserDto {
 		this.bornDate=user.getBornDate();
 		this.createdDate=user.getCreatedDate();
 		this.image=user.getImage();
+		this.status=user.getStatus();
 		this.roles = user.getRoles().stream()
 				.map(role -> role.getName().name())
 				.collect(Collectors.toSet());

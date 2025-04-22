@@ -14,6 +14,7 @@ public class OrderDto {
     private String clientUsername;
     private Long brigadierId;
     private String brigadierUsername;
+    private String brigadierName;
     private AddressDto address;
     private Long addressId;
     private String orderDetails;

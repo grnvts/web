@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import './App.css';
 import UserSignupPage from './pages/User/UserSignupPage';
 import UserLoginPage from './pages/User/UserLoginPage';
@@ -11,14 +11,12 @@ import AuthenticatedRoute from './components/AuthenticatedRoute';
 import { connect } from 'react-redux';
 import ApiService from './Services/BaseService/ApiService';
 import UsersPage from './pages/User/UsersPage';
-import BuildingComponent from './pages/Building/BuildingComponent';
-import UpdateBuilding from './pages/Building/UpdateBuilding';
-import BuildingDetail from './pages/Building/BuildingDetail';
 import MyOrdersPage from "./pages/Orders/MyOrdersPage";
 import OrderDetailPage from "./pages/Orders/OrderDetailPage";
 import CreateOrderPage from "./pages/Orders/CreateOrderPage";
 import EditOrderPage from './pages/Orders/EditOrderPage';
 import AllOrdersPage from './pages/Orders/AllOrdersPage';
+import CreateUserPage from './pages/User/CreateUserPage';
 
 
 class App extends Component {
@@ -58,6 +56,12 @@ class App extends Component {
         });
         return <Redirect to="/login" />
     }
+    componentDidMount() {
+        const token = localStorage.getItem('jwttoken');
+        ApiService.changeAuthToken(token);
+      }
+      
+    
     back() {
         this.props.history.push('/login');
     }
@@ -96,7 +100,7 @@ class App extends Component {
                     <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/orders/create" component={CreateOrderPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/orders/:orderId" component={OrderDetailPage} isLoggedIn={isLoggedIn} />
-
+                    <AuthenticatedRoute path="/create-user" component={CreateUserPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>
                     <Redirect to="/index" />
                 </Switch>
             );
@@ -128,6 +132,7 @@ class App extends Component {
         )
     }
 }
+
 const mapStateToProps = (store) => {
     return {
         isLoggedIn: store.isLoggedIn,

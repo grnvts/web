@@ -18,7 +18,7 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
     endDate: initialData?.endDate || '',
     price: initialData?.price || '',
     status: initialData?.status || 'NEW',
-    brigadier: initialData?.brigadierUsername || '',
+
   });
 
   const [brigadiers, setBrigadiers] = useState([]);
@@ -183,23 +183,7 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
         </select>
       </div>
 
-      <div className="form-group">
-        <label>{t('Brigadier')}</label>
-        <select
-          name="brigadier"
-          className="form-control"
-          value={formData.brigadier}
-          onChange={handleChange}
-        >
-          <option value="">{t('Select Brigadier')}</option>
-          {brigadiers.map((brigadier) => (
-            <option key={brigadier.id} value={brigadier.username}>
-              {brigadier.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
+     
       <button type="submit" className="btn btn-primary">
         {t('Save')}
       </button>

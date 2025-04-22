@@ -249,7 +249,8 @@ i18n.use(initReactI18next).init({
   "No orders found": "Заказы не найдены",
   "Create Order": "Создать заказ",
   'Preferred Start Date': "Желаемая дата начала",
-  "My Orders": "Мои заказы"
+  "My Orders": "Мои заказы",
+  'Create User': 'Создать пользователя'
         }
       }
     },

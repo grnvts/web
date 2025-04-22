@@ -14,16 +14,21 @@ import com.example.demo.dto.UserUpdateDto;
 import com.example.demo.model.User;
 
 public interface UserService {
-	public ResponseEntity<?> save(@Valid User user);
+	ResponseEntity<?> save(@Valid User user);
 
-	public Boolean deleteUser(Long id);
+	Boolean deleteUser(Long id);
+
+	UserDto getUser(String username);
+
+	Page<UserDto> getAll(Pageable page,String authHeader ) ;
+
+	Boolean restoreUser(Long id);
+
+	ResponseEntity<?> updateUser(String authHeader,String username,UserUpdateDto dto);
+
+	ResponseEntity<?> createUserWithRoles(UserDto dto);
+
+	ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto);
 
 
-	public UserDto getUser(String username);
-
-	public Page<UserDto> getAll(Pageable page,String authHeader ) ;
-
-	public ResponseEntity<?> updateUser(String authHeader,String username,UserUpdateDto dto);
-
-	public  ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto);
 }

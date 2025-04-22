@@ -5,6 +5,8 @@ import AlertifyService from '../../Services/AlertifyService';
 import UserService from '../../Services/UserService';
 import { Redirect } from 'react-router-dom';
 import UserTableRow from "../../components/UserTableRow";
+import CreateUserPage from './CreateUserPage';
+
 
 class UsersPage extends Component {
     constructor(props) {
@@ -39,6 +41,17 @@ class UsersPage extends Component {
         }
     };
 
+    restoreUser = async (userId) => {
+        try {
+            await UserService.restoreUser(userId, this.state.jwttoken);
+            // Отправляем запрос на восстановление
+            AlertifyService.success(this.props.t('User restored successfully'));
+            this.getUsers(this.state.page.number, this.state.page.size); // Обновляем список пользователей
+        } catch (error) {
+            console.error('Error restoring user:', error); // Логируем ошибку
+            AlertifyService.error(this.props.t('Failed to restore user'));
+        }
+    };
     handleRoleFilterChange = (e) => {
         this.setState({ rolesFilter: e.target.value });
     };
@@ -57,23 +70,31 @@ class UsersPage extends Component {
         if (!this.state.isAdmin) {
             return <Redirect to="/index" />;
         }
-
+    
         const { content: users, first, last } = this.state.page;
         const { t } = this.props;
         const { rolesFilter } = this.state;
-
+    
         // Фильтруем пользователей по роли
         const filteredUsers = rolesFilter
             ? users.filter((user) => user.roles.includes(rolesFilter))
             : users;
-
+    
         return (
             <div className="col-sm-12">
                 <div className="card">
                     <h3 className="card-header">
-                        <div className="d-flex justify-content-center">{t('Users')}</div>
+                        <div className="d-flex justify-content-between">
+                            <span>{t('Users')}</span>
+                            <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => this.props.history.push('/create-user')}
+                            >
+                                {t('Create User')}
+                            </button>
+                        </div>
                     </h3>
-
+    
                     <div className="card-header d-flex justify-content-between">
                         <div>
                             <label htmlFor="roleFilter">{t('Filter by Role')}:</label>
@@ -102,7 +123,7 @@ class UsersPage extends Component {
                             )}
                         </div>
                     </div>
-
+    
                     <table className="table table-hover">
                         <thead>
                             <tr>
@@ -117,7 +138,10 @@ class UsersPage extends Component {
                         </thead>
                         <tbody>
                             {filteredUsers.map((user) => (
-                                <UserTableRow user={user} key={user.username} />
+                                <UserTableRow user={user}
+                                key={user.username}
+                                onRestore={this.restoreUser} // Передаем обработчик восстановления
+                            />
                             ))}
                         </tbody>
                     </table>

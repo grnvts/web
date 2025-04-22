@@ -6,25 +6,9 @@ const API_BASE_URL = 'http://localhost:8501/api';
 const LOGIN_URL = '/login';
 class ApiService {
 
-    get(url) {
-
-        return Axios.get(API_BASE_URL + url)
-        // .catch((error) => {
-        //     if (error.response) {
-        //         //console.log(error.response);
-        //         if (error.response.data.status === 401){
-        //             console.log("401")
-        //         }
-        //             //this.props.dispatch(logoutAction())
-        //     } else if (error.request) {
-        //         console.log(error.request);
-        //     } else {
-        //         console.log('Error', error.message);
-        //     }
-
-        // });
-
-    }
+    get(url, config = {}) {
+        return Axios.get(API_BASE_URL + url, config);
+      }
 
     post(url, data) { return Axios.post(API_BASE_URL + url, data); }
 
@@ -36,11 +20,11 @@ class ApiService {
 
     changeAuthToken(jwt) {
         if (jwt)
-            Axios.defaults.headers['Authorization'] = 'Bearer ' + jwt;
+            Axios.defaults.headers.common['Authorization'] = 'Bearer ' + jwt;
         else
-            Axios.defaults.headers['Authorization'] = null;
+            delete Axios.defaults.headers.common['Authorization'];
     }
-
+    
     changeLanguage(lg) { Axios.defaults.headers["accept-language"] = lg; }
 }
 
