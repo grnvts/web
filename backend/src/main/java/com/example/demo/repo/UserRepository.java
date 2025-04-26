@@ -19,6 +19,8 @@ import javax.validation.constraints.Size;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	User findByUsername(String username);
+	Optional<User> findUserByUsername(String username);
+
 	@Query("SELECT u FROM User u WHERE u.username <> :username")
 	Page<User> findByUsernameNot(String username, Pageable page);
 	

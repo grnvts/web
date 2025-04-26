@@ -8,6 +8,7 @@ import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,12 +25,12 @@ public class OrderController {
     private final JwtTokenUtil jwtTokenUtil;
 
 
-    @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
-        orderService.updateOrderStatus(id, request.getStatus());
-        return ResponseEntity.ok("Order status updated successfully");
-    }
+//    @PutMapping("/{id}/status")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+//        orderService.updateOrderStatus(id, request.getStatus());
+//        return ResponseEntity.ok("Order status updated successfully");
+//    }
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -64,6 +65,15 @@ public class OrderController {
         return orderService.getOrdersForClient(username);
     }
 
+    @GetMapping("/brigadier")
+   // @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    public List<OrderDto> getBrigadierOrders(@RequestHeader("Authorization") String authHeader) {
+        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
+        System.out.println("Username: " + username);
+        System.out.println("Roles: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        return orderService.getOrdersForBrigadier(username);
+    }
+
     //Получение одного заказа по ID
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id:[0-9]+}") // Ограничиваем {id} только цифрами, чтобы "my" не срабатывал как ID
@@ -74,7 +84,7 @@ public class OrderController {
 
 
     @GetMapping("/brigadier/{username}/calendar")
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Long> getBrigadierOrderCalendar(
             @PathVariable String username,
             @RequestParam String month // формат: "2025-04"
@@ -91,4 +101,23 @@ public class OrderController {
     public List<UserDto> getAllBrigadiers() {
         return orderService.getAllBrigadiers(); // Реализуем в сервисе
     }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestBody UpdateStatusRequest request // <== правильный DTO
+    ) {
+        orderService.updateOrderStatus(id, request.getStatus(), request.getMessage());
+        return ResponseEntity.ok("Order status updated");
+    }
+
+//
+//    @PutMapping("/{id}/status")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+//    orderService.updateOrderStatus(id, request.getStatus(), request.getMessage());
+//    return ResponseEntity.ok("Order status updated successfully");
+//}
 }
+    

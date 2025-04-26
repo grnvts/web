@@ -12,4 +12,5 @@ import lombok.Setter;
 @Setter
 public class UpdateStatusRequest {
     private String status;
+   private String message;
 }

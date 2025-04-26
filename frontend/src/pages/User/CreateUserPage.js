@@ -16,8 +16,8 @@ class CreateUserPage extends Component {
       surname: "",
       patronymic: "",
       phone: "",
-      bornDate: new Date(),
-      roles: [],
+      bornDate: "",
+      role: "", // Изменено на одиночный выбор роли
       errors: {},
     };
   }
@@ -27,7 +27,7 @@ class CreateUserPage extends Component {
     stateData[name] = value;
     const errors = { ...this.state.errors };
     errors[name] = undefined;
-  
+
     if (name === "password" || name === "repeatPassword") {
       if (stateData.password !== stateData.repeatPassword) {
         errors.repeatPassword = this.props.t("Password mismatch");
@@ -35,18 +35,12 @@ class CreateUserPage extends Component {
         errors.repeatPassword = undefined;
       }
     }
-  
+
     this.setState({ ...stateData, errors });
   };
-  
-  
 
   handleRoleChange = (e) => {
-    const { options } = e.target;
-    const selectedRoles = Array.from(options)
-      .filter((option) => option.selected)
-      .map((option) => option.value);
-    this.setState({ roles: selectedRoles });
+    this.setState({ role: e.target.value }); // Устанавливаем выбранную роль
   };
 
   onClickCreateUser = async (e) => {
@@ -63,11 +57,16 @@ class CreateUserPage extends Component {
       patronymic,
       phone,
       bornDate,
-      roles,
+      role,
     } = this.state;
 
     if (password !== repeatPassword) {
       AlertifyService.error(this.props.t("Password mismatch"));
+      return;
+    }
+
+    if (!role) {
+      AlertifyService.error(this.props.t("Role is required"));
       return;
     }
 
@@ -79,8 +78,8 @@ class CreateUserPage extends Component {
       surname,
       patronymic,
       phone,
-      bornDate,
-      roles,
+      bornDate: bornDate || null, // Если дата рождения не указана, отправляем null
+      roles: [role], // Роль передается как массив
     };
 
     try {
@@ -98,11 +97,23 @@ class CreateUserPage extends Component {
 
   render() {
     const { t } = this.props;
-    const { username, password, repeatPassword, email, name, surname, patronymic, phone, bornDate, errors } = this.state;
+    const {
+      username,
+      password,
+      repeatPassword,
+      email,
+      name,
+      surname,
+      patronymic,
+      phone,
+      bornDate,
+      role,
+      errors,
+    } = this.state;
 
     return (
       <div className="container">
-        <h3>{t("Create User")}</h3>
+        <h3>{t("Creating User")}</h3>
         <form>
           <Input
             label={t("Username *")}
@@ -142,6 +153,7 @@ class CreateUserPage extends Component {
           />
           <Input
             label={t("Name")}
+            error={errors.name}
             type="text"
             name="name"
             placeholder={t("Name")}
@@ -150,6 +162,7 @@ class CreateUserPage extends Component {
           />
           <Input
             label={t("Surname")}
+            error={errors.surname}
             type="text"
             name="surname"
             placeholder={t("Surname")}
@@ -158,6 +171,7 @@ class CreateUserPage extends Component {
           />
           <Input
             label={t("Patronymic")}
+            error={errors.patronymic}
             type="text"
             name="patronymic"
             placeholder={t("Patronymic")}
@@ -166,6 +180,7 @@ class CreateUserPage extends Component {
           />
           <Input
             label={t("Phone")}
+            error={errors.phone}
             type="tel"
             name="phone"
             placeholder={t("Phone (e.g. +3754467890)")}
@@ -175,20 +190,51 @@ class CreateUserPage extends Component {
           <div className="form-group">
             <label>{t("Born Date")}</label>
             <input
-            type="date"
-            name="bornDate"
-            className="form-control"
-            value={bornDate ? new Date(bornDate).toISOString().slice(0, 10) : ""}
-            onChange={this.onChangeData}
+              type="date"
+              name="bornDate"
+              className="form-control"
+              value={bornDate ? new Date(bornDate).toISOString().slice(0, 10) : ""}
+              onChange={(e) => this.onChangeData("bornDate", e.target.value)}
             />
           </div>
           <div className="form-group">
-            <label>{t("Roles")}</label>
-            <select multiple className="form-control" onChange={this.handleRoleChange}>
-              <option value="ROLE_USER">{t("User")}</option>
-              <option value="ROLE_ADMIN">{t("Admin")}</option>
-              <option value="ROLE_BRIGADIER">{t("Brigadier")}</option>
-            </select>
+            <label>{t("Role")}</label>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="role"
+                  value="ROLE_USER"
+                  checked={role === "ROLE_USER"}
+                  onChange={this.handleRoleChange}
+                />
+                {" " + t("User")}
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="role"
+                  value="ROLE_ADMIN"
+                  checked={role === "ROLE_ADMIN"}
+                  onChange={this.handleRoleChange}
+                />
+                {" " +t("Admin")}
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="role"
+                  value="ROLE_BRIGADIER"
+                  checked={role === "ROLE_BRIGADIER"}
+                  onChange={this.handleRoleChange}
+                />
+                {" " + t("Brigadier")}
+              </label>
+            </div>
           </div>
           <button className="btn btn-primary" onClick={this.onClickCreateUser}>
             {t("Create User")}

@@ -90,6 +90,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 				.antMatchers(HttpMethod.GET, "/api/orders/my").authenticated()
 				.antMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
 				.antMatchers(HttpMethod.POST, "/api/orders").authenticated()
+				.antMatchers(HttpMethod.POST, "/api/orders/brigadier/my").authenticated()
 		.antMatchers("/api/user/**").authenticated()
         .and()
         .authorizeRequests().anyRequest().authenticated()

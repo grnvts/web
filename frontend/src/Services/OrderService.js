@@ -12,10 +12,12 @@ class OrderService {
   }
 
   getMyOrders() {
-    return ApiService.get('/orders/my'); // не нужно передавать headers вручную
+    return ApiService.get('/orders/my'); 
   }
-  
-
+  getMyOrdersForBrigadier() {
+    return ApiService.get('/orders/brigadier'); 
+  }
+ 
   getOrderById(orderId) {
     return ApiService.get(`/orders/${orderId}`);
   }
@@ -24,17 +26,18 @@ class OrderService {
     return ApiService.put(`/orders/${orderId}`, updatedOrder);
   }
   
-  updateOrderStatus(orderId, status) {
-    return ApiService.put(`/orders/${orderId}/status`, status);
-  }
+ // updateOrderStatus(orderId, status) {
+  //  return ApiService.put(`/orders/${orderId}/status`, status);
+  //}
 
-  updateOrderStatus(orderId, status) {
-    return ApiService.put(`/orders/${orderId}/status`, { status }, {
+  updateOrderStatus(orderId, payload) {
+    return ApiService.put(`/orders/${orderId}/status`, payload, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
   }
+  
   
   getAllBrigadiers() {
     return ApiService.get('/orders/brigadiers');

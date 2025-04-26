@@ -250,7 +250,11 @@ i18n.use(initReactI18next).init({
   "Create Order": "Создать заказ",
   'Preferred Start Date': "Желаемая дата начала",
   "My Orders": "Мои заказы",
-  'Create User': 'Создать пользователя'
+  'Create User': 'Создать пользователя',
+  "Role": "Роль",
+  "Brigadier": "Бригадир",
+  "Creating User" : "Создание пользователя",
+
         }
       }
     },

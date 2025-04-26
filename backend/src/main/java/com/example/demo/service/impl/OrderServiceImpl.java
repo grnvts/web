@@ -5,19 +5,15 @@ import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.*;
 import com.example.demo.repo.*;
+import com.example.demo.service.NotificationService;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,10 +26,11 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final BuildingRepository buildingRepository;
     private final ModelMapper mapper;
-
+    private final NotificationService notificationService;
     @Autowired
     private AddressRepository addressRepository;
     private RoleRepository roleRepository;
+
 
     @Override
     @Transactional
@@ -184,19 +181,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    @Override
-    public void updateOrderStatus(Long id, String status) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        try {
-            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            order.setStatus(orderStatus);
-            orderRepository.save(order);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid order status: " + status);
-        }
-    }
+//
 
     @Override
     public List<OrderDto> getAllOrders() {
@@ -225,5 +210,63 @@ public class OrderServiceImpl implements OrderService {
 
         return brigadiers.stream().map(UserDto::new).collect(Collectors.toList());
     }
+   // @Transactional
+    @Override
+    public void updateOrderStatus(Long id, String status, String message) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
+        User client = order.getClient(); // Получаем клиента заказа
+
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
+
+            // Создаем уведомление
+            notificationService.createNotification(order, client, message);
+
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+    }
+
+
+//    @Override
+//    public List<OrderDto> getOrdersForBrigadier(String username) {
+//
+//        User brigadier = userRepository.findUserByUsername(username)
+//                .orElseThrow(() -> new RuntimeException("Brigadier not found"));
+//        List<Order> orders = orderRepository.findByBrigadier(brigadier);
+//        return orders.stream()
+//                .map(order -> mapper.map(order, OrderDto.class))
+//                .collect(Collectors.toList());
+//    }
+
+    @Override
+    public List<OrderDto> getOrdersForBrigadier(String username) {
+        User brigadier = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Brigadier not found"));
+        List<Order> orders = orderRepository.findByBrigadierId(brigadier.getId());
+        System.out.println("Brigadier ID: " + brigadier.getId());
+        System.out.println("Orders: " + orders);
+        return orders.stream()
+                .map(order -> mapper.map(order, OrderDto.class))
+                .collect(Collectors.toList());
+
+    }
+
+//    @Override
+//    public void updateOrderStatus(Long id, String status) {
+//        Order order = orderRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Order not found"));
+//
+//        try {
+//            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+//            order.setStatus(orderStatus);
+//            orderRepository.save(order);
+//        } catch (IllegalArgumentException e) {
+//            throw new RuntimeException("Invalid order status: " + status);
+//        }
+//    }
 }

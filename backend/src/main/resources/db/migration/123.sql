@@ -11,3 +11,8 @@ WHERE version = '3';
 UPDATE flyway_schema_history
 SET checksum = -15706828
 WHERE version = '6';
+
+SELECT * FROM orders
+WHERE brigadier_id = 12;
+
+SELECT * FROM orders WHERE brigadier_id = (SELECT id FROM users WHERE username = 'BrigadiercreatedByAdmin');

@@ -68,6 +68,10 @@ class UserService {
         });
     };
     
+
+    getUserNotifications() {
+        return ApiService.get('/notifications');
+      }
     //put(url, data) { return axios.put(API_BASE_URL + url, data); }
 
     //delete(url) { return axios.delete(API_BASE_URL + url); }

@@ -16,6 +16,8 @@ const OrderDetailPage = () => {
   const [showBrigadierModal, setShowBrigadierModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const { t } = useTranslation();
+  const [statusMessage, setStatusMessage] = useState('');
+
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -53,11 +55,12 @@ const OrderDetailPage = () => {
 
   const handleChangeStatus = async () => {
     try {
-      await OrderService.updateOrderStatus(orderId, status); // Передаем строку напрямую
+      // Ensure the payload matches the backend DTO
+      await OrderService.updateOrderStatus(orderId, { status, message: statusMessage });
       AlertifyService.success(t('Order status updated successfully'));
       const updatedOrder = await OrderService.getOrderById(orderId);
       setOrder(updatedOrder.data);
-      setShowStatusModal(false); // Закрываем модальное окно
+      setShowStatusModal(false);
     } catch (error) {
       AlertifyService.error(t('Failed to update order status'));
     }
@@ -124,6 +127,12 @@ const OrderDetailPage = () => {
                       <option value="CANCELLED">{t('Cancelled')}</option>
                       <option value="REJECTED">{t('Rejected')}</option>
                     </select>
+                    <textarea
+                      className="form-control"
+                      value={statusMessage}
+                      onChange={(e) => setStatusMessage(e.target.value)}
+                      placeholder={t('Enter a message for the user')}
+                    />
                   </div>
                   <div className="modal-footer">
                     <button

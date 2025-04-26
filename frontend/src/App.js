@@ -17,7 +17,9 @@ import CreateOrderPage from "./pages/Orders/CreateOrderPage";
 import EditOrderPage from './pages/Orders/EditOrderPage';
 import AllOrdersPage from './pages/Orders/AllOrdersPage';
 import CreateUserPage from './pages/User/CreateUserPage';
-
+import BrigadierOrdersPage from './pages/Brigadier/BrigadierOrdersPage';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 class App extends Component {
 
@@ -56,10 +58,10 @@ class App extends Component {
         });
         return <Redirect to="/login" />
     }
-    componentDidMount() {
-        const token = localStorage.getItem('jwttoken');
-        ApiService.changeAuthToken(token);
-      }
+    //componentDidMount() {
+       // const token = localStorage.getItem('jwttoken');
+        //ApiService.changeAuthToken(token);
+      //}
       
     
     back() {
@@ -94,7 +96,7 @@ class App extends Component {
                     <AuthenticatedRoute exact path="/index" component={HomeComponent} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute path="/user/:username" component={UserDetailPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/users" component={UsersPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']} />
-                    
+                    <AuthenticatedRoute exact path="/orders/brigadier" component={BrigadierOrdersPage} isLoggedIn={isLoggedIn} roles={['ROLE_BRIGADIER']} />
                     <AuthenticatedRoute exact path="/orders/all" component={AllOrdersPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>               
                     <AuthenticatedRoute path="/orders/:orderId/edit" component={EditOrderPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>
                     <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />
