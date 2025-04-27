@@ -31,4 +31,5 @@ public interface UserService {
 	ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto);
 
 
+	User getUserEntity(String username);
 }

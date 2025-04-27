@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UserDto;
+import com.example.demo.model.Order;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -22,4 +23,6 @@ public interface OrderService {
     @Transactional
     void updateOrderStatus(Long id, String status, String message);
     public List<OrderDto> getActiveOrdersForBrigadier(String username);
+
+    Order getOrderEntity(Long orderId);
 }

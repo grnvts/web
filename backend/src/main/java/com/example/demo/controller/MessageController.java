@@ -1,0 +1,46 @@
+package com.example.demo.controller;
+
+import com.example.demo.dto.MessageDto;
+import com.example.demo.model.Message;
+import com.example.demo.model.Order;
+import com.example.demo.model.User;
+import com.example.demo.service.MessageService;
+import com.example.demo.service.OrderService;
+import com.example.demo.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/messages")
+@RequiredArgsConstructor
+public class MessageController {
+
+    private final MessageService messageService;
+    private final OrderService orderService;
+    private final UserService userService;
+
+    @PostMapping
+    public ResponseEntity<?> sendMessage(@RequestBody MessageDto messageDto) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User sender = userService.getUserEntity(username);
+        User recipient = userService.getUserEntity(messageDto.getRecipientUsername());
+        Order order = orderService.getOrderEntity(messageDto.getOrderId());
+
+        // Передаем все необходимые параметры
+        Message message = messageService.sendMessage(sender, recipient, order, messageDto.getContent());
+        return ResponseEntity.ok(new MessageDto(message));
+    }
+
+    @GetMapping("/{orderId}")
+    public List<MessageDto> getMessagesForOrder(@PathVariable Long orderId) {
+        Order order = orderService.getOrderEntity(orderId);
+        return messageService.getMessagesForOrder(order).stream()
+                .map(MessageDto::new)
+                .collect(Collectors.toList());
+    }
+}

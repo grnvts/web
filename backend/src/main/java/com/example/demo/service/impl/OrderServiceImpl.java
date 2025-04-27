@@ -87,10 +87,18 @@ public class OrderServiceImpl implements OrderService {
         dto.setId(order.getId());
         dto.setClientId(order.getClient().getId());
         dto.setClientUsername(order.getClient().getUsername());
+        dto.setClientName(order.getClient().getName());
+        dto.setClientSurname(order.getClient().getSurname());
+        dto.setClientPatronymic(order.getClient().getPatronymic());
+        dto.setClientPhone(order.getClient().getPhone());
 
         if (order.getBrigadier() != null) {
-            dto.setBrigadierId(order.getBrigadier().getId());
+            dto.setBrigadierId(order.getBrigadier().getId() );
             dto.setBrigadierUsername(order.getBrigadier().getUsername());
+            dto.setBrigadierName(order.getBrigadier().getName());
+            dto.setBrigadierSurname(order.getBrigadier().getSurname());
+            dto.setBrigadierPatronymic(order.getBrigadier().getPatronymic());
+            dto.setBrigadierPhone(order.getBrigadier().getPhone());
         }
 
         // Convert Address entity to AddressDto
@@ -259,6 +267,12 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> mapper.map(order, OrderDto.class))
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public Order getOrderEntity(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
 

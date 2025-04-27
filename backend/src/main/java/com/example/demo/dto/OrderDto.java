@@ -12,9 +12,16 @@ public class OrderDto {
     private Long id;
     private Long clientId;
     private String clientUsername;
+    private String clientName;
+    private String clientSurname;
+    private String clientPhone;
+    private String clientPatronymic;
     private Long brigadierId;
     private String brigadierUsername;
     private String brigadierName;
+    private String brigadierSurname;
+    private String brigadierPatronymic;
+    private String brigadierPhone;
     private AddressDto address;
     private Long addressId;
     private String orderDetails;

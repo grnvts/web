@@ -46,6 +46,7 @@ public class UserServiceImp implements UserService {
 	private final JwtTokenUtil tokenUtil;
 	private final FileService fileService;
 	private final RoleRepository roleRepository;
+	private final UserRepository userRepository;
 
 	private String[] types = { "image/png", "image/jpeg" };
 
@@ -268,6 +269,11 @@ public class UserServiceImp implements UserService {
 		repository.save(user);
 
 		return ResponseEntity.ok(new UserDto(user));
+	}
+	@Override
+	public User getUserEntity(String username) {
+		return userRepository.findUserByUsername(username)
+				.orElseThrow(() -> new RuntimeException("User not found"));
 	}
 
 }
