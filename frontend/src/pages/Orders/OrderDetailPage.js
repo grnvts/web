@@ -5,7 +5,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import AlertifyService from '../../Services/AlertifyService';
 import { useTranslation } from 'react-i18next';
 import BrigadierPickerWithCalendar from '../../components/BrigadierPickerWithCalendar';
-
+import { useSelector } from 'react-redux';
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -17,6 +17,10 @@ const OrderDetailPage = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const { t } = useTranslation();
   const [statusMessage, setStatusMessage] = useState('');
+  const roles = useSelector((state) => state.roles); // Получаем роли пользователя
+ 
+  const isBrigadier = roles?.includes('ROLE_BRIGADIER');
+  const isAdmin = roles?.includes('ROLE_ADMIN');
 
 
   useEffect(() => {
@@ -55,14 +59,37 @@ const OrderDetailPage = () => {
 
   const handleChangeStatus = async () => {
     try {
-      // Ensure the payload matches the backend DTO
-      await OrderService.updateOrderStatus(orderId, { status, message: statusMessage });
-      AlertifyService.success(t('Order status updated successfully'));
-      const updatedOrder = await OrderService.getOrderById(orderId);
-      setOrder(updatedOrder.data);
-      setShowStatusModal(false);
+        await OrderService.updateOrderStatus(orderId, {
+            status,
+            message: `Status changed to ${status}`,
+        });
+        AlertifyService.success(t('Order status updated successfully'));
+        const updatedOrder = await OrderService.getOrderById(orderId);
+        setOrder(updatedOrder.data);
+        setShowStatusModal(false);
     } catch (error) {
-      AlertifyService.error(t('Failed to update order status'));
+        AlertifyService.error(t('Failed to update order status'));
+    }
+};
+
+
+  const handleStartOrder = async () => {
+    try {
+      await OrderService.updateOrderStatus(order.id, { status: 'IN_PROGRESS' });
+      AlertifyService.success(t('Order started successfully'));
+      setOrder({ ...order, status: 'IN_PROGRESS' });
+    } catch (error) {
+      AlertifyService.error(t('Failed to start order'));
+    }
+  };
+
+  const handleCompleteOrder = async () => {
+    try {
+      await OrderService.updateOrderStatus(order.id, { status: 'COMPLETED' });
+      AlertifyService.success(t('Order marked as completed'));
+      setOrder({ ...order, status: 'COMPLETED' });
+    } catch (error) {
+      AlertifyService.error(t('Failed to complete order'));
     }
   };
 
@@ -71,26 +98,48 @@ const OrderDetailPage = () => {
       {order ? (
         <>
           <OrderCard order={order} />
-          <button className="btn btn-primary mt-3" onClick={handleEditClick}>
-            {t('Edit Order')}
-          </button>
 
-          {/* Кнопка для открытия модального окна "Назначить бригадира" */}
-          <button
-            className="btn btn-success mt-3"
-            onClick={() => setShowBrigadierModal(true)}
-          >
-            {t('Assign Brigadier')}
-          </button>
 
-           {/* Кнопка для открытия модального окна "Изменить статус" */}
-        <button
-          className="btn btn-warning mt-3"
-          onClick={handleOpenStatusModal}
-        >
-          {t('Change Status')}
-        </button>
 
+           {/* Кнопки для бригадира */}
+      {isBrigadier && (
+        <div className="mt-3">
+          {order.status === 'APPROVED' && (
+            <button className="btn btn-primary" onClick={handleStartOrder}>
+              {t('Start Order')}
+            </button>
+          )}
+          {order.status === 'IN_PROGRESS' && (
+            <button className="btn btn-success" onClick={handleCompleteOrder}>
+              {t('Mark as Completed')}
+            </button>
+          )}
+        </div>
+      )}
+
+{isAdmin && (
+  <>
+    <button className="btn btn-primary mt-3" onClick={handleEditClick}>
+      {t('Edit Order')}
+    </button>
+
+    {/* Кнопка для открытия модального окна "Назначить бригадира" */}
+    <button
+      className="btn btn-success mt-3"
+      onClick={() => setShowBrigadierModal(true)}
+    >
+      {t('Assign Brigadier')}
+    </button>
+
+    {/* Кнопка для открытия модального окна "Изменить статус" */}
+    <button
+      className="btn btn-warning mt-3"
+      onClick={handleOpenStatusModal}
+    >
+      {t('Change Status')}
+    </button>
+  </>
+)}
           {/* Модальное окно для назначения бригадира */}
           {showBrigadierModal && (
   <BrigadierPickerWithCalendar onAssign={(username) => {
@@ -124,7 +173,7 @@ const OrderDetailPage = () => {
                       <option value="CREATED">{t('Created')}</option>
                       <option value="IN_PROGRESS">{t('In Progress')}</option>
                       <option value="COMPLETED">{t('Completed')}</option>
-                      <option value="CANCELLED">{t('Cancelled')}</option>
+                      <option value="APPROVED">{t('Approved')}</option>
                       <option value="REJECTED">{t('Rejected')}</option>
                     </select>
                     <textarea
@@ -155,7 +204,7 @@ const OrderDetailPage = () => {
         </>
       ) : (
         <p>{t('Loading...')}</p>
-      )}
+            )}
     </div>
   );
 };

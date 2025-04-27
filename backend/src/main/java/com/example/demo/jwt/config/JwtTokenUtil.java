@@ -3,6 +3,7 @@ package com.example.demo.jwt.config;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -53,11 +54,24 @@ public class JwtTokenUtil implements Serializable
 	// generate token for user
 	public String generateToken(Authentication authentication) {
 		Map<String, Object> claims = new HashMap<>();
-		
+
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		String username = userDetails.getUsername();
+
+		// Добавляем роли в claims
+		claims.put("roles", userDetails.getAuthorities()
+				.stream()
+				.map(authority -> authority.getAuthority())
+				.toArray(String[]::new)
+		);
+
 		return doGenerateToken(claims, username);
 	}
+	public List<String> getRolesFromToken(String token) {
+		final Claims claims = getAllClaimsFromToken(token);
+		return claims.get("roles", List.class);
+	}
+
 
 	// while creating the token -
 	// 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID

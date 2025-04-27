@@ -42,6 +42,7 @@ class App extends Component {
         localStorage.setItem("jwttoken", authState.jwttoken);
         localStorage.setItem("isLoggedIn", true);
         this.setState({ ...authState, isLoggedIn: true });
+        console.log('JWT Token set in onLoginSuccess:', authState.jwttoken);
 
         return <Redirect to="/index" />
     }
@@ -97,6 +98,7 @@ class App extends Component {
                     <AuthenticatedRoute path="/user/:username" component={UserDetailPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/users" component={UsersPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']} />
                     <AuthenticatedRoute exact path="/orders/brigadier" component={BrigadierOrdersPage} isLoggedIn={isLoggedIn} roles={['ROLE_BRIGADIER']} />
+                    <AuthenticatedRoute exact path="/orders/brigadier/active" component={BrigadierOrdersPage} isLoggedIn={isLoggedIn} roles={['ROLE_BRIGADIER']} />
                     <AuthenticatedRoute exact path="/orders/all" component={AllOrdersPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>               
                     <AuthenticatedRoute path="/orders/:orderId/edit" component={EditOrderPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>
                     <AuthenticatedRoute exact path="/orders" component={MyOrdersPage} isLoggedIn={isLoggedIn} />

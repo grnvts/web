@@ -66,16 +66,14 @@ public class OrderController {
     }
 
     @GetMapping("/brigadier")
-   // @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+   @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public List<OrderDto> getBrigadierOrders(@RequestHeader("Authorization") String authHeader) {
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
-        System.out.println("Username: " + username);
-        System.out.println("Roles: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         return orderService.getOrdersForBrigadier(username);
     }
 
     //Получение одного заказа по ID
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/{id:[0-9]+}") // Ограничиваем {id} только цифрами, чтобы "my" не срабатывал как ID
     public OrderDto getOrder(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
@@ -103,15 +101,24 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateOrderStatus(
             @PathVariable Long id,
-            @RequestBody UpdateStatusRequest request // <== правильный DTO
+            @RequestBody UpdateStatusRequest request
     ) {
         orderService.updateOrderStatus(id, request.getStatus(), request.getMessage());
         return ResponseEntity.ok("Order status updated");
     }
 
+
+    @GetMapping("/brigadier/active")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    public List<OrderDto> getActiveOrdersForBrigadier(@RequestHeader("Authorization") String authHeader) {
+        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
+        System.out.println("Username: " + username);
+        System.out.println("Roles: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        return orderService.getActiveOrdersForBrigadier(username);
+    }
 //
 //    @PutMapping("/{id}/status")
 //    @PreAuthorize("hasRole('ADMIN')")

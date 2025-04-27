@@ -1,5 +1,5 @@
 import ApiService from './BaseService/ApiService';
-
+import Axios from "axios";
 class OrderService {
 
 
@@ -14,10 +14,11 @@ class OrderService {
   getMyOrders() {
     return ApiService.get('/orders/my'); 
   }
-  getMyOrdersForBrigadier() {
-    return ApiService.get('/orders/brigadier'); 
-  }
- 
+  getActiveOrdersForBrigadier() {
+    console.log('Calling /orders/brigadier/active...');
+    console.log('Authorization header:', Axios.defaults.headers.common['Authorization']);
+    return ApiService.get('/orders/brigadier/active');
+}
   getOrderById(orderId) {
     return ApiService.get(`/orders/${orderId}`);
   }

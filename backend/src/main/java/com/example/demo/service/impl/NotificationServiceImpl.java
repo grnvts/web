@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         notification.setOrder(order);
         notification.setUser(user);
-        notification.setMessage(message);
+        notification.setMessage(message != null ? message : "-");
         notificationRepository.save(notification);
     }
 }

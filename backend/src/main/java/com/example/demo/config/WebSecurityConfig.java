@@ -86,12 +86,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .antMatchers(HttpMethod.GET,"/images/**").permitAll()
         .antMatchers(HttpMethod.POST,"/api/login").permitAll()
         .antMatchers(HttpMethod.POST,"/api/user").authenticated()
-		.antMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN")
+		.antMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN") //ROLE_ из названия роли надо опустить тк автоматически убирается
+				.antMatchers("/api/orders/brigadier/active").hasRole("BRIGADIER")
 				.antMatchers(HttpMethod.GET, "/api/orders/my").authenticated()
 				.antMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
 				.antMatchers(HttpMethod.POST, "/api/orders").authenticated()
 				.antMatchers(HttpMethod.POST, "/api/orders/brigadier/my").authenticated()
-		.antMatchers("/api/user/**").authenticated()
+				.antMatchers(HttpMethod.POST, "/api/orders/brigadier").authenticated()
+
+				.antMatchers("/api/user/**").authenticated()
         .and()
         .authorizeRequests().anyRequest().authenticated()
         .and()

@@ -20,4 +20,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o.startDate, COUNT(o) FROM Order o WHERE o.brigadier.username = :username AND o.startDate BETWEEN :start AND :end GROUP BY o.startDate")
     List<Object[]> countOrdersByBrigadierPerDay(@Param("username") String username, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
+    @Query("SELECT o FROM Order o WHERE (o.endDate >= :currentDate OR o.status = 'IN_PROGRESS' OR o.startDate >= :currentDate) AND o.brigadier.username = :username")
+    List<Order> findActiveOrdersForBrigadier(@Param("username") String username, @Param("currentDate") LocalDate currentDate);
 }

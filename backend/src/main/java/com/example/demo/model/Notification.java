@@ -31,7 +31,7 @@ public class Notification {
     private String message;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();;
 
     @PrePersist
     protected void onCreate() {

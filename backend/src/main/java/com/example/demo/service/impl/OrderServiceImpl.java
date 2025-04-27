@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         // Проверяем, является ли пользователь владельцем заказа или администратором
         if (!order.getClient().getUsername().equals(username) &&
                 !userRepository.findByUsername(username).getRoles().stream()
-                        .anyMatch(role -> role.getName().equals(RoleName.ROLE_ADMIN))) {
+                        .anyMatch(role -> role.getName().equals(RoleName.ROLE_ADMIN) || role.getName().equals(RoleName.ROLE_BRIGADIER))) {
             throw new RuntimeException("Access denied");
         }
 
@@ -210,38 +210,43 @@ public class OrderServiceImpl implements OrderService {
 
         return brigadiers.stream().map(UserDto::new).collect(Collectors.toList());
     }
-   // @Transactional
+   @Override
+   @Transactional
+   public void updateOrderStatus(Long id, String status, String message) {
+       Order order = orderRepository.findById(id)
+               .orElseThrow(() -> new RuntimeException("Order not found"));
+
+       User client = order.getClient(); // Получаем клиента заказа
+
+       try {
+           OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+           order.setStatus(orderStatus);
+           orderRepository.save(order);
+
+           // Формируем сообщение для уведомления
+           String notificationMessage = String.format(
+                   "Order #%d status changed to %s. %s",
+                   order.getId(),
+                   orderStatus.name(),
+                   message != null ? message : ""
+           );
+
+           // Создаем уведомление
+           notificationService.createNotification(order, client, notificationMessage);
+
+       } catch (IllegalArgumentException e) {
+           throw new RuntimeException("Invalid order status: " + status);
+       }
+   }
+
     @Override
-    public void updateOrderStatus(Long id, String status, String message) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        User client = order.getClient(); // Получаем клиента заказа
-
-        try {
-            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            order.setStatus(orderStatus);
-            orderRepository.save(order);
-
-            // Создаем уведомление
-            notificationService.createNotification(order, client, message);
-
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid order status: " + status);
-        }
+    public List<OrderDto> getActiveOrdersForBrigadier(String username) {
+        LocalDate currentDate = LocalDate.now();
+        List<Order> orders = orderRepository.findActiveOrdersForBrigadier(username, currentDate);
+        return orders.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
-
-
-//    @Override
-//    public List<OrderDto> getOrdersForBrigadier(String username) {
-//
-//        User brigadier = userRepository.findUserByUsername(username)
-//                .orElseThrow(() -> new RuntimeException("Brigadier not found"));
-//        List<Order> orders = orderRepository.findByBrigadier(brigadier);
-//        return orders.stream()
-//                .map(order -> mapper.map(order, OrderDto.class))
-//                .collect(Collectors.toList());
-//    }
 
     @Override
     public List<OrderDto> getOrdersForBrigadier(String username) {
@@ -256,17 +261,5 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-//    @Override
-//    public void updateOrderStatus(Long id, String status) {
-//        Order order = orderRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Order not found"));
-//
-//        try {
-//            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-//            order.setStatus(orderStatus);
-//            orderRepository.save(order);
-//        } catch (IllegalArgumentException e) {
-//            throw new RuntimeException("Invalid order status: " + status);
-//        }
-//    }
+
 }
