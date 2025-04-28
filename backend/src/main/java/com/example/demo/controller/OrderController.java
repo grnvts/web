@@ -73,7 +73,7 @@ public class OrderController {
     }
 
     //Получение одного заказа по ID
-    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
+   // @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/{id:[0-9]+}") // Ограничиваем {id} только цифрами, чтобы "my" не срабатывал как ID
     public OrderDto getOrder(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));

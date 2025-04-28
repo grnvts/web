@@ -72,14 +72,17 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Проверяем, является ли пользователь владельцем заказа или администратором
-        if (!order.getClient().getUsername().equals(username) &&
-                !userRepository.findByUsername(username).getRoles().stream()
-                        .anyMatch(role -> role.getName().equals(RoleName.ROLE_ADMIN) || role.getName().equals(RoleName.ROLE_BRIGADIER))) {
-            throw new RuntimeException("Access denied");
+        // Проверяем, является ли пользователь владельцем заказа, бригадиром или администратором
+        boolean isClient = order.getClient().getUsername().equals(username);
+        boolean isBrigadier = order.getBrigadier() != null && order.getBrigadier().getUsername().equals(username);
+        boolean isAdmin = userRepository.findByUsername(username).getRoles().stream()
+                .anyMatch(role -> role.getName() == RoleName.ROLE_ADMIN);
+
+        if (!isClient && !isBrigadier && !isAdmin) {
+            throw new RuntimeException("Access denied: You do not have permission to view this order");
         }
 
-        return toDto(order);
+        return mapper.map(order, OrderDto.class);
     }
 
     private OrderDto toDto(Order order) {

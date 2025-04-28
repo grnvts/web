@@ -29,8 +29,20 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.save(message);
     }
 
-    @Override
-    public List<Message> getMessagesForOrder(Order order) {
-        return messageRepository.findByOrder(order);
+//    @Override
+//    public List<Message> getMessagesForOrder(Order order) {
+//        return messageRepository.findByOrder(order);
+//    }
+@Override
+public List<Message> getMessagesForOrder(Order order, String recipientUsername, String senderUsername) {
+    return messageRepository.findByOrderAndRecipientOrSender(order, recipientUsername, senderUsername);
+}
+
+    public List<Message> getDialogMessages(Order order, String user1, String user2) {
+        return messageRepository.findDialogMessages(order, user1, user2);
+    }
+
+    public List<Message> getAdminUserDialogMessages(Order order, String user, String admin) {
+        return messageRepository.findAdminUserDialogMessages(order, user, user, admin);
     }
 }

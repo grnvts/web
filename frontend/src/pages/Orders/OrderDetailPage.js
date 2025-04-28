@@ -19,6 +19,7 @@ const OrderDetailPage = () => {
   const { t } = useTranslation();
   const [statusMessage, setStatusMessage] = useState('');
   const roles = useSelector((state) => state.roles); // Получаем роли пользователя
+  const username = useSelector((state) => state.username);
   const [showChat, setShowChat] = useState(false);
   const [chatRecipient, setChatRecipient] = useState('');
   
@@ -41,11 +42,11 @@ const OrderDetailPage = () => {
 
   const openChat = (recipientType) => {
     if (recipientType === 'admin') {
-      setChatRecipient('admin'); // Чат с администратором
+      setChatRecipient('admin'); // Все администраторы
     } else if (recipientType === 'brigadier') {
-      setChatRecipient(order.brigadierUsername); // Чат с бригадиром
+      setChatRecipient(order.brigadierUsername); // Конкретный бригадир
     } else if (recipientType === 'user') {
-      setChatRecipient(order.clientUsername); // Чат с пользователем
+      setChatRecipient(order.clientUsername); // Конкретный пользователь
     }
     setShowChat(true);
   };
@@ -165,33 +166,49 @@ const OrderDetailPage = () => {
 
           {/* Кнопка чата для администратора */}
           {isAdmin && (
-            <div className="mt-3">
-              <button
-                className="btn btn-primary"
-                onClick={() => openChat('user')}
-              >
-                {t('Chat with User')}
-              </button>
-              {order.brigadierUsername && (
-                <button
-                  className="btn btn-primary ms-2"
-                  onClick={() => openChat('brigadier')}
-                >
-                  {t('Chat with Brigadier')}
-                </button>
-              )}
-            </div>
-          )}
+  <div className="mt-3">
+    {/* Кнопка "Чат с пользователем" всегда показывается */}
+    <button
+      className="btn btn-primary"
+      onClick={() => openChat('user')}
+    >
+      {t('Chat with User')}
+    </button>
+    {/* Кнопка "Чат с бригадиром" только если админ — клиент этого заказа */}
+    {order.brigadierUsername && order.clientUsername === username && (
+      <button
+        className="btn btn-primary ms-2"
+        onClick={() => openChat('brigadier')}
+      >
+        {t('Chat with Brigadier')}
+      </button>
+    )}
+    {/* Кнопка "Чат с админом" только если админ НЕ клиент этого заказа */}
+    {order.clientUsername !== username && !isAdmin && (
+      <button
+        className="btn btn-primary ms-2"
+        onClick={() => openChat('admin')}
+      >
+        {t('Chat with Admin')}
+      </button>
+    )}
+  </div>
+)}
 
 
 {showChat && (
   <ChatModal
     orderId={order.id}
-    recipientUsername={chatRecipient}
+    recipientUsername={
+      // если чат с админом (для пользователя), то передаем username пользователя
+      (chatRecipient === 'admin' && isUser)
+        ? order.clientUsername
+        : chatRecipient
+    }
+    isAdminChat={isAdmin ? chatRecipient === order.clientUsername : isUser && chatRecipient === 'admin'}
     onClose={() => setShowChat(false)}
   />
 )}
-
 
 
 

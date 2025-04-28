@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import OrderCard from '../../components/OrderCard';
+import CompactOrderCard from '../../components/CompactOrderCard';
 import OrderService from '../../Services/OrderService';
 import AlertifyService from '../../Services/AlertifyService';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
 
 const MyOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
-  const history = useHistory();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -27,10 +25,6 @@ const MyOrdersPage = () => {
     fetchOrders();
   }, [t]);
 
-  const handleOrderClick = (orderId) => {
-    history.push(`/orders/${orderId}`); // Переход к деталям заказа
-  };
-
   if (loading) {
     return <div className="container">{t('Loading orders...')}</div>;
   }
@@ -42,7 +36,7 @@ const MyOrdersPage = () => {
         <div className="row">
           {orders.map((order) => (
             <div className="col-md-4" key={order.id}>
-              <OrderCard order={order} onClick={() => handleOrderClick(order.id)} />
+              <CompactOrderCard order={order} />
             </div>
           ))}
         </div>

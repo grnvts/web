@@ -1,37 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import MessageService from '../Services/MessageService';
+import { useSelector } from 'react-redux';
 
-const ChatModal = ({ orderId, recipientUsername, onClose }) => {
+const ChatModal = ({ orderId, recipientUsername, onClose, isAdminChat }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const currentUser = useSelector((state) => state.username);
+  const roles = useSelector((state) => state.roles); 
+  const isAdmin = roles?.includes('ROLE_ADMIN');  
 
-  // Функция для получения сообщений
   const fetchMessages = async () => {
     try {
-      const response = await MessageService.getMessagesForOrder(orderId);
+      let response;
+      if (isAdminChat) {
+        // user — username пользователя!
+        response = await MessageService.getAdminUserDialogMessages(orderId, recipientUsername);
+      } else {
+        response = await MessageService.getDialogMessages(orderId, currentUser, recipientUsername);
+      }
       setMessages(response.data);
     } catch (error) {
       console.error('Failed to load messages', error);
     }
   };
 
-  // Периодическое обновление сообщений
   useEffect(() => {
     fetchMessages();
-    const interval = setInterval(fetchMessages, 3000); // Обновляем каждые 3 секунды
-    return () => clearInterval(interval); // Очищаем интервал при размонтировании
-  }, [orderId]);
+    const interval = setInterval(fetchMessages, 3000);
+    return () => clearInterval(interval);
+  }, [orderId, recipientUsername, isAdminChat]);
 
-  // Отправка нового сообщения
   const handleSendMessage = async () => {
     try {
+      let recipient = recipientUsername;
+      // Если пользователь пишет админу, recipientUsername === order.clientUsername, а надо — username админа
+      if (isAdminChat && !isAdmin) {
+        recipient = 'admin'; // или username любого админа, если есть
+      }
       await MessageService.sendMessage({
         orderId,
-        recipientUsername,
+        recipientUsername: recipient,
         content: newMessage,
       });
       setNewMessage('');
-      fetchMessages(); // Обновляем сообщения после отправки
+      fetchMessages();
     } catch (error) {
       console.error('Failed to send message', error);
     }
