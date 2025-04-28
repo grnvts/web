@@ -27,6 +27,8 @@ public class OrderServiceImpl implements OrderService {
     private final BuildingRepository buildingRepository;
     private final ModelMapper mapper;
     private final NotificationService notificationService;
+    private final BrigadeRepository brigadeRepository;
+
     @Autowired
     private AddressRepository addressRepository;
     private RoleRepository roleRepository;
@@ -278,5 +280,21 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
+
+
+    @Override
+    public List<UserDto> getBrigadeMasters(Long brigadeId) {
+        Brigade brigade = brigadeRepository.findById(brigadeId).orElseThrow();
+        return brigade.getMasters().stream().map(UserDto::new).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void assignMasters(Long orderId, List<Long> masterIds) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        List<User> masters = userRepository.findAllById(masterIds);
+        order.setAssignedMasters(masters);
+        orderRepository.save(order);
+    }
 
 }

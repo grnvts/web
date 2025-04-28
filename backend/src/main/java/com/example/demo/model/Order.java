@@ -6,6 +6,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name = "orders")
 @Data
@@ -50,4 +52,15 @@ public class Order {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
+
+    @ManyToOne
+    private Brigade brigade;
+
+    @ManyToMany
+    @JoinTable(
+            name = "order_masters",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "master_id")
+    )
+    private List<User> assignedMasters;
 }

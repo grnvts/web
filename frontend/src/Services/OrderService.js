@@ -23,6 +23,10 @@ class OrderService {
     return ApiService.get(`/orders/${orderId}`);
   }
 
+  assignMasters(orderId, masterIds) {
+    return ApiService.put(`/orders/${orderId}/assign-masters`, masterIds);
+  }
+  
   updateOrder(orderId, updatedOrder) {
     return ApiService.put(`/orders/${orderId}`, updatedOrder);
   }

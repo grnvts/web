@@ -7,6 +7,7 @@ import AlertifyService from '../../Services/AlertifyService';
 import { useTranslation } from 'react-i18next';
 import BrigadierPickerWithCalendar from '../../components/BrigadierPickerWithCalendar';
 import { useSelector } from 'react-redux';
+import AssignMastersModal from '../../components/AssignMastersModal';
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -22,7 +23,8 @@ const OrderDetailPage = () => {
   const username = useSelector((state) => state.username);
   const [showChat, setShowChat] = useState(false);
   const [chatRecipient, setChatRecipient] = useState('');
-  
+  const [showAssignMastersModal, setShowAssignMastersModal] = useState(false);
+
   const isBrigadier = roles?.includes('ROLE_BRIGADIER');
   const isAdmin = roles?.includes('ROLE_ADMIN');
   const isUser = roles?.includes('ROLE_USER');
@@ -51,13 +53,25 @@ const OrderDetailPage = () => {
     setShowChat(true);
   };
 
+  const handleAssignMasters = async (masterIds) => {
+    try {
+      await OrderService.assignMasters(order.id, masterIds);
+      AlertifyService.success(t('Masters assigned successfully'));
+      const updatedOrder = await OrderService.getOrderById(order.id);
+      setOrder(updatedOrder.data);
+      setShowAssignMastersModal(false);
+    } catch (error) {
+      AlertifyService.error(t('Failed to assign masters'));
+    }
+  };
+
 
   const handleEditClick = () => {
     history.push(`/orders/${orderId}/edit`);
   };
   
   const handleOpenStatusModal = () => {
-    setStatus(order.status); // Устанавливаем текущий статус заказа
+    setStatus(order.status); 
     setShowStatusModal(true); // Открываем модальное окно
   };
 
@@ -132,6 +146,22 @@ const OrderDetailPage = () => {
           )}
         </div>
       )}
+
+
+{isBrigadier && order && order.status === 'CREATED' && order.brigade && (
+  <button className="btn btn-info mt-3" onClick={() => setShowAssignMastersModal(true)}>
+    {t('Assign Masters')}
+  </button>
+)}
+{showAssignMastersModal && order && order.brigade && (
+  <AssignMastersModal
+    brigadeId={order.brigade.id}
+    assignedMasters={order.assignedMasters}
+    onAssign={handleAssignMasters}
+    onClose={() => setShowAssignMastersModal(false)}
+  />
+)}
+
  {/* Кнопки чатов для пользователя */}
  {isUser && (
             <div className="mt-3">

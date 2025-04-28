@@ -22,7 +22,10 @@ public interface OrderService {
     List<OrderDto> getOrdersForBrigadier(String username);
     @Transactional
     void updateOrderStatus(Long id, String status, String message);
-    public List<OrderDto> getActiveOrdersForBrigadier(String username);
+    List<OrderDto> getActiveOrdersForBrigadier(String username);
 
     Order getOrderEntity(Long orderId);
+
+    List<UserDto> getBrigadeMasters(Long brigadeId);
+    void assignMasters(Long orderId, List<Long> masterIds);
 }

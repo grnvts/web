@@ -101,5 +101,12 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
+	@ManyToMany
+	@JoinTable(
+			name = "master_qualification",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "qualification_id")
+	)
+	private List<Qualification> qualifications;
 
 }

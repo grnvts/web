@@ -119,12 +119,22 @@ public class OrderController {
         System.out.println("Roles: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         return orderService.getActiveOrdersForBrigadier(username);
     }
-//
-//    @PutMapping("/{id}/status")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
-//    orderService.updateOrderStatus(id, request.getStatus(), request.getMessage());
-//    return ResponseEntity.ok("Order status updated successfully");
-//}
+
+    // работа с мастерами
+    @GetMapping("/brigade/{brigadeId}/masters")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    public List<UserDto> getBrigadeMasters(@PathVariable Long brigadeId) {
+        return orderService.getBrigadeMasters(brigadeId);
+    }
+
+
+    @PutMapping("/{orderId}/assign-masters")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    public ResponseEntity<?> assignMasters(@PathVariable Long orderId, @RequestBody List<Long> masterIds) {
+        orderService.assignMasters(orderId, masterIds);
+        return ResponseEntity.ok("Masters assigned");
+    }
+
+
 }
     
