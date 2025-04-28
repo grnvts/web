@@ -22,6 +22,7 @@ public class OrderDto {
     private String brigadierSurname;
     private String brigadierPatronymic;
     private String brigadierPhone;
+    private String brigadeNumber;
     private AddressDto address;
     private Long addressId;
     private String orderDetails;

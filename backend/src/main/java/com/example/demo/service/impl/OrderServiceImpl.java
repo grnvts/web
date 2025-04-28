@@ -97,14 +97,28 @@ public class OrderServiceImpl implements OrderService {
         dto.setClientPatronymic(order.getClient().getPatronymic());
         dto.setClientPhone(order.getClient().getPhone());
 
-        if (order.getBrigadier() != null) {
-            dto.setBrigadierId(order.getBrigadier().getId() );
-            dto.setBrigadierUsername(order.getBrigadier().getUsername());
-            dto.setBrigadierName(order.getBrigadier().getName());
-            dto.setBrigadierSurname(order.getBrigadier().getSurname());
-            dto.setBrigadierPatronymic(order.getBrigadier().getPatronymic());
-            dto.setBrigadierPhone(order.getBrigadier().getPhone());
+        if (order.getBrigade() != null) {
+            dto.setBrigadeNumber(order.getBrigade().getNumber());
+            if (order.getBrigade().getBrigadier() != null) {
+                dto.setBrigadierUsername(order.getBrigade().getBrigadier().getUsername());
+                dto.setBrigadierName(order.getBrigade().getBrigadier().getName());
+                dto.setBrigadierSurname(order.getBrigade().getBrigadier().getSurname());
+                dto.setBrigadierPatronymic(order.getBrigade().getBrigadier().getPatronymic());
+                dto.setBrigadierPhone(order.getBrigade().getBrigadier().getPhone());
+                dto.setBrigadierId(order.getBrigade().getBrigadier().getId());
+            }
         }
+
+
+
+//        if (order.getBrigadier() != null) {
+//            dto.setBrigadierId(order.getBrigadier().getId() );
+//            dto.setBrigadierUsername(order.getBrigadier().getUsername());
+//            dto.setBrigadierName(order.getBrigadier().getName());
+//            dto.setBrigadierSurname(order.getBrigadier().getSurname());
+//            dto.setBrigadierPatronymic(order.getBrigadier().getPatronymic());
+//            dto.setBrigadierPhone(order.getBrigadier().getPhone());
+//        }
 
         // Convert Address entity to AddressDto
         Address address = order.getAddress();
