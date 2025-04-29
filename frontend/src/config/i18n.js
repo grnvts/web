@@ -261,7 +261,9 @@ i18n.use(initReactI18next).init({
   "tiler" : "Плиточник",
   "carpenter" : "Столяр",
   "painter" : "Маляр",
-  "labiurer" : "Разнорабочий"
+  "labiurer" : "Разнорабочий", 
+  'My Brigade': 'Моя бригада',
+  'Brigade': 'Бригада'
 
         }
       }

@@ -73,6 +73,12 @@ const NavbarComponent = props => {
         }
     };
 
+    const { i18n } = useTranslation();
+
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+    };
+
     let links = (
         <ul className="navbar-nav ml-auto">
             <li className="nav-item">
@@ -83,7 +89,7 @@ const NavbarComponent = props => {
             </li>
         </ul>
     );
-
+    
     if (isLoggedIn) {
 
 
@@ -241,9 +247,21 @@ const NavbarComponent = props => {
         }
     }
     return (
-        <div className="col-lg-12 shadow-sm bg-light mb-2">
-            <nav className="navbar navbar-expand-lg navbar-light">
-                <Link className="navbar-brand" to="/">{t('Navbar')}</Link>
+        <div className="col-lg-12 shadow-sm mb-2" style={{ width: '100%', padding: 0 }}>
+            <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: '#fff' }}>
+                {/* Language Switcher */}
+                <ul className="navbar-nav" style={{marginLeft: 'auto', marginRight: 'auto', flexDirection: 'row'}}>
+                    <li className="nav-item">
+                        <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => changeLanguage('en')}>
+                            English
+                        </span>
+                    </li>
+                    <li className="nav-item">
+                        <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => changeLanguage('ru')}>
+                            Русский
+                        </span>
+                    </li>
+                </ul>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -254,5 +272,4 @@ const NavbarComponent = props => {
         </div>
     );
 };
-
 export default NavbarComponent;

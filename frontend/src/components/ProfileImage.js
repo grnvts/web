@@ -11,7 +11,7 @@ const ProfileImage = (props) => {
     
     return (
             <img 
-                className="rounded-circle shadow" 
+                className="rounded-circle" 
                 width={width} 
                 height={height}
                 src={newimage || source }  
