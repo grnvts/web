@@ -34,6 +34,9 @@ class OrderService {
   updateOrder(orderId, updatedOrder) {
     return ApiService.put(`/orders/${orderId}`, updatedOrder);
   }
+  addExpense(orderId, amount) {
+    return ApiService.post(`/orders/${orderId}/add-expense`, { amount });
+  }
   
  // updateOrderStatus(orderId, status) {
   //  return ApiService.put(`/orders/${orderId}/status`, status);

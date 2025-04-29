@@ -24,6 +24,8 @@ const OrderDetailPage = () => {
   const [showChat, setShowChat] = useState(false);
   const [chatRecipient, setChatRecipient] = useState('');
   const [showAssignMastersModal, setShowAssignMastersModal] = useState(false);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [expenseAmount, setExpenseAmount] = useState('');
 
   const isBrigadier = roles?.includes('ROLE_BRIGADIER');
   const isAdmin = roles?.includes('ROLE_ADMIN');
@@ -51,6 +53,25 @@ const OrderDetailPage = () => {
       setChatRecipient(order.clientUsername); // Конкретный пользователь
     }
     setShowChat(true);
+  };
+
+  const handleAddExpense = async () => {
+    if (!expenseAmount || isNaN(expenseAmount) || Number(expenseAmount) <= 0) {
+      alert('Введите корректную сумму расходов');
+      return;
+    }
+
+    try {
+      await OrderService.addExpense(orderId, Number(expenseAmount));
+      alert('Расходы успешно добавлены');
+      setShowExpenseModal(false);
+      setExpenseAmount('');
+      // Обновляем данные заказа
+      const updatedOrder = await OrderService.getOrderById(orderId);
+      setOrder(updatedOrder.data);
+    } catch (error) {
+      alert('Ошибка при добавлении расходов');
+    }
   };
 
   const handleAssignMasters = async (masterIds) => {
@@ -129,8 +150,6 @@ const OrderDetailPage = () => {
         <>
           <OrderCard order={order} />
 
-
-
            {/* Кнопки для бригадира */}
       {isBrigadier && (
         <div className="mt-3">
@@ -149,9 +168,44 @@ const OrderDetailPage = () => {
 
 
 {isBrigadier && (
+  <>
   <button className="btn btn-info mt-3" onClick={() => setShowAssignMastersModal(true)}>
     {t('Assign Masters')}
   </button>
+  <button className="btn btn-info mt-3" onClick={() => setShowExpenseModal(true)} >
+  {t('Добавить расходы')}
+</button>
+{showExpenseModal && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Добавить расходы</h5>
+                <button type="button" className="btn-close" onClick={() => setShowExpenseModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <label>Сумма расходов:</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={expenseAmount}
+                  onChange={(e) => setExpenseAmount(e.target.value)}
+                />
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowExpenseModal(false)}>
+                  Отмена
+                </button>
+                <button type="button" className="btn btn-success" onClick={handleAddExpense}>
+                  Добавить
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+</>
 )}
  {showAssignMastersModal && (
   <AssignMastersModal

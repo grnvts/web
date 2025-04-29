@@ -1,6 +1,7 @@
 package com.example.demo.dto;
 
 
+import com.example.demo.model.Address;
 import lombok.Data;
 
 @Data
@@ -10,4 +11,11 @@ public class AddressDto {
     private String street;
     private String buildingNo;
     private String apartmentNo;
+    public AddressDto(Address address) {
+        this.id = address.getId();
+        this.city = address.getCity();
+        this.street = address.getStreet();
+        this.buildingNo = address.getBuildingNo();
+        this.apartmentNo = address.getApartmentNo();
+    }
 }

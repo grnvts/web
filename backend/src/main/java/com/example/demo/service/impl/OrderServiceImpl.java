@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +134,7 @@ public class OrderServiceImpl implements OrderService {
         // Convert Address entity to AddressDto
         Address address = order.getAddress();
         if (address != null) {
-            AddressDto addressDto = new AddressDto();
+            AddressDto addressDto = new AddressDto(order.getAddress());
             addressDto.setId(address.getId());
             addressDto.setStreet(address.getStreet());
             addressDto.setCity(address.getCity());
@@ -360,6 +361,21 @@ public class OrderServiceImpl implements OrderService {
         return userDto;
     }
 
+    @Override
+    @Transactional
+    public Order addExpense(Long orderId, Double amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("Некорректная сумма расходов");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Заказ не найден"));
+
+        order.setPrice(order.getPrice().add(BigDecimal.valueOf(amount)));
+        orderRepository.save(order);
+
+        return order;
+    }
 
 
 }

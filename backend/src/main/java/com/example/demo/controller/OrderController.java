@@ -4,6 +4,7 @@ import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UpdateStatusRequest;
 import com.example.demo.dto.UserDto;
 import com.example.demo.jwt.config.JwtTokenUtil;
+import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -138,6 +139,19 @@ public class OrderController {
     public ResponseEntity<?> assignMasters(@PathVariable Long orderId, @RequestBody List<Long> masterIds) {
         orderService.assignMasters(orderId, masterIds);
         return ResponseEntity.ok("Masters assigned");
+    }
+
+    @PostMapping("/{orderId}/add-expense")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    public ResponseEntity<?> addExpense(@PathVariable Long orderId, @RequestBody Map<String, Double> body) {
+        Double amount = body.get("amount");
+        try {
+            Order order = orderService.addExpense(orderId, amount);
+            OrderDto dto = new OrderDto(order); // Используйте DTO!
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 
