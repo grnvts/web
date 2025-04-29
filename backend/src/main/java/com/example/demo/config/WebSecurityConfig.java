@@ -93,7 +93,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 				.antMatchers(HttpMethod.POST, "/api/orders").authenticated()
 				.antMatchers(HttpMethod.POST, "/api/orders/brigadier/my").authenticated()
 				.antMatchers(HttpMethod.POST, "/api/orders/brigadier").authenticated()
-
+				.antMatchers(HttpMethod.GET, "/api/brigade/all").hasRole("ADMIN")
+				.antMatchers(HttpMethod.GET, "/api/user/masters").hasAnyRole("ADMIN", "BRIGADIER")
 				.antMatchers("/api/user/**").authenticated()
         .and()
         .authorizeRequests().anyRequest().authenticated()

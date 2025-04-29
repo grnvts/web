@@ -2,6 +2,9 @@ package com.example.demo.api;
 
 import javax.validation.Valid;
 
+import com.example.demo.dto.CreateMasterDto;
+import com.example.demo.model.Qualification;
+import com.example.demo.repo.QualificationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -29,7 +32,7 @@ import java.util.Map;
 @CrossOrigin
 public class UserApi {
 	private final UserService service;
-
+	private final QualificationRepository qualificationRepository;
 	// localhost:8501/api/user/users?page=1&size=4
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users")
@@ -81,4 +84,22 @@ public class UserApi {
     	return ResponseEntity.ok(service.deleteUser(id));
 	}
 
+	@GetMapping("/masters")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_BRIGADIER')")
+	public List<UserDto> getAllMasters() {
+		return service.findAllMasters();
+	}
+
+	@GetMapping("/qualifications")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public List<Qualification> getAllQualifications() {
+		return qualificationRepository.findAll();
+	}
+
+
+	@PostMapping("/masters")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<?> createMaster(@RequestBody CreateMasterDto dto) {
+		return service.createMaster(dto);
+	}
 }

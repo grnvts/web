@@ -20,7 +20,8 @@ import CreateUserPage from './pages/User/CreateUserPage';
 import BrigadierOrdersPage from './pages/Brigadier/BrigadierOrdersPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-
+import AllBrigadesPage from './pages/Brigade/AllBrigadesPage';
+import BrigadeManagePage from './pages/Brigade/BrigadeManagePage';
 class App extends Component {
 
     constructor(props) {
@@ -105,6 +106,8 @@ class App extends Component {
                     <AuthenticatedRoute exact path="/orders/create" component={CreateOrderPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute exact path="/orders/:orderId" component={OrderDetailPage} isLoggedIn={isLoggedIn} />
                     <AuthenticatedRoute path="/create-user" component={CreateUserPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}/>
+                    <AuthenticatedRoute exact path="/brigades" component={AllBrigadesPage} isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']} />
+                    <AuthenticatedRoute exact path="/brigade/manage" component={BrigadeManagePage} isLoggedIn={isLoggedIn} roles={['ROLE_BRIGADIER']} />
                     <Redirect to="/index" />
                 </Switch>
             );

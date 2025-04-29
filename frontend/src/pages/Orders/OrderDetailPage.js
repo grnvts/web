@@ -148,15 +148,15 @@ const OrderDetailPage = () => {
       )}
 
 
-{isBrigadier && order && order.status === 'CREATED' && order.brigade && (
+{isBrigadier && (
   <button className="btn btn-info mt-3" onClick={() => setShowAssignMastersModal(true)}>
     {t('Assign Masters')}
   </button>
 )}
-{showAssignMastersModal && order && order.brigade && (
+ {showAssignMastersModal && (
   <AssignMastersModal
-    brigadeId={order.brigade.id}
-    assignedMasters={order.assignedMasters}
+    brigadeId={order.brigadeId}
+    orderId={order.id}
     onAssign={handleAssignMasters}
     onClose={() => setShowAssignMastersModal(false)}
   />

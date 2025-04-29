@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UserDto;
+import com.example.demo.error.NotFoundException;
 import com.example.demo.model.*;
 import com.example.demo.repo.*;
 import com.example.demo.service.NotificationService;
@@ -10,7 +11,9 @@ import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -71,12 +74,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderById(Long id, String username) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdWithBrigadier(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         // Проверяем, является ли пользователь владельцем заказа, бригадиром или администратором
         boolean isClient = order.getClient().getUsername().equals(username);
-        boolean isBrigadier = order.getBrigadier() != null && order.getBrigadier().getUsername().equals(username);
+        boolean isBrigadier = order.getBrigade().getBrigadier() != null && order.getBrigade().getBrigadier().getUsername().equals(username);
         boolean isAdmin = userRepository.findByUsername(username).getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_ADMIN);
 
@@ -84,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Access denied: You do not have permission to view this order");
         }
 
-        return mapper.map(order, OrderDto.class);
+        return toDto(order);
     }
 
     private OrderDto toDto(Order order) {
@@ -98,8 +101,10 @@ public class OrderServiceImpl implements OrderService {
         dto.setClientPhone(order.getClient().getPhone());
 
         if (order.getBrigade() != null) {
+            dto.setBrigadeId(order.getBrigade().getId());
             dto.setBrigadeNumber(order.getBrigade().getNumber());
             if (order.getBrigade().getBrigadier() != null) {
+
                 dto.setBrigadierUsername(order.getBrigade().getBrigadier().getUsername());
                 dto.setBrigadierName(order.getBrigade().getBrigadier().getName());
                 dto.setBrigadierSurname(order.getBrigade().getBrigadier().getSurname());
@@ -108,6 +113,11 @@ public class OrderServiceImpl implements OrderService {
                 dto.setBrigadierId(order.getBrigade().getBrigadier().getId());
             }
         }
+//        dto.setAssignedMasters(
+//                order.getAssignedMasters().stream()
+//                        .map(UserDto::new)
+//                        .collect(Collectors.toList())
+//        );
 
 
 
@@ -152,9 +162,16 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Invalid brigadier");
         }
 
-        order.setBrigadier(brigadier);
+        // Находим бригаду по бригадиру
+        Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
+                .orElseThrow(() -> new RuntimeException("Brigade not found for brigadier"));
+
+        // Устанавливаем бригаду в заказ
+        order.setBrigade(brigade);
+
         orderRepository.save(order);
     }
+
 
     @Override
     @Transactional
@@ -199,9 +216,9 @@ public class OrderServiceImpl implements OrderService {
         if (updatedOrder.getBrigadierUsername() != null) {
             User brigadier = userRepository.findByUsername(updatedOrder.getBrigadierUsername());
             if (brigadier != null) {
-                order.setBrigadier(brigadier);
+                order.getBrigade().setBrigadier(brigadier);
             } else {
-                order.setBrigadier(null);
+                order.getBrigade().setBrigadier(null);
             }
         }
 
@@ -310,5 +327,39 @@ public class OrderServiceImpl implements OrderService {
         order.setAssignedMasters(masters);
         orderRepository.save(order);
     }
+
+    @Override
+    public List<UserDto> getAssignedMasters(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException());
+
+        String currentUsername;
+        try {
+            currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        } catch (Exception e) {
+            throw new AccessDeniedException("Не удалось получить имя пользователя");
+        }
+
+        if (!order.getBrigade().getBrigadier().getUsername().equals(currentUsername)) {
+            throw new AccessDeniedException("You don't have permission to view masters for this order");
+        }
+
+        return order.getAssignedMasters().stream()
+                .map(this::mapToUserDto)
+                .collect(Collectors.toList());
+    }
+
+    private UserDto mapToUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setUsername(user.getUsername());
+        userDto.setName(user.getName());
+        userDto.setSurname(user.getSurname());
+        userDto.setPatronymic(user.getPatronymic());
+        userDto.setPhone(user.getPhone());
+        return userDto;
+    }
+
+
 
 }

@@ -254,6 +254,13 @@ i18n.use(initReactI18next).init({
   "Role": "Роль",
   "Brigadier": "Бригадир",
   "Creating User" : "Создание пользователя",
+  "electrician" : "Электрик",
+  "plasterer" : "Штукатур",
+  "plumber" : "Сантехник",
+  "tiler" : "Плиточник",
+  "carpenter" : "Столяр",
+  "painter" : "Маляр",
+  "labiurer" : "Разнорабочий"
 
         }
       }

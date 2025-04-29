@@ -87,20 +87,23 @@ const NavbarComponent = props => {
     if (isLoggedIn) {
 
 
-        
-            
-            let dropdownClassName = "dropdown-menu p-2 shadow";
-            if (dropDownVisible) {
-                dropdownClassName += " show";
-            }
-            if (image) {
-                imageSource = image;
-            }
-            if (isBrigadier) {
+
+
+        let dropdownClassName = "dropdown-menu p-2 shadow";
+        if (dropDownVisible) {
+            dropdownClassName += " show";
+        }
+        if (image) {
+            imageSource = image;
+        }
+        if (isBrigadier) {
             links = (
                 <ul className="navbar-nav ml-auto">
                     <li className="nav-item active">
                         <Link className="nav-link" to="/orders/brigadier">{t('My Orders')}</Link>
+                    </li>
+                    <li className="nav-item active">
+                        <Link className="nav-link" to="/brigade/manage">{t('My Brigade')}</Link>
                     </li>
                     <li className="naw-item dropdown ml-3" style={{ cursor: "pointer" }} ref={dropDownMenuArea}>
                         <div className="d-flex" onClick={() => setDropDownVisible(true)}>
@@ -129,108 +132,113 @@ const NavbarComponent = props => {
         else {
 
 
-        
-        links = (
-            <ul className="navbar-nav ml-auto">
-                <li className="nav-item active">
-                    <Link className="nav-link" to="/index">{t('HomePage')} <span className="sr-only">(current)</span></Link>
-                </li>
-                <li className="nav-item dropdown" style={{ position: 'relative' }}>
-                    <span className="nav-link dropdown-toggle" onClick={() => setOrdersDropdownVisible(!ordersDropdownVisible)} style={{ cursor: 'pointer' }}>
-                        {t('Orders')}
-                    </span>
 
-                    {ordersDropdownVisible && (
-                        <div className="dropdown-menu show" style={{ display: 'block' }}>
-                            <Link className="dropdown-item" to="/orders">{t('My Orders')}</Link>
-                            <Link className="dropdown-item" to="/orders/create">{t('Create Order')}</Link>
-                            {isAdmin && <Link className="dropdown-item" to="/orders/all">{t('All Orders')}</Link>}
-                        </div>
-                    )}
-</li>
-                {isAdmin && (
+            links = (
+                <ul className="navbar-nav ml-auto">
                     <li className="nav-item active">
-                        <Link className="nav-link" to="/users">{t('Users')}</Link>
+                        <Link className="nav-link" to="/index">{t('HomePage')} <span className="sr-only">(current)</span></Link>
                     </li>
-                )}
-                <li className="nav-item active">
-                    <Link className="nav-link" to={"/building/" + username}>{t('Building')}</Link>
-                </li>
-                {/* Уведомления */}
-                <li className="nav-item dropdown" ref={notificationsMenuArea} style={{ position: 'relative' }}>
-                <span className="nav-link" style={{ cursor: 'pointer' }} onClick={toggleNotifications}>
-    <img 
-        src="/bell-1-svgrepo-com.svg" 
-        alt="Notifications" 
-        style={{ width: '20px', height: '20px' }}
-    />
-    {/* Добавьте бейдж с количеством уведомлений */}
-    {notifications.length > 0 && (
-        <span className="badge badge-danger" style={{
-            position: 'absolute',
-            top: '5px',
-            right: '5px',
-            fontSize: '10px'
-        }}>
-            {notifications.length}
-        </span>
-    )}
-</span>
-{notificationsVisible && (
-    <div className="dropdown-menu show" 
-         style={{
-             position: 'absolute',
-             right: 0,
-             left: 'auto',
-             top: '100%',
-             zIndex: 1000,
-             display: 'block'
-         }}>
-                            <h6 className="dropdown-header">{t('Notifications')}</h6>
-
-                            {notifications.length > 0 ? (
-                                notifications.map((notification, index) => (
-                                    <div key={index} className="dropdown-item">
-                                        <p>{notification.message || 'No message'}</p>
-                                        <small>
-                                            {notification.orderDate
-                                                ? `${t('Order Date')}: ${notification.orderDate}`
-                                                : t('No date')}
-                                        </small>
-                                    </div>
-                                ))
-) : (
-    <p className="dropdown-item">{t('No notifications')}</p>
-)}
-                        </div>
-                    )}
-                </li>
-                {/* DropDown Menu */}
-                <li className="naw-item dropdown ml-3" style={{ cursor: "pointer" }} ref={dropDownMenuArea}>
-                    <div className="d-flex" onClick={() => setDropDownVisible(true)}>
-                        <ProfileImage
-                            width="32"
-                            height="32"
-                            imageSource={imageSource}
-                            username={username}
-                            className="m-auto"
-                        />
-                        <span className="nav-link dropdown-toggle">{username}</span>
-                    </div>
-                    <div className={dropdownClassName}>
-                        <Link
-                            className="dropdown-item"
-                            to={"/user/" + username}
-                            onClick={() => setDropDownVisible(false)}>{t("My Profile")}</Link>
-
-                        <span className="dropdown-item" onClick={onLogout} style={{ cursor: "pointer" }}>
-                            {t('Logout')}
+                    <li className="nav-item dropdown" style={{ position: 'relative' }}>
+                        <span className="nav-link dropdown-toggle" onClick={() => setOrdersDropdownVisible(!ordersDropdownVisible)} style={{ cursor: 'pointer' }}>
+                            {t('Orders')}
                         </span>
-                    </div>
-                </li>
-            </ul>
-        );
-    }
+
+                        {ordersDropdownVisible && (
+                            <div className="dropdown-menu show" style={{ display: 'block' }}>
+                                <Link className="dropdown-item" to="/orders">{t('My Orders')}</Link>
+                                <Link className="dropdown-item" to="/orders/create">{t('Create Order')}</Link>
+                                {isAdmin && <Link className="dropdown-item" to="/orders/all">{t('All Orders')}</Link>}
+                            </div>
+                        )}
+                    </li>
+                    {isAdmin && (
+                        <>
+                            <li className="nav-item active">
+                                <Link className="nav-link" to="/users">{t('Users')}</Link>
+                            </li>
+                            <li className="nav-item active">
+                                <Link className="nav-link" to="/brigades">{t('Brigades')}</Link>
+                            </li>
+                        </>
+                    )}
+                    <li className="nav-item active">
+                        <Link className="nav-link" to={"/building/" + username}>{t('Building')}</Link>
+                    </li>
+                    {/* Уведомления */}
+                    <li className="nav-item dropdown" ref={notificationsMenuArea} style={{ position: 'relative' }}>
+                        <span className="nav-link" style={{ cursor: 'pointer' }} onClick={toggleNotifications}>
+                            <img
+                                src="/bell-1-svgrepo-com.svg"
+                                alt="Notifications"
+                                style={{ width: '20px', height: '20px' }}
+                            />
+                            {/* Добавьте бейдж с количеством уведомлений */}
+                            {notifications.length > 0 && (
+                                <span className="badge badge-danger" style={{
+                                    position: 'absolute',
+                                    top: '5px',
+                                    right: '5px',
+                                    fontSize: '10px'
+                                }}>
+                                    {notifications.length}
+                                </span>
+                            )}
+                        </span>
+                        {notificationsVisible && (
+                            <div className="dropdown-menu show"
+                                style={{
+                                    position: 'absolute',
+                                    right: 0,
+                                    left: 'auto',
+                                    top: '100%',
+                                    zIndex: 1000,
+                                    display: 'block'
+                                }}>
+                                <h6 className="dropdown-header">{t('Notifications')}</h6>
+
+                                {notifications.length > 0 ? (
+                                    notifications.map((notification, index) => (
+                                        <div key={index} className="dropdown-item">
+                                            <p>{notification.message || 'No message'}</p>
+                                            <small>
+                                                {notification.orderDate
+                                                    ? `${t('Order Date')}: ${notification.orderDate}`
+                                                    : t('No date')}
+                                            </small>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="dropdown-item">{t('No notifications')}</p>
+                                )}
+                            </div>
+                        )}
+                    </li>
+                    {/* DropDown Menu */}
+                    <li className="naw-item dropdown ml-3" style={{ cursor: "pointer" }} ref={dropDownMenuArea}>
+                        <div className="d-flex" onClick={() => setDropDownVisible(true)}>
+                            <ProfileImage
+                                width="32"
+                                height="32"
+                                imageSource={imageSource}
+                                username={username}
+                                className="m-auto"
+                            />
+                            <span className="nav-link dropdown-toggle">{username}</span>
+                        </div>
+                        <div className={dropdownClassName}>
+                            <Link
+                                className="dropdown-item"
+                                to={"/user/" + username}
+                                onClick={() => setDropDownVisible(false)}>{t("My Profile")}</Link>
+
+                            <span className="dropdown-item" onClick={onLogout} style={{ cursor: "pointer" }}>
+                                {t('Logout')}
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            );
+        }
     }
     return (
         <div className="col-lg-12 shadow-sm bg-light mb-2">

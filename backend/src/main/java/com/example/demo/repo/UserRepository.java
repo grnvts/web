@@ -3,6 +3,7 @@ package com.example.demo.repo;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.demo.model.RoleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,6 +37,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :username and u.status = 1")
 	User findUserByUsernameWithStatusOne(String username);
 
+	List<User> findByRoles_Name(RoleName roles_name);
 
 	List<User> findByRolesContainsOrderByUsernameAsc(Role role);
 

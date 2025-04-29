@@ -1,6 +1,7 @@
 package com.example.demo.dto;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class UserDto {
 	private String image;
 	private Set<String> roles;
 
-
+	private List<QualificationDto> qualifications;
 	
 	public String getFullName() {
 		return this.name+" "+this.surname+" "+this.patronymic;
@@ -65,5 +66,10 @@ public class UserDto {
 		this.roles = user.getRoles().stream()
 				.map(role -> role.getName().name())
 				.collect(Collectors.toSet());
+		this.qualifications = user.getQualifications() != null
+				? user.getQualifications().stream()
+				.map(QualificationDto::new)
+				.collect(Collectors.toList())
+				: null;
 	}
 }

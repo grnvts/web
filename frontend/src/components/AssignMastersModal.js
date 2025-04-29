@@ -1,14 +1,17 @@
-// components/AssignMastersModal.js
 import React, { useEffect, useState } from 'react';
 import UserService from '../Services/UserService';
+import OrderService from '../Services/OrderService';
 
-const AssignMastersModal = ({ brigadeId, assignedMasters, onAssign, onClose }) => {
+const AssignMastersModal = ({ brigadeId, orderId, onAssign, onClose }) => {
   const [masters, setMasters] = useState([]);
-  const [selected, setSelected] = useState(assignedMasters?.map(m => m.id) || []);
+  const [selected, setSelected] = useState([]);
 
   useEffect(() => {
+    // Загружаем всех мастеров бригады
     UserService.getBrigadeMasters(brigadeId).then(res => setMasters(res.data));
-  }, [brigadeId]);
+    // Загружаем назначенных мастеров для заказа
+    OrderService.getAssignedMasters(orderId).then(res => setSelected(res.data.map(m => m.id)));
+  }, [brigadeId, orderId]);
 
   const handleToggle = (id) => {
     setSelected(selected =>

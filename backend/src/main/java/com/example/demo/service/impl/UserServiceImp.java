@@ -1,21 +1,22 @@
 package com.example.demo.service.impl;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import com.example.demo.model.Role;
-import com.example.demo.model.RoleName;
+import com.example.demo.dto.CreateMasterDto;
+import com.example.demo.model.*;
+import com.example.demo.repo.BrigadeRepository;
+import com.example.demo.repo.QualificationRepository;
 import com.example.demo.repo.RoleRepository;
 import com.example.demo.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,6 @@ import com.example.demo.error.ApiError;
 import com.example.demo.error.NotFoundException;
 import com.example.demo.file.FileService;
 import com.example.demo.jwt.config.JwtTokenUtil;
-import com.example.demo.model.User;
 import com.example.demo.repo.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -47,8 +47,11 @@ public class UserServiceImp implements UserService {
 	private final FileService fileService;
 	private final RoleRepository roleRepository;
 	private final UserRepository userRepository;
-
+	private final QualificationRepository qualificationRepository;
 	private String[] types = { "image/png", "image/jpeg" };
+	@Autowired
+	private BrigadeRepository brigadeRepository;
+
 
 	@Override
 	@Transactional
@@ -265,15 +268,86 @@ public class UserServiceImp implements UserService {
 				.collect(Collectors.toSet());
 		user.setRoles(roles);
 
-		// Сохранение пользователя
-		repository.save(user);
+		// Сохраняем пользователя
+		user = repository.save(user);
+
+
+		boolean isBrigadier = roles.stream()
+				.anyMatch(role -> role.getName().equals(RoleName.ROLE_BRIGADIER));
+		if (isBrigadier) {
+			createBrigadeForBrigadier(user);
+		}
 
 		return ResponseEntity.ok(new UserDto(user));
 	}
+
+
+	private void createBrigadeForBrigadier(User brigadier) {
+		Brigade brigade = new Brigade();
+		brigade.setBrigadier(brigadier);
+		brigade.setNumber(brigadier.getId().toString()); // Например: "BR-17"
+		brigade.setMasters(List.of()); // Изначально без мастеров
+		brigadeRepository.save(brigade);
+	}
+
+
 	@Override
 	public User getUserEntity(String username) {
 		return userRepository.findUserByUsername(username)
 				.orElseThrow(() -> new RuntimeException("User not found"));
+	}
+
+	@Override
+	public List<UserDto> findAllMasters() {
+		List<User> masters = userRepository.findAll().stream()
+				.filter(user -> user.getRoles().stream()
+						.anyMatch(role -> role.getName().name().equals("ROLE_MASTER")))
+				.collect(Collectors.toList());
+		return masters.stream().map(UserDto::new).collect(Collectors.toList());
+	}
+
+
+	@Override
+	@Transactional
+	public ResponseEntity<?> createMaster(CreateMasterDto dto) {
+		if (dto.getName() == null || dto.getName().isBlank() ||
+				dto.getSurname() == null || dto.getSurname().isBlank() ||
+				dto.getPatronymic() == null || dto.getPatronymic().isBlank() ||
+				dto.getQualificationIds() == null || dto.getQualificationIds().isEmpty()) {
+			return ResponseEntity.badRequest().body("Все поля обязательны");
+		}
+
+		// Генерация уникального username
+		String baseUsername = "master";
+		int counter = 1;
+		String username;
+		while (true) {
+			username = baseUsername + counter;
+			if (userRepository.findByUsername(username) == null) break;
+			counter++;
+		}
+
+		// Создание пользователя-мастера
+		User master = new User();
+		master.setUsername(username);
+		master.setName(dto.getName());
+		master.setSurname(dto.getSurname());
+		master.setPatronymic(dto.getPatronymic());
+		master.setStatus(1);
+		String generatedPassword = "Temporary";//временный пароль
+		master.setRealPassword(generatedPassword);
+		master.setPassword(passwordEncoder.encode(generatedPassword));
+		// Присваиваем роль мастера
+		Role masterRole = roleRepository.findByName(RoleName.ROLE_MASTER)
+				.orElseThrow(() -> new RuntimeException("ROLE_MASTER not found"));
+		master.setRoles(Set.of(masterRole));
+
+		// Привязка квалификаций
+		List<Qualification> qualifications = qualificationRepository.findAllById(dto.getQualificationIds());
+		master.setQualifications(qualifications);
+
+		userRepository.save(master);
+		return ResponseEntity.ok(new UserDto(master));
 	}
 
 }

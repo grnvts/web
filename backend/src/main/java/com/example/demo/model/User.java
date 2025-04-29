@@ -107,6 +107,7 @@ public class User {
 			joinColumns = @JoinColumn(name = "user_id"),
 			inverseJoinColumns = @JoinColumn(name = "qualification_id")
 	)
+
 	private List<Qualification> qualifications;
 
 }

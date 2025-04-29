@@ -1,11 +1,14 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.Brigade;
 import com.example.demo.model.OrderStatus;
 import lombok.Data;
 
+import javax.sql.rowset.BaseRowSet;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class OrderDto {
@@ -23,6 +26,8 @@ public class OrderDto {
     private String brigadierPatronymic;
     private String brigadierPhone;
     private String brigadeNumber;
+    private Long brigadeId;
+   // private List<UserDto> assignedMasters;
     private AddressDto address;
     private Long addressId;
     private String orderDetails;

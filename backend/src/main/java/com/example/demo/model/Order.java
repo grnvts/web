@@ -23,9 +23,9 @@ public class Order {
     @JoinColumn(name = "client_id", nullable = false)
     private User client;
 
-    @ManyToOne
-    @JoinColumn(name = "brigadier_id")
-    private User brigadier;
+//    @ManyToOne
+//    @JoinColumn(name = "brigadier_id")
+//    private User brigadier;
 
 
 

@@ -28,4 +28,6 @@ public interface OrderService {
 
     List<UserDto> getBrigadeMasters(Long brigadeId);
     void assignMasters(Long orderId, List<Long> masterIds);
+
+    List<UserDto> getAssignedMasters(Long orderId);
 }

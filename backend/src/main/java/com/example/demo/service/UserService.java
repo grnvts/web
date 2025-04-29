@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.example.demo.dto.CreateMasterDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,8 @@ public interface UserService {
 	ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto);
 
 
+	ResponseEntity<?> createMaster(CreateMasterDto dto);
 	User getUserEntity(String username);
+
+	List<UserDto> findAllMasters();
 }

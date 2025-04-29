@@ -122,19 +122,24 @@ public class OrderController {
 
     // работа с мастерами
     @GetMapping("/brigade/{brigadeId}/masters")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     public List<UserDto> getBrigadeMasters(@PathVariable Long brigadeId) {
         return orderService.getBrigadeMasters(brigadeId);
     }
 
+    @GetMapping("/{orderId}/assigned-masters")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
+    public List<UserDto> getAssignedMasters(@PathVariable Long orderId) {
+        return orderService.getAssignedMasters(orderId);
+    }
 
     @PutMapping("/{orderId}/assign-masters")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> assignMasters(@PathVariable Long orderId, @RequestBody List<Long> masterIds) {
         orderService.assignMasters(orderId, masterIds);
         return ResponseEntity.ok("Masters assigned");
     }
 
 
-}
+}   
     

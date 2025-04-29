@@ -24,9 +24,21 @@ class UserService {
         return ApiService.post('/user/create', data);
     }
 
+    createMaster(data) {
+        return ApiService.post('/user/masters', data);
+      }
+
+    getBrigadeMasters(brigadeId) {
+        return ApiService.get(`/orders/brigade/${brigadeId}/masters`);
+      }
+      
     loadImage(username,body) { 
         return ApiService.put(USER_URL+"/upload-image/"+username,body)
     }
+    getQualifications() {
+    
+        return ApiService.get('/user/qualifications');
+      }
     deleteUserById = (id, token) => {
         return fetch(`http://localhost:8501/api/user/${id}`, {
             method: 'DELETE',
