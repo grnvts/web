@@ -175,6 +175,7 @@ i18n.use(initReactI18next).init({
           "Street": "Улица",
           "BuildingNo": "Номер здания",
           'All Roles': "Все роли",
+          'Master' : "Мастер",
           'Admin': "Администратор",
           'User': "Пользователь",
           'brigadier': "Бригадир",

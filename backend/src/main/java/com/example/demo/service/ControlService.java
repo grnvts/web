@@ -8,14 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.BuildingDto;
 import com.example.demo.error.ApiError;
-import com.example.demo.error.NotFoundException;
+
 import com.example.demo.jwt.config.JwtTokenUtil;
-import com.example.demo.model.Building;
 import com.example.demo.model.User;
-import com.example.demo.repo.ApartmentRepository;
-import com.example.demo.repo.BuildingRepository;
+
 import com.example.demo.repo.UserRepository;
 
 import lombok.RequiredArgsConstructor;

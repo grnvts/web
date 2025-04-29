@@ -28,7 +28,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final BuildingRepository buildingRepository;
     private final ModelMapper mapper;
     private final NotificationService notificationService;
     private final BrigadeRepository brigadeRepository;

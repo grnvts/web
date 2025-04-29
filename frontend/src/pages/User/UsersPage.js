@@ -108,6 +108,7 @@ class UsersPage extends Component {
                                 <option value="ROLE_ADMIN">{t('Admin')}</option>
                                 <option value="ROLE_USER">{t('User')}</option>
                                 <option value="ROLE_BRIGADIER">{t('Brigadier')}</option>
+                                <option value="ROLE_MASTER">{t('Master')}</option>
                             </select>
                         </div>
                         <div>
