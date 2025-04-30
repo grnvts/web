@@ -1,97 +1,69 @@
-import React, { Component } from 'react'
-import Input from '../../components/input';
+import React, { Component } from 'react';
 import { withTranslation } from 'react-i18next';
-import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { /*loginAction,*/ loginHandler } from './../../redux/AuthenticationAction';
-import Spinner from '../../components/Spinner';
-import Axios from 'axios';
+import { loginHandler } from '../../redux/AuthenticationAction';
+import Input from '../../components/input';
+import './UserLoginPage.css';
 
 class UserLoginPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             username: '',
-            email: null,
             password: '',
-            error: null,
-            errors: {
-            },
-            pendingApiCall: false
-
+            errors: {}
         };
     }
-    componentDidMount() {
-        Axios.interceptors.request.use(request => {
-            this.setState({ pendingApiCall: true })
-            return request;
-        });
-        Axios.interceptors.response.use(request => {
-            this.setState({ pendingApiCall: false })
-            return request;
-        }, error => {
-            this.setState({ pendingApiCall: false })
-            throw error;
-        });
-    }
+
     onChangeData = (type, event) => {
-        if (this.state.error)
-            this.setState({ error: null })
         const stateData = this.state;
-        stateData[type] = event
-
-        this.setState({ stateData });
+        stateData[type] = event;
+        const errors = { ...this.state.errors };
+        errors[type] = undefined;
+        this.setState({ stateData, errors });
     }
-    onClickLogin = async (event) => {
-        //this.setState({ pendingApiCall: true })
 
-
-        event.preventDefault();
-        if (this.state.error) {
-            this.setState({ error: null });
-        }
-        const { dispatch, history } = this.props;
+    onClickLogin = async (e) => {
+        e.preventDefault();
+        this.setState({ errors: {} });
         const { username, password } = this.state;
-        const creds = { username, password };
+        const { dispatch, history } = this.props;
 
         try {
-            await dispatch(loginHandler(creds));
+            await dispatch(loginHandler({ username, password }));
             history.push("/index");
         } catch (error) {
-            if (error.response) {
-                if (error.response.data.message) {
-                    console.log(error.response)
-
-                    this.setState({ error: error.response.data.message })
-                }
+            if (error.response?.status === 401) {
+                this.setState({
+                    errors: {
+                        username: 'Неверный логин или пароль',
+                        password: 'Неверный логин или пароль'
+                    }
+                });
+            } else if (error.response?.data?.validationErrors) {
+                this.setState({ errors: error.response.data.validationErrors });
             }
-            else if (error.request)
-                console.log(error.request);
-            else
-                console.log(error.message);
         }
-        //this.setState({ pendingApiCall: false })
-
     }
+
     render() {
         const { username, password } = this.state.errors;
-        const btnEnable = this.state.username && this.state.password;
         const { t } = this.props;
-        return (
-            <div className="container row">
-                <div className="col-lg-8">
-                    <h3>{t('Login')}</h3>
 
-                    <p className="description-p" style={{ color: "red" }}>
-                        ( * ) {t('Required field')}
-                    </p>
-                    <form >
+        return (
+            <div className="login-page">
+                <div className="login-container">
+                    <div className="login-header">
+                        <h1>{t('Welcome Back')}</h1>
+                        <p>{t('Please login to your account')}</p>
+                    </div>
+                    <form className="login-form">
                         <Input
                             label={t("Username *")}
                             error={username}
                             type="text"
                             name="username"
-                            placeholder={t("Username *")}
+                            placeholder={t("Enter your username")}
                             valueName={this.state.username}
                             onChangeData={this.onChangeData}
                         />
@@ -100,42 +72,26 @@ class UserLoginPage extends Component {
                             error={password}
                             type="password"
                             name="password"
-                            placeholder={t("Password *")}
+                            placeholder={t("Enter your password")}
                             valueName={this.state.password}
                             onChangeData={this.onChangeData}
                         />
-                        {
-                            this.state.pendingApiCall ? <Spinner /> :
-                                <button
-                                    className="btn btn-dark"
-                                    type="button"
-                                    disabled={!btnEnable}
-                                    onClick={this.onClickLogin}>{t('Login')}</button>
-                        }
-
-                    </form>
-                    <br />
-                    {this.state.error &&
-                        <div className="alert alert-danger" role="alert">
-                            {this.state.error}
+                        <button
+                            className="login-button"
+                            type="button"
+                            onClick={this.onClickLogin}
+                        >
+                            {t('Login')}
+                        </button>
+                        <div className="login-footer">
+                            <p>{t("Don't have an account?")} <a href="/signup">{t('Sign Up')}</a></p>
                         </div>
-
-
-                    }
-                </div>
-                <div className="col-lg-3">
-                    <img style={{ height: 200 }} src="https://lovegospelmusic.com/wp-content/uploads/2020/07/Lovemusic-Income-Program-Login-Page.png" alt="" />
-
-                    {/* <img style={{ height: 200 }} src="https://images.squarespace-cdn.com/content/v1/55e06d0ee4b0718764fcc921/1507805805238-M8XG4RMCMWITZ7LJGEEF/ke17ZwdGBToddI8pDm48kETUuxmp5xHjxR_mq0kKQipZw-zPPgdn4jUwVcJE1ZvWhcwhEtWJXoshNdA9f1qD7XbdY2v8mR--EcMEe2KaFSVzNBu9Qs0q6qR3QzqKFtHJVM6oy5K0EEbGe9v0FXNpEg/slidebank+login.gif" alt="" /> */}
-                </div>
-                <div className="col"></div>
-                <div className="col-lg-12">
-
+                    </form>
                 </div>
             </div>
-        )
+        );
     }
 }
-// withTranslation to change language (turkısh <=> english)
-// connect for redux
-export default connect()(withTranslation()(withRouter(UserLoginPage)));
+
+const translation = withTranslation()(UserLoginPage);
+export default connect()(translation);

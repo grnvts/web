@@ -5,8 +5,8 @@ import AlertifyService from '../../Services/AlertifyService';
 import UserService from '../../Services/UserService';
 import { Redirect } from 'react-router-dom';
 import UserTableRow from "../../components/UserTableRow";
-import CreateUserPage from './CreateUserPage';
-
+import AddMasterModal from '../../components/AddMasterModal';
+import './UsersPage.css';
 
 class UsersPage extends Component {
     constructor(props) {
@@ -17,16 +17,19 @@ class UsersPage extends Component {
                 number: 0,
                 size: 10,
             },
-            rolesFilter: '', // Фильтр по роли
+            rolesFilter: '',
+            searchQuery: '',
             jwttoken: props.jwttoken,
-            isAdmin: props.roles?.includes('ROLE_ADMIN'), // Проверяем, является ли пользователь администратором
+            isAdmin: props.roles?.includes('ROLE_ADMIN'),
+            loading: true,
+            showAddMasterModal: false,
         };
     }
 
     componentDidMount() {
         if (!this.state.isAdmin) {
-            AlertifyService.error('Access denied: Admins only');
-            this.props.history.push('/index'); // Перенаправляем на главную страницу
+            AlertifyService.error('Доступ запрещен: только для администраторов');
+            this.props.history.push('/index');
             return;
         }
         this.getUsers(this.state.page.number, this.state.page.size);
@@ -34,26 +37,32 @@ class UsersPage extends Component {
 
     getUsers = async (number, size) => {
         try {
+            this.setState({ loading: true });
             const response = await UserService.getUsers(number, size);
-            this.setState({ page: response.data });
+            this.setState({ page: response.data, loading: false });
         } catch (error) {
-            AlertifyService.error('Failed to load users');
+            AlertifyService.error('Ошибка при загрузке пользователей');
+            this.setState({ loading: false });
         }
     };
 
     restoreUser = async (userId) => {
         try {
             await UserService.restoreUser(userId, this.state.jwttoken);
-            // Отправляем запрос на восстановление
-            AlertifyService.success(this.props.t('User restored successfully'));
-            this.getUsers(this.state.page.number, this.state.page.size); // Обновляем список пользователей
+            AlertifyService.success('Пользователь успешно восстановлен');
+            this.getUsers(this.state.page.number, this.state.page.size);
         } catch (error) {
-            console.error('Error restoring user:', error); // Логируем ошибку
-            AlertifyService.error(this.props.t('Failed to restore user'));
+            console.error('Error restoring user:', error);
+            AlertifyService.error('Ошибка при восстановлении пользователя');
         }
     };
+
     handleRoleFilterChange = (e) => {
         this.setState({ rolesFilter: e.target.value });
+    };
+
+    handleSearchChange = (e) => {
+        this.setState({ searchQuery: e.target.value });
     };
 
     onClickNext = () => {
@@ -70,83 +79,137 @@ class UsersPage extends Component {
         if (!this.state.isAdmin) {
             return <Redirect to="/index" />;
         }
-    
+
         const { content: users, first, last } = this.state.page;
-        const { t } = this.props;
-        const { rolesFilter } = this.state;
-    
-        // Фильтруем пользователей по роли
-        const filteredUsers = rolesFilter
-            ? users.filter((user) => user.roles.includes(rolesFilter))
-            : users;
-    
+        const { rolesFilter, searchQuery, loading, showAddMasterModal } = this.state;
+
+        // Фильтрация пользователей по роли и поиску
+        const filteredUsers = users
+            .filter(user => !rolesFilter || user.roles.includes(rolesFilter))
+            .filter(user => {
+                if (!searchQuery) return true;
+                const searchLower = searchQuery.toLowerCase();
+                return (
+                    (user.username && user.username.toLowerCase().includes(searchLower)) ||
+                    (user.name && user.name.toLowerCase().includes(searchLower)) ||
+                    (user.surname && user.surname.toLowerCase().includes(searchLower)) ||
+                    (user.email && user.email.toLowerCase().includes(searchLower))
+                );
+            });
+
         return (
-            <div className="col-sm-12">
-                <div className="card">
-                    <h3 className="card-header">
-                        <div className="d-flex justify-content-between">
-                            <span>{t('Users')}</span>
-                            <button
-                                className="btn btn-primary btn-sm"
-                                onClick={() => this.props.history.push('/create-user')}
-                            >
-                                {t('Create User')}
-                            </button>
+            <div className="users-page-container">
+                <div className="users-page-header">
+                    <h2>Управление пользователями</h2>
+                    <div className="header-buttons">
+                        <button
+                            className="create-user-btn"
+                            onClick={() => this.props.history.push('/create-user')}
+                        >
+                            <i className="fas fa-plus"></i>
+                            Создать пользователя
+                        </button>
+                        <button
+                            className="create-master-btn"
+                            onClick={() => this.setState({ showAddMasterModal: true })}
+                        >
+                            <i className="fas fa-user-tie"></i>
+                            Создать мастера
+                        </button>
+                    </div>
+                </div>
+
+                {showAddMasterModal && (
+                    <AddMasterModal
+                        onClose={() => this.setState({ showAddMasterModal: false })}
+                        onCreated={() => {
+                            this.setState({ showAddMasterModal: false });
+                            this.getUsers(this.state.page.number, this.state.page.size);
+                        }}
+                    />
+                )}
+
+                <div className="users-filters">
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            className="search-input"
+                            placeholder="Поиск по имени, email или логину..."
+                            value={searchQuery}
+                            onChange={this.handleSearchChange}
+                        />
+                        <i className="fas fa-search search-icon"></i>
+                    </div>
+
+                    <div className="role-filter">
+                        <select
+                            className="role-select"
+                            value={rolesFilter}
+                            onChange={this.handleRoleFilterChange}
+                        >
+                            <option value="">Все роли</option>
+                            <option value="ROLE_ADMIN">Администратор</option>
+                            <option value="ROLE_USER">Пользователь</option>
+                            <option value="ROLE_BRIGADIER">Бригадир</option>
+                            <option value="ROLE_MASTER">Мастер</option>
+                        </select>
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className="loading-spinner">
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <span>Загрузка...</span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="users-table-container">
+                            <table className="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Логин</th>
+                                        <th>Имя</th>
+                                        <th>Фамилия</th>
+                                        <th>Email</th>
+                                        <th>Роли</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.map((user) => (
+                                        <UserTableRow 
+                                            user={user}
+                                            key={user.username}
+                                            onRestore={this.restoreUser}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                    </h3>
-    
-                    <div className="card-header d-flex justify-content-between">
-                        <div>
-                            <label htmlFor="roleFilter">{t('Filter by Role')}:</label>
-                            <select
-                                id="roleFilter"
-                                className="form-control"
-                                value={rolesFilter}
-                                onChange={this.handleRoleFilterChange}
-                            >
-                                <option value="">{t('All Roles')}</option>
-                                <option value="ROLE_ADMIN">{t('Admin')}</option>
-                                <option value="ROLE_USER">{t('User')}</option>
-                                <option value="ROLE_BRIGADIER">{t('Brigadier')}</option>
-                                <option value="ROLE_MASTER">{t('Master')}</option>
-                            </select>
-                        </div>
-                        <div>
+
+                        <div className="pagination-controls">
                             {!first && (
-                                <button onClick={this.onClickPrevious} className="btn btn-secondary btn-sm">
-                                    {t('Previous')}
+                                <button 
+                                    onClick={this.onClickPrevious} 
+                                    className="pagination-btn"
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                    Предыдущая
                                 </button>
                             )}
                             {!last && (
-                                <button onClick={this.onClickNext} className="btn btn-secondary btn-sm">
-                                    {t('Next')}
+                                <button 
+                                    onClick={this.onClickNext} 
+                                    className="pagination-btn"
+                                >
+                                    Следующая
+                                    <i className="fas fa-chevron-right"></i>
                                 </button>
                             )}
                         </div>
-                    </div>
-    
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">{t('Username')}</th>
-                                <th scope="col">{t('Name')}</th>
-                                <th scope="col">{t('Surname')}</th>
-                                <th scope="col">{t('Email')}</th>
-                                <th scope="col">{t('Roles')}</th>
-                                <th scope="col">{t('Action')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredUsers.map((user) => (
-                                <UserTableRow user={user}
-                                key={user.username}
-                                onRestore={this.restoreUser} // Передаем обработчик восстановления
-                            />
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                    </>
+                )}
             </div>
         );
     }
@@ -157,7 +220,7 @@ const mapStateToProps = (store) => {
         isLoggedIn: store.isLoggedIn,
         username: store.username,
         jwttoken: store.jwttoken,
-        roles: store.roles, // Получаем роли пользователя из Redux
+        roles: store.roles,
     };
 };
 

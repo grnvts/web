@@ -19,8 +19,6 @@ public class Role {
     @Column(length = 60, unique = true)
     private RoleName name;
 
-    // Удаляем user_id, так как связь многие-ко-многим через user_roles
-    // private Long user_id;
 
     public Role() {}
 

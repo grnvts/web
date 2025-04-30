@@ -43,7 +43,6 @@ public class OrderDto {
     private LocalDate endDate;
 
 
-    // Конструктор из Order
     public OrderDto(Order order) {
         this.id = order.getId();
         if (order.getClient() != null) {

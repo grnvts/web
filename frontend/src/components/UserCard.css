@@ -1,0 +1,129 @@
+.user-profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff5f2, #fff);
+}
+
+.user-profile-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(255, 87, 34, 0.1);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #FF5722, #F4511E);
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+}
+
+.profile-image-container {
+    margin: 0 auto;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: 0 4px 10px rgba(255, 87, 34, 0.2);
+    margin-bottom: 20px;
+}
+
+.profile-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-title {
+    margin-top: 20px;
+}
+
+.profile-title h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+.username {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 5px 0 0;
+    color: white;
+}
+
+.profile-info {
+    padding: 30px;
+}
+
+.info-section {
+    margin-bottom: 30px;
+}
+
+.info-section h3 {
+    color: #FF5722;
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #FF5722;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    background: #fff5f2;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 87, 34, 0.1);
+}
+
+.info-icon {
+    color: #FF5722;
+    font-size: 20px;
+    width: 24px;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content label {
+    display: block;
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.info-content span {
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .user-profile-container {
+        padding: 10px;
+    }
+
+    .profile-header {
+        padding: 30px 15px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+} 

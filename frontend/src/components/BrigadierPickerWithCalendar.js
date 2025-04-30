@@ -1,107 +1,121 @@
+import React, { useState, useEffect } from 'react';
 import OrderService from '../Services/OrderService';
-import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Calendar from 'react-calendar';
-import { format } from 'date-fns';
-
+import 'react-calendar/dist/Calendar.css';
+import './Modal.css';
+import './BrigadierPickerWithCalendar.css';
 
 const BrigadierPickerWithCalendar = ({ onAssign }) => {
-  const [brigadiers, setBrigadiers] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [search, setSearch] = useState('');
-  const [calendarData, setCalendarData] = useState({});
-  const [month, setMonth] = useState(new Date());
+    const [brigadiers, setBrigadiers] = useState([]);
+    const [selectedBrigadier, setSelectedBrigadier] = useState('');
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [error, setError] = useState('');
+    const [orderCounts, setOrderCounts] = useState({});
+    const { t } = useTranslation();
 
-  useEffect(() => {
-    const loadBrigadiers = async () => {
-      const res = await OrderService.getAllBrigadiers();
-      setBrigadiers(res.data);
-      setFiltered(res.data);
+    useEffect(() => {
+        const fetchBrigadiers = async () => {
+            try {
+                const response = await OrderService.getAllBrigadiers();
+                setBrigadiers(response.data);
+            } catch (error) {
+                console.error('Failed to load brigadiers', error);
+                setError(t('Failed to load brigadiers'));
+            }
+        };
+
+        fetchBrigadiers();
+    }, [t]);
+
+    useEffect(() => {
+        const fetchOrderCounts = async () => {
+            if (selectedBrigadier) {
+                try {
+                    const month = selectedDate.toISOString().slice(0, 7); // формат "YYYY-MM"
+                    const response = await OrderService.getBrigadierCalendar(selectedBrigadier, month);
+                    setOrderCounts(response.data);
+                } catch (error) {
+                    console.error('Failed to load order counts', error);
+                }
+            }
+        };
+
+        fetchOrderCounts();
+    }, [selectedBrigadier, selectedDate]);
+
+    const handleAssign = () => {
+        if (!selectedBrigadier) {
+            setError(t('Please select a brigadier'));
+            return;
+        }
+        onAssign(selectedBrigadier);
     };
-    loadBrigadiers();
-  }, []);
 
-  useEffect(() => {
-    if (selected) {
-      const monthStr = format(month, 'yyyy-MM');
-      OrderService.getBrigadierCalendar(selected.username, monthStr)
-        .then(res => setCalendarData(res.data))
-        .catch(error => {
-          console.error('Failed to fetch calendar data:', error);
-          setCalendarData({}); // Reset calendar data on error
-        });
-    }
-  }, [selected, month]);
+    const tileContent = ({ date }) => {
+        const dateStr = date.toISOString().split('T')[0];
+        const count = orderCounts[dateStr] || 0;
+        return count > 0 ? (
+            <div className="order-count-badge">{count}</div>
+        ) : null;
+    };
 
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearch(term);
-    setFiltered(brigadiers.filter(b =>
-      b.username.toLowerCase().includes(term) ||
-      (b.name && b.name.toLowerCase().includes(term))
-    ));
-  };
-
-  return (
-    <div className="modal show d-block" tabIndex="-1">
-      <div className="modal-dialog modal-lg">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Назначить бригадира</h5>
-          </div>
-          <div className="modal-body d-flex">
-            <div className="w-50 pe-3">
-              <input
-                className="form-control mb-2"
-                placeholder="Поиск по имени/логину"
-                value={search}
-                onChange={handleSearch}
-              />
-              <ul className="list-group overflow-auto" style={{ maxHeight: '300px' }}>
-                {filtered.map(b => (
-                  <li
-                    key={b.username}
-                    className={`list-group-item ${selected?.username === b.username ? 'active' : ''}`}
-                    onClick={() => setSelected(b)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {b.name} ({b.username})
-                  </li>
-                ))}
-              </ul>
+    return (
+        <div className="modal-overlay">
+            <div className="modal-container brigadier-picker-modal">
+                <div className="modal-header">
+                    <h3 className="modal-title">{t('Assign Brigadier')}</h3>
+                    <button className="modal-close" onClick={() => onAssign(null)}>×</button>
+                </div>
+                <div className="modal-body">
+                    {error && <div className="modal-error">{error}</div>}
+                    <div className="brigadier-picker-content">
+                        <div className="brigadier-picker-section">
+                            <h4 className="brigadier-picker-section-title">{t('Select Brigadier')}</h4>
+                            <select
+                                className="modal-input"
+                                value={selectedBrigadier}
+                                onChange={(e) => setSelectedBrigadier(e.target.value)}
+                            >
+                                <option value="">{t('Select Brigadier')}</option>
+                                {brigadiers.map((brigadier) => (
+                                    <option key={brigadier.username} value={brigadier.username}>
+                                        {brigadier.fullName && brigadier.fullName.replace(/null/g, '').trim() 
+                                            ? brigadier.fullName.replace(/null/g, '').trim() 
+                                            : brigadier.username}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="brigadier-picker-section">
+                            <h4 className="brigadier-picker-section-title">{t('Select Date')}</h4>
+                            <div className="calendar-container">
+                                <Calendar
+                                    onChange={setSelectedDate}
+                                    value={selectedDate}
+                                    minDate={new Date()}
+                                    className="custom-calendar"
+                                    tileContent={tileContent}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal-footer">
+                    <button className="modal-button modal-button-secondary" onClick={() => onAssign(null)}>
+                        {t('Cancel')}
+                    </button>
+                    <button 
+                        className="modal-button modal-button-primary" 
+                        onClick={handleAssign}
+                        disabled={!selectedBrigadier}
+                    >
+                        {t('Assign')}
+                    </button>
+                </div>
             </div>
-            <div className="w-50">
-              {selected ? (
-                <>
-                  <p className="fw-bold">Загрузка заказов для {selected.username}</p>
-                  <Calendar
-                    onActiveStartDateChange={({ activeStartDate }) => setMonth(activeStartDate)}
-                    tileContent={({ date }) => {
-                      const dateStr = format(date, 'yyyy-MM-dd');
-                      const count = calendarData[dateStr];
-                      return count ? <div className="badge bg-primary">{count}</div> : null;
-                    }}
-                  />
-                </>
-              ) : (
-                <p>Выберите бригадира</p>
-              )}
-            </div>
-          </div>
-          <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={() => onAssign(null)}>Отмена</button>
-            <button
-              className="btn btn-success"
-              disabled={!selected}
-              onClick={() => onAssign(selected.username)}
-            >
-              Назначить
-            </button>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default BrigadierPickerWithCalendar;

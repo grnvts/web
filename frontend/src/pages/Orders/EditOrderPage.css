@@ -1,0 +1,136 @@
+.edit-order-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.edit-order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f5f5f5;
+}
+
+.edit-order-header h3 {
+    color: #2c3e50;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: #FF5722;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.back-button:hover {
+    background-color: #fff5f2;
+    color: #F4511E;
+    transform: translateX(-2px);
+}
+
+.edit-order-content {
+    display: grid;
+    gap: 30px;
+    animation: fadeIn 0.5s ease;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    color: #FF5722;
+    font-size: 18px;
+    gap: 15px;
+    background-color: #fff9f7;
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.loading-container i {
+    font-size: 24px;
+    animation: spin 1s linear infinite;
+}
+
+.error-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    color: #e74c3c;
+    font-size: 18px;
+    background-color: #fff5f5;
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid #ffebee;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .edit-order-container {
+        margin: 10px;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .edit-order-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .edit-order-header h3 {
+        font-size: 24px;
+    }
+
+    .back-button {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .loading-container,
+    .error-message {
+        min-height: 200px;
+        padding: 20px;
+    }
+} 

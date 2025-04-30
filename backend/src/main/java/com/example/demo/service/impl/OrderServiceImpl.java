@@ -79,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Проверяем, является ли пользователь владельцем заказа, бригадиром или администратором
         boolean isClient = order.getClient().getUsername().equals(username);
-        boolean isBrigadier = order.getBrigade().getBrigadier() != null && order.getBrigade().getBrigadier().getUsername().equals(username);
+        boolean isBrigadier = order.getBrigade() != null && order.getBrigade().getBrigadier() != null && order.getBrigade().getBrigadier().getUsername().equals(username);
         boolean isAdmin = userRepository.findByUsername(username).getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_ADMIN);
 

@@ -1,0 +1,120 @@
+.order-detail-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff5f2, #fff);
+}
+
+.order-detail-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(255, 87, 34, 0.1);
+    padding: 30px;
+}
+
+.order-detail-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #FF5722;
+}
+
+.order-detail-header h1 {
+    color: #FF5722;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.order-detail-header p {
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+.order-detail-content {
+    display: grid;
+    gap: 30px;
+}
+
+.order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.order-actions button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #FF5722;
+}
+
+.btn-primary:hover {
+    background-color: #F4511E;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background-color: #2ecc71;
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background-color: #f39c12;
+}
+
+.btn-warning:hover {
+    background-color: #d35400;
+    transform: translateY(-2px);
+}
+
+.btn-info {
+    background-color: #FF5722;
+}
+
+.btn-info:hover {
+    background-color: #F4511E;
+    transform: translateY(-2px);
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #FF5722;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .order-detail-page {
+        padding: 10px;
+    }
+
+    .order-detail-container {
+        padding: 20px;
+    }
+
+    .order-actions {
+        flex-direction: column;
+    }
+
+    .order-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+} 

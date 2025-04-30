@@ -6,9 +6,10 @@ import com.example.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByOrderAndRecipient(Order order, User recipient);
     List<Message> findByOrderAndSender(Order order, User sender);
@@ -23,14 +24,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                                      @Param("user1") String user1,
                                      @Param("user2") String user2);
     @Query("SELECT m FROM Message m WHERE m.order = :order AND " +
-            "((m.sender.username = :user AND m.recipient IN (SELECT u FROM User u JOIN u.roles r WHERE r.name = 'ROLE_ADMIN')) " +
-            "OR (m.recipient.username = :user AND m.sender IN (SELECT u FROM User u JOIN u.roles r WHERE r.name = 'ROLE_ADMIN')) " +
-            "OR (m.sender.username = :user2 AND m.recipient.username = :user1) " +
-            "OR (m.sender.username = :user1 AND m.recipient.username = :user2)) " +
+            "(m.sender.username = :user OR m.recipient.username = :user) " +
             "ORDER BY m.timestamp ASC")
     List<Message> findAdminUserDialogMessages(@Param("order") Order order,
-                                              @Param("user") String user,
-                                              @Param("user1") String user1,
-                                              @Param("user2") String user2);
-
+                                              @Param("user") String user);
 }

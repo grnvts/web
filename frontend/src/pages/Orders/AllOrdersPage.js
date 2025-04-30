@@ -5,6 +5,7 @@ import AdminOrderCard from '../../components/AdminOrderCard';
 import OrderService from '../../Services/OrderService';
 import AlertifyService from '../../Services/AlertifyService';
 import { useTranslation } from 'react-i18next';
+import './AllOrdersPage.css';
 
 const AllOrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -38,21 +39,38 @@ const AllOrdersPage = () => {
   }, [isAdmin, history, t]);
 
   if (loading) {
-    return <div className="container">{t('Loading orders...')}</div>;
+    return (
+      <div className="orders-page">
+        <div className="orders-container">
+          <div className="loading-spinner">
+            <i className="fas fa-spinner fa-spin"></i>
+            <span>{t('Loading orders...')}</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container">
-      <h3>{t('All Orders')}</h3>
-      {orders.length > 0 ? (
-        orders.map((order) => (
-          <div key={order.id} className="mb-3">
-            <AdminOrderCard order={order} />
-          </div>
-        ))
-      ) : (
-        <p>{t('No orders found')}</p>
-      )}
+    <div className="orders-page">
+      <div className="orders-container">
+        <div className="orders-header">
+          <h1>{t('All Orders')}</h1>
+          <p>{t('Manage and monitor all orders in the system')}</p>
+        </div>
+        <div className="orders-grid">
+          {orders.length > 0 ? (
+            orders.map((order) => (
+              <AdminOrderCard key={order.id} order={order} />
+            ))
+          ) : (
+            <div className="no-orders">
+              <i className="fas fa-clipboard-list"></i>
+              <p>{t('No orders found')}</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

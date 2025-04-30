@@ -1,0 +1,201 @@
+.brigade-manage-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brigade-manage-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #eee;
+}
+
+.brigade-manage-header h2 {
+  color: #2c3e50;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.brigade-id {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.error-message {
+  color: #e74c3c;
+  background-color: #fdf0ed;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #fadbd8;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.error-message::before {
+  content: "⚠";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #3498db;
+}
+
+.loading-spinner i {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.masters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.current-masters,
+.available-masters {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.current-masters h3,
+.available-masters h3 {
+  color: #34495e;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.search-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #95a5a6;
+  font-size: 14px;
+}
+
+.no-masters {
+  color: #7f8c8d;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+.masters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.master-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.master-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.master-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.master-name {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.master-username {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.add-master-btn,
+.remove-master-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.add-master-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.add-master-btn:hover {
+  background-color: #2980b9;
+}
+
+.remove-master-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.remove-master-btn:hover {
+  background-color: #c0392b;
+}
+
+@media (max-width: 768px) {
+  .brigade-manage-container {
+    margin: 10px;
+    padding: 20px;
+  }
+
+  .masters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .master-card {
+    padding: 12px;
+  }
+
+  .search-input {
+    padding: 10px 36px 10px 12px;
+    font-size: 14px;
+  }
+} 

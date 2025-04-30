@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import BrigadierPickerWithCalendar from '../../components/BrigadierPickerWithCalendar';
 import { useSelector } from 'react-redux';
 import AssignMastersModal from '../../components/AssignMastersModal';
+import './OrderDetailPage.css';
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -26,6 +27,8 @@ const OrderDetailPage = () => {
   const [showAssignMastersModal, setShowAssignMastersModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [expenseAmount, setExpenseAmount] = useState('');
+  const [loading, setLoading] = useState(true); // Добавляем состояние загрузки
+  const [error, setError] = useState(false); // Добавляем состояние для ошибки
 
   const isBrigadier = roles?.includes('ROLE_BRIGADIER');
   const isAdmin = roles?.includes('ROLE_ADMIN');
@@ -34,10 +37,16 @@ const OrderDetailPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
+        setLoading(true);
         const response = await OrderService.getOrderById(orderId);
         setOrder(response.data);
+        setError(false); // Сбрасываем ошибку при успешной загрузке
       } catch (error) {
+        console.error('Failed to load order details', error);
         AlertifyService.error(t('Failed to load order details'));
+        setError(true); // Устанавливаем ошибку в true
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -144,47 +153,188 @@ const OrderDetailPage = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="order-detail-page">
+        <div className="loading-spinner">
+          <i className="fas fa-spinner fa-spin"></i>
+          <span>{t('Loading...')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="order-detail-page">
+        <div className="order-detail-container">
+          <div className="order-detail-header">
+            <h1>{t('Order Details')}</h1>
+            <p>{t('View and manage order information')}</p>
+          </div>
+          <div className="no-data">
+            <i className="fas fa-exclamation-triangle"></i>
+            <p>{t('No data available')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container">
-      {order ? (
-        <>
+    <div className="order-detail-page">
+      <div className="order-detail-container">
+        <div className="order-detail-header">
+          <h1>{t('Order Details')}</h1>
+          <p>{t('View and manage order information')}</p>
+        </div>
+
+        <div className="order-detail-content">
           <OrderCard order={order} />
 
-           {/* Кнопки для бригадира */}
-      {isBrigadier && (
-        <div className="mt-3">
-          {order.status === 'APPROVED' && (
-            <button className="btn btn-primary" onClick={handleStartOrder}>
-              {t('Start Order')}
-            </button>
-          )}
-          {order.status === 'IN_PROGRESS' && (
-            <button className="btn btn-success" onClick={handleCompleteOrder}>
-              {t('Mark as Completed')}
-            </button>
-          )}
+          <div className="order-actions">
+            {isBrigadier && (
+              <>
+                {order.status === 'APPROVED' && (
+                  <button className="btn btn-primary" onClick={handleStartOrder}>
+                    <i className="fas fa-play"></i>
+                    {t('Start Order')}
+                  </button>
+                )}
+                {order.status === 'IN_PROGRESS' && (
+                  <button className="btn btn-success" onClick={handleCompleteOrder}>
+                    <i className="fas fa-check"></i>
+                    {t('Mark as Completed')}
+                  </button>
+                )}
+                <button className="btn btn-info" onClick={() => setShowAssignMastersModal(true)}>
+                  <i className="fas fa-users"></i>
+                  {t('Assign Masters')}
+                </button>
+                <button className="btn btn-info" onClick={() => setShowExpenseModal(true)}>
+                  <i className="fas fa-money-bill"></i>
+                  {t('Add Expenses')}
+                </button>
+              </>
+            )}
+
+            {isUser && (
+              <>
+                <button className="btn btn-primary" onClick={() => openChat('admin')}>
+                  <i className="fas fa-comments"></i>
+                  {t('Chat with Admin')}
+                </button>
+                {order?.brigadierUsername && (
+                  <button className="btn btn-primary" onClick={() => openChat('brigadier')}>
+                    <i className="fas fa-comments"></i>
+                    {t('Chat with Brigadier')}
+                  </button>
+                )}
+              </>
+            )}
+
+            {isBrigadier && (
+              <button className="btn btn-primary" onClick={() => openChat('user')}>
+                <i className="fas fa-comments"></i>
+                {t('Chat with User')}
+              </button>
+            )}
+
+            {isAdmin && (
+              <>
+                <button className="btn btn-primary" onClick={handleEditClick}>
+                  <i className="fas fa-edit"></i>
+                  {t('Edit Order')}
+                </button>
+                <button className="btn btn-success" onClick={() => setShowBrigadierModal(true)}>
+                  <i className="fas fa-user-tie"></i>
+                  {t('Assign Brigadier')}
+                </button>
+                <button className="btn btn-warning" onClick={handleOpenStatusModal}>
+                  <i className="fas fa-exchange-alt"></i>
+                  {t('Change Status')}
+                </button>
+                <button className="btn btn-info" onClick={() => openChat('user')}>
+                  <i className="fas fa-comments"></i>
+                  {t('Chat with User')}
+                </button>
+               
+              </>
+            )}
+          </div>
         </div>
+      </div>
+
+      {showBrigadierModal && (
+        <BrigadierPickerWithCalendar onAssign={(username) => {
+          if (username) handleAssignBrigadier(username);
+          setShowBrigadierModal(false);
+        }} />
       )}
 
-
-{isBrigadier && (
-  <>
-  <button className="btn btn-info mt-3" onClick={() => setShowAssignMastersModal(true)}>
-    {t('Assign Masters')}
-  </button>
-  <button className="btn btn-info mt-3" onClick={() => setShowExpenseModal(true)} >
-  {t('Добавить расходы')}
-</button>
-{showExpenseModal && (
+      {showStatusModal && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Добавить расходы</h5>
+                <h5 className="modal-title">{t('Change Status')}</h5>
+                <button type="button" className="btn-close" onClick={() => setShowStatusModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label htmlFor="status" className="form-label">{t('Select Status')}</label>
+                  <select
+                    id="status"
+                    className="form-select"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option value="">{t('Select Status')}</option>
+                    <option value="CREATED">{t('Created')}</option>
+                    <option value="IN_PROGRESS">{t('In Progress')}</option>
+                    <option value="COMPLETED">{t('Completed')}</option>
+                    <option value="APPROVED">{t('Approved')}</option>
+                    <option value="REJECTED">{t('Rejected')}</option>
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="statusMessage" className="form-label">{t('Enter a message for the user')}</label>
+                  <textarea
+                    id="statusMessage"
+                    className="form-control"
+                    value={statusMessage}
+                    onChange={(e) => setStatusMessage(e.target.value)}
+                    rows="3"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowStatusModal(false)}>
+                  {t('Cancel')}
+                </button>
+                <button 
+                  className="btn btn-warning" 
+                  onClick={handleChangeStatus}
+                  disabled={!status || status === order.status}
+                >
+                  {t('Change')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showExpenseModal && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{t('Add Expenses')}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowExpenseModal(false)}></button>
               </div>
               <div className="modal-body">
-                <label>Сумма расходов:</label>
+                <label>{t('Expense Amount')}</label>
                 <input
                   type="number"
                   className="form-control"
@@ -193,11 +343,11 @@ const OrderDetailPage = () => {
                 />
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowExpenseModal(false)}>
-                  Отмена
+                <button className="btn btn-secondary" onClick={() => setShowExpenseModal(false)}>
+                  {t('Cancel')}
                 </button>
-                <button type="button" className="btn btn-success" onClick={handleAddExpense}>
-                  Добавить
+                <button className="btn btn-success" onClick={handleAddExpense}>
+                  {t('Add')}
                 </button>
               </div>
             </div>
@@ -205,186 +355,25 @@ const OrderDetailPage = () => {
         </div>
       )}
 
-</>
-)}
- {showAssignMastersModal && (
-  <AssignMastersModal
-    brigadeId={order.brigadeId}
-    orderId={order.id}
-    onAssign={handleAssignMasters}
-    onClose={() => setShowAssignMastersModal(false)}
-  />
-)}
-
- {/* Кнопки чатов для пользователя */}
- {isUser && (
-            <div className="mt-3">
-              <button
-                className="btn btn-primary"
-                onClick={() => openChat('admin')}
-              >
-                {t('Chat with Admin')}
-              </button>
-              {order.brigadierUsername && (
-                <button
-                  className="btn btn-primary ms-2"
-                  onClick={() => openChat('brigadier')}
-                >
-                  {t('Chat with Brigadier')}
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Кнопка чата для бригадира */}
-          {isBrigadier && (
-            <div className="mt-3">
-              <button
-                className="btn btn-primary"
-                onClick={() => openChat('user')}
-              >
-                {t('Chat with User')}
-              </button>
-            </div>
-          )}
-
-          {/* Кнопка чата для администратора */}
-          {isAdmin && (
-  <div className="mt-3">
-    {/* Кнопка "Чат с пользователем" всегда показывается */}
-    <button
-      className="btn btn-primary"
-      onClick={() => openChat('user')}
-    >
-      {t('Chat with User')}
-    </button>
-    {/* Кнопка "Чат с бригадиром" только если админ — клиент этого заказа */}
-    {order.brigadierUsername && order.clientUsername === username && (
-      <button
-        className="btn btn-primary ms-2"
-        onClick={() => openChat('brigadier')}
-      >
-        {t('Chat with Brigadier')}
-      </button>
-    )}
-    {/* Кнопка "Чат с админом" только если админ НЕ клиент этого заказа */}
-    {order.clientUsername !== username && !isAdmin && (
-      <button
-        className="btn btn-primary ms-2"
-        onClick={() => openChat('admin')}
-      >
-        {t('Chat with Admin')}
-      </button>
-    )}
-  </div>
-)}
-
-
 {showChat && (
-  <ChatModal
-    orderId={order.id}
-    recipientUsername={
-      // если чат с админом (для пользователя), то передаем username пользователя
-      (chatRecipient === 'admin' && isUser)
-        ? order.clientUsername
-        : chatRecipient
-    }
-    isAdminChat={isAdmin ? chatRecipient === order.clientUsername : isUser && chatRecipient === 'admin'}
-    onClose={() => setShowChat(false)}
-  />
-)}
-
-
-
-
-{isAdmin && (
   <>
-    <button className="btn btn-primary mt-3" onClick={handleEditClick}>
-      {t('Edit Order')}
-    </button>
-
-    {/* Кнопка для открытия модального окна "Назначить бригадира" */}
-    <button
-      className="btn btn-success mt-3"
-      onClick={() => setShowBrigadierModal(true)}
-    >
-      {t('Assign Brigadier')}
-    </button>
-
-    {/* Кнопка для открытия модального окна "Изменить статус" */}
-    <button
-      className="btn btn-warning mt-3"
-      onClick={handleOpenStatusModal}
-    >
-      {t('Change Status')}
-    </button>
+    {console.log("isAdminChat:", isAdmin ? chatRecipient === order.clientUsername : isUser && chatRecipient === 'admin')}
+    <ChatModal
+      orderId={order.id}
+      recipientUsername={chatRecipient}
+      isAdminChat={isAdmin ? chatRecipient === order.clientUsername : isUser && chatRecipient === 'admin'}
+      onClose={() => setShowChat(false)}
+    />
   </>
 )}
-          {/* Модальное окно для назначения бригадира */}
-          {showBrigadierModal && (
-  <BrigadierPickerWithCalendar onAssign={(username) => {
-    if (username) handleAssignBrigadier(username);
-    setShowBrigadierModal(false);
-  }} />
-)}
-
-          {/* Модальное окно для изменения статуса */}
-          {showStatusModal && (
-            <div className="modal show d-block" tabIndex="-1">
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title">{t('Change Status')}</h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      onClick={() => setShowStatusModal(false)}
-                    ></button>
-                  </div>
-                  <div className="modal-body">
-                    <label htmlFor="status">{t('Select Status')}</label>
-                    <select
-                      id="status"
-                      className="form-control"
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <option value="">{t('Select Status')}</option>
-                      <option value="CREATED">{t('Created')}</option>
-                      <option value="IN_PROGRESS">{t('In Progress')}</option>
-                      <option value="COMPLETED">{t('Completed')}</option>
-                      <option value="APPROVED">{t('Approved')}</option>
-                      <option value="REJECTED">{t('Rejected')}</option>
-                    </select>
-                    <textarea
-                      className="form-control"
-                      value={statusMessage}
-                      onChange={(e) => setStatusMessage(e.target.value)}
-                      placeholder={t('Enter a message for the user')}
-                    />
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      className="btn btn-secondary"
-                      onClick={() => setShowStatusModal(false)}
-                    >
-                      {t('Cancel')}
-                    </button>
-                    <button
-                      className="btn btn-warning"
-                      onClick={handleChangeStatus}
-                    >
-                      {t('Change')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <p>{t('Loading...')}</p>
-            )}
+      {showAssignMastersModal && (
+        <AssignMastersModal
+          brigadeId={order.brigadeId}
+          orderId={order.id}
+          onAssign={handleAssignMasters}
+          onClose={() => setShowAssignMastersModal(false)}
+        />
+      )}
     </div>
   );
 };

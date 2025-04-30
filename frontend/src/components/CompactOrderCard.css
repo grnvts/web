@@ -1,0 +1,133 @@
+.compact-order-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.compact-order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.compact-order-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-title {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+}
+
+.status-created {
+    background-color: #2196F3;
+}
+
+.status-in-progress {
+    background-color: #FF9800;
+}
+
+.status-completed {
+    background-color: #4CAF50;
+}
+
+.status-approved {
+    background-color: #ffa162;
+}
+
+.status-rejected {
+    background-color: #9E9E9E;
+}
+
+.compact-order-content {
+    padding: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.info-item i {
+    color: #FF5722;
+    width: 20px;
+    text-align: center;
+    margin-top: 3px;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 100px;
+}
+
+.info-value {
+    color: #666;
+    word-break: break-word;
+}
+
+.compact-order-actions {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.view-details-btn {
+    background-color: #FF5722;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.view-details-btn:hover {
+    background-color: #F4511E;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
+
+@media (max-width: 768px) {
+    .compact-order-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .compact-order-actions {
+        justify-content: center;
+    }
+
+    .info-item {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .info-label {
+        min-width: auto;
+    }
+} 

@@ -7,14 +7,18 @@ import ApiService from '../Services/BaseService/ApiService';
 import ProfileImage from '../components/ProfileImage';
 import defaultPicture from "./../assets/profile.png";
 import { BACKEND_IMAGE_URL } from '../Shared/config';
+import './Navbar.css';
 
 const NavbarComponent = props => {
     const [dropDownVisible, setDropDownVisible] = useState(false);
-    const [notificationsVisible, setNotificationsVisible] = useState(false); // Для управления видимостью уведомлений
-    const [notifications, setNotifications] = useState([]); // Для хранения уведомлений
+    const [notificationsVisible, setNotificationsVisible] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [ordersDropdownVisible, setOrdersDropdownVisible] = useState(false);
     const dropDownMenuArea = useRef(null);
     const notificationsMenuArea = useRef(null);
-    const [ordersDropdownVisible, setOrdersDropdownVisible] = useState(false); // Для отслеживания кликов вне уведомлений
+    const profileMenuArea = useRef(null);
+    const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
+    const ordersMenuArea = useRef(null);
     let imageSource = defaultPicture;
 
     const { isLoggedIn, username, image, roles } = useSelector(store => ({
@@ -33,14 +37,17 @@ const NavbarComponent = props => {
         return () => {
             document.removeEventListener("click", menuClickTracker);
         };
-    }, [isLoggedIn]);
+    }, []);
 
     const menuClickTracker = (event) => {
-        if (dropDownMenuArea.current === null || !dropDownMenuArea.current.contains(event.target)) {
-            setDropDownVisible(false);
-        }
         if (notificationsMenuArea.current === null || !notificationsMenuArea.current.contains(event.target)) {
             setNotificationsVisible(false);
+        }
+        if (profileMenuArea.current === null || !profileMenuArea.current.contains(event.target)) {
+            setProfileDropdownVisible(false);
+        }
+        if (ordersMenuArea.current === null || !ordersMenuArea.current.contains(event.target)) {
+            setOrdersDropdownVisible(false);
         }
     };
 
@@ -49,13 +56,11 @@ const NavbarComponent = props => {
         dispatch(logoutAction());
     };
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const loadNotifications = async () => {
         try {
-            console.log('Loading notifications...');
             const response = await ApiService.get('/notifications');
-            console.log('Notifications received:', response.data);
             setNotifications(response.data);
         } catch (error) {
             console.error('Failed to load notifications:', error);
@@ -66,14 +71,11 @@ const NavbarComponent = props => {
     };
 
     const toggleNotifications = () => {
-        console.log('Current visibility:', notificationsVisible);
         setNotificationsVisible(!notificationsVisible);
         if (!notificationsVisible) {
             loadNotifications();
         }
     };
-
-    const { i18n } = useTranslation();
 
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng);
@@ -82,194 +84,277 @@ const NavbarComponent = props => {
     let links = (
         <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-                <Link className="nav-link" to="/login">{t('Login')}</Link>
+                <Link className="nav-link" to="/login">
+                    <i className="fas fa-sign-in-alt"></i>
+                    <span>{t('Login')}</span>
+                </Link>
             </li>
             <li className="nav-item">
-                <Link className="nav-link" to="/signup">{t('Sign Up')}</Link>
+                <Link className="nav-link" to="/signup">
+                    <i className="fas fa-user-plus"></i>
+                    <span>{t('Sign Up')}</span>
+                </Link>
             </li>
         </ul>
     );
-    
+
     if (isLoggedIn) {
-
-
-
-
-        let dropdownClassName = "dropdown-menu p-2 shadow";
+        let dropdownClassName = "nav-dropdown-menu";
         if (dropDownVisible) {
             dropdownClassName += " show";
         }
         if (image) {
             imageSource = image;
         }
+
         if (isBrigadier) {
             links = (
                 <ul className="navbar-nav ml-auto">
-                    <li className="nav-item active">
-                        <Link className="nav-link" to="/orders/brigadier">{t('My Orders')}</Link>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/orders/brigadier">
+                            <i className="fas fa-clipboard-list"></i>
+                            <span>{t('My Orders')}</span>
+                        </Link>
                     </li>
-                    <li className="nav-item active">
-                        <Link className="nav-link" to="/brigade/manage">{t('My Brigade')}</Link>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/brigade/manage">
+                            <i className="fas fa-users"></i>
+                            <span>{t('My Brigade')}</span>
+                        </Link>
                     </li>
-                    <li className="naw-item dropdown ml-3" style={{ cursor: "pointer" }} ref={dropDownMenuArea}>
-                        <div className="d-flex" onClick={() => setDropDownVisible(true)}>
-                            <ProfileImage
-                                width="32"
-                                height="32"
-                                imageSource={imageSource}
-                                username={username}
-                                className="m-auto"
-                            />
-                            <span className="nav-link dropdown-toggle">{username}</span>
+                    <li className="nav-item" ref={dropDownMenuArea}>
+                        <div className="nav-item" ref={profileMenuArea}>
+                            <div className="nav-dropdown-trigger" onClick={() => setProfileDropdownVisible(!profileDropdownVisible)}>
+                                <ProfileImage
+                                    width="32"
+                                    height="32"
+                                    imageSource={imageSource}
+                                    username={username}
+                                    className="profile-image"
+                                />
+                                <span className="username">{username}</span>
+                            </div>
+
+                            {profileDropdownVisible && (
+                                <div className="nav-dropdown-menu">
+                                    <div className="dropdown-header">
+                                        <ProfileImage
+                                            width="60"
+                                            height="60"
+                                            imageSource={imageSource}
+                                            username={username}
+                                            className="profile-image-large"
+                                        />
+                                        <div className="profile-info">
+                                            <span className="profile-name">{username}</span>
+                                            <span className="profile-role">
+                                                {isAdmin ? t('Administrator') : isBrigadier ? t('Brigadier') : t('User')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="dropdown-content">
+                                        <Link to={`/user/${username}`} className="dropdown-item" onClick={() => setProfileDropdownVisible(false)}>
+                                            <i className="fas fa-user"></i>
+                                            <span>{t('My Profile')}</span>
+                                        </Link>
+                                        <div className="dropdown-divider"></div>
+                                        <div className="dropdown-item" onClick={onLogout}>
+                                            <i className="fas fa-sign-out-alt"></i>
+                                            <span>{t('Logout')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        <div className={dropdownClassName}>
-                            <Link
-                                className="dropdown-item"
-                                to={"/user/" + username}
-                                onClick={() => setDropDownVisible(false)}>{t("My Profile")}</Link>
-                            <span className="dropdown-item" onClick={onLogout} style={{ cursor: "pointer" }}>
-                                {t('Logout')}
-                            </span>
-                        </div>
+
                     </li>
                 </ul>
             );
-        }
-        else {
-
-
-
+        } else {
             links = (
                 <ul className="navbar-nav ml-auto">
-                    <li className="nav-item active">
-                        <Link className="nav-link" to="/index">{t('HomePage')} <span className="sr-only">(current)</span></Link>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/index">
+                            <i className="fas fa-home"></i>
+                            <span>{t('HomePage')}</span>
+                        </Link>
                     </li>
-                    <li className="nav-item dropdown" style={{ position: 'relative' }}>
-                        <span className="nav-link dropdown-toggle" onClick={() => setOrdersDropdownVisible(!ordersDropdownVisible)} style={{ cursor: 'pointer' }}>
-                            {t('Orders')}
-                        </span>
-
-                        {ordersDropdownVisible && (
-                            <div className="dropdown-menu show" style={{ display: 'block' }}>
-                                <Link className="dropdown-item" to="/orders">{t('My Orders')}</Link>
-                                <Link className="dropdown-item" to="/orders/create">{t('Create Order')}</Link>
-                                {isAdmin && <Link className="dropdown-item" to="/orders/all">{t('All Orders')}</Link>}
-                            </div>
-                        )}
-                    </li>
+                    {isAdmin ? (
+    <li className="nav-item">
+        <Link className="nav-link" to="/orders/all">
+            <i className="fas fa-globe"></i>
+            <span>{t('All Orders')}</span>
+        </Link>
+    </li>
+) : (
+    <li className="nav-item" ref={ordersMenuArea}>
+        <div className="nav-dropdown-trigger" onClick={(e) => {
+            e.stopPropagation();
+            setOrdersDropdownVisible(!ordersDropdownVisible);
+        }}>
+            <i className="fas fa-clipboard-list"></i>
+            <span>{t('Orders')}</span>
+        </div>
+        {ordersDropdownVisible && (
+            <div className="nav-dropdown-menu">
+                <div className="dropdown-content">
+                    {!isAdmin && (
+                        <>
+                            <Link to="/orders" className="dropdown-item" onClick={() => setOrdersDropdownVisible(false)}>
+                                <i className="fas fa-list"></i>
+                                <span>{t('My Orders')}</span>
+                            </Link>
+                            <Link to="/orders/create" className="dropdown-item" onClick={() => setOrdersDropdownVisible(false)}>
+                                <i className="fas fa-plus"></i>
+                                <span>{t('Create Order')}</span>
+                            </Link>
+                        </>
+                    )}
+                    {isBrigadier && (
+                        <Link to="/orders/brigadier" className="dropdown-item" onClick={() => setOrdersDropdownVisible(false)}>
+                            <i className="fas fa-hard-hat"></i>
+                            <span>{t('Brigadier Orders')}</span>
+                        </Link>
+                    )}
+                </div>
+            </div>
+        )}
+    </li>
+)}
                     {isAdmin && (
                         <>
-                            <li className="nav-item active">
-                                <Link className="nav-link" to="/users">{t('Users')}</Link>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/users">
+                                    <i className="fas fa-users"></i>
+                                    <span>{t('Users')}</span>
+                                </Link>
                             </li>
-                            <li className="nav-item active">
-                                <Link className="nav-link" to="/brigades">{t('Brigades')}</Link>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/brigades">
+                                    <i className="fas fa-hard-hat"></i>
+                                    <span>{t('Brigades')}</span>
+                                </Link>
                             </li>
                         </>
                     )}
-                    <li className="nav-item active">
-                        <Link className="nav-link" to={"/building/" + username}>{t('Building')}</Link>
-                    </li>
-                    {/* Уведомления */}
-                    <li className="nav-item dropdown" ref={notificationsMenuArea} style={{ position: 'relative' }}>
-                        <span className="nav-link" style={{ cursor: 'pointer' }} onClick={toggleNotifications}>
-                            <img
-                                src="/bell-1-svgrepo-com.svg"
-                                alt="Notifications"
-                                style={{ width: '20px', height: '20px' }}
-                            />
-                            {/* Добавьте бейдж с количеством уведомлений */}
+                    
+                    <li className="nav-item" ref={notificationsMenuArea}>
+                        <div className="nav-dropdown-trigger" onClick={toggleNotifications}>
+                            <i className="fas fa-bell"></i>
                             {notifications.length > 0 && (
-                                <span className="badge badge-danger" style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    fontSize: '10px'
-                                }}>
-                                    {notifications.length}
-                                </span>
+                                <span className="notification-badge">{notifications.length}</span>
                             )}
-                        </span>
+                        </div>
                         {notificationsVisible && (
-                            <div className="dropdown-menu show"
-                                style={{
-                                    position: 'absolute',
-                                    right: 0,
-                                    left: 'auto',
-                                    top: '100%',
-                                    zIndex: 1000,
-                                    display: 'block'
-                                }}>
-                                <h6 className="dropdown-header">{t('Notifications')}</h6>
-
-                                {notifications.length > 0 ? (
-                                    notifications.map((notification, index) => (
-                                        <div key={index} className="dropdown-item">
-                                            <p>{notification.message || 'No message'}</p>
-                                            <small>
-                                                {notification.orderDate
-                                                    ? `${t('Order Date')}: ${notification.orderDate}`
-                                                    : t('No date')}
-                                            </small>
+                            <div className="nav-dropdown-menu notifications-menu">
+                                <div className="dropdown-header">
+                                    <h4>{t('Notifications')}</h4>
+                                    {notifications.length > 0 && (
+                                        <span className="notification-count">{notifications.length}</span>
+                                    )}
+                                </div>
+                                <div className="dropdown-content">
+                                    {notifications.length > 0 ? (
+                                        notifications.map((notification, index) => (
+                                            <div key={index} className="notification-item">
+                                                <i className="fas fa-info-circle"></i>
+                                                <div className="notification-text">
+                                                    <p>{notification.message || t('No message')}</p>
+                                                    <span className="notification-date">
+                                                        {notification.orderDate || t('No date')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="no-notifications">
+                                            <i className="fas fa-check-circle"></i>
+                                            <p>{t('No notifications')}</p>
                                         </div>
-                                    ))
-                                ) : (
-                                    <p className="dropdown-item">{t('No notifications')}</p>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         )}
                     </li>
-                    {/* DropDown Menu */}
-                    <li className="naw-item dropdown ml-3" style={{ cursor: "pointer" }} ref={dropDownMenuArea}>
-                        <div className="d-flex" onClick={() => setDropDownVisible(true)}>
-                            <ProfileImage
-                                width="32"
-                                height="32"
-                                imageSource={imageSource}
-                                username={username}
-                                className="m-auto"
-                            />
-                            <span className="nav-link dropdown-toggle">{username}</span>
-                        </div>
-                        <div className={dropdownClassName}>
-                            <Link
-                                className="dropdown-item"
-                                to={"/user/" + username}
-                                onClick={() => setDropDownVisible(false)}>{t("My Profile")}</Link>
+                    <li className="nav-item" ref={dropDownMenuArea}>
+                        <div className="nav-item" ref={profileMenuArea}>
+                            <div className="nav-dropdown-trigger" onClick={() => setProfileDropdownVisible(!profileDropdownVisible)}>
+                                <ProfileImage
+                                    width="32"
+                                    height="32"
+                                    imageSource={imageSource}
+                                    username={username}
+                                    className="profile-image"
+                                />
+                                <span className="username">{username}</span>
+                            </div>
 
-                            <span className="dropdown-item" onClick={onLogout} style={{ cursor: "pointer" }}>
-                                {t('Logout')}
-                            </span>
+                            {profileDropdownVisible && (
+                                <div className="nav-dropdown-menu">
+                                    <div className="dropdown-header">
+                                        <ProfileImage
+                                            width="60"
+                                            height="60"
+                                            imageSource={imageSource}
+                                            username={username}
+                                            className="profile-image-large"
+                                        />
+                                        <div className="profile-info">
+                                            <span className="profile-name">{username}</span>
+                                            <span className="profile-role">
+                                                {isAdmin ? t('Administrator') : t('User')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="dropdown-content">
+                                        <Link to={`/user/${username}`} className="dropdown-item" onClick={() => setProfileDropdownVisible(false)}>
+                                            <i className="fas fa-user"></i>
+                                            <span>{t('My Profile')}</span>
+                                        </Link>
+                                        <div className="dropdown-divider"></div>
+                                        <div className="dropdown-item" onClick={onLogout}>
+                                            <i className="fas fa-sign-out-alt"></i>
+                                            <span>{t('Logout')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </li>
                 </ul>
             );
         }
     }
+
     return (
-        <div className="col-lg-12 shadow-sm mb-2" style={{ width: '100%', padding: 0 }}>
-            <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: '#fff' }}>
-                {/* Language Switcher */}
-                <ul className="navbar-nav" style={{marginLeft: 'auto', marginRight: 'auto', flexDirection: 'row'}}>
-                    <li className="nav-item">
-                        <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => changeLanguage('en')}>
-                            English
-                        </span>
-                    </li>
-                    <li className="nav-item">
-                        <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => changeLanguage('ru')}>
-                            Русский
-                        </span>
-                    </li>
-                </ul>
-                <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <nav className="navbar navbar-expand-lg">
+            <div className="container">
+                <Link className="navbar-brand" to="/">
+                    <i className="fas fa-tools"></i>
+                    <span>Ремонт-Мастер</span>
+                </Link>
+                <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
                     {links}
+                    {/* Language Switcher */}
+                    <ul className="navbar-nav ml-auto" style={{ flexDirection: 'row' }}>
+                        <li className="nav-item">
+                            <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => changeLanguage('en')}>
+                                English
+                            </span>
+                        </li>
+                        <li className="nav-item">
+                            <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => changeLanguage('ru')}>
+                                Русский
+                            </span>
+                        </li>
+                    </ul>
                 </div>
-            </nav>
-        </div>
+            </div>
+        </nav>
     );
 };
+
 export default NavbarComponent;

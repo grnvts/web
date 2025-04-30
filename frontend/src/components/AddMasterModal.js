@@ -9,10 +9,28 @@ const AddMasterModal = ({ onClose, onCreated }) => {
   const [qualifications, setQualifications] = useState([]);
   const [selectedQualifications, setSelectedQualifications] = useState([]);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Получить список квалификаций с бэка
-    UserService.getQualifications().then(res => setQualifications(res.data));
+    const fetchQualifications = async () => {
+      try {
+        setLoading(true);
+        const response = await UserService.getQualifications();
+        if (response.data && Array.isArray(response.data)) {
+          setQualifications(response.data);
+        } else {
+          setQualifications([]);
+          console.error('Полученные данные не являются массивом:', response.data);
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке квалификаций:', error);
+        setQualifications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQualifications();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -66,7 +84,7 @@ const AddMasterModal = ({ onClose, onCreated }) => {
                 <label>Фамилия *</label>
                 <input className="form-control" value={surname} onChange={e => setSurname(e.target.value)} />
                 {errors.surname && <div className="text-danger">{errors.surname} </div>}
-                </div>
+              </div>
               <div className="mb-2">
                 <label>Отчество *</label>
                 <input className="form-control" value={patronymic} onChange={e => setPatronymic(e.target.value)} />
@@ -74,18 +92,26 @@ const AddMasterModal = ({ onClose, onCreated }) => {
               </div>
               <div className="mb-2">
                 <label>Квалификации *</label>
-                <div>
-                  {qualifications.map(q => (
-                    <label key={q.id} className="me-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedQualifications.includes(q.id)}
-                        onChange={() => handleQualificationChange(q.id)}
-                      />{' '}
-                      {q.name}
-                    </label>
-                  ))}
-                </div>
+                {loading ? (
+                  <div>Загрузка квалификаций...</div>
+                ) : (
+                  <div>
+                    {Array.isArray(qualifications) && qualifications.length > 0 ? (
+                      qualifications.map(q => (
+                        <label key={q.id} className="me-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedQualifications.includes(q.id)}
+                            onChange={() => handleQualificationChange(q.id)}
+                          />{' '}
+                          {q.name}
+                        </label>
+                      ))
+                    ) : (
+                      <div className="text-warning">Нет доступных квалификаций</div>
+                    )}
+                  </div>
+                )}
                 {errors.qualifications && <div className="text-danger">{errors.qualifications}</div>}
               </div>
             </div>

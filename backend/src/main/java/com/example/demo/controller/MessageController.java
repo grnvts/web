@@ -47,21 +47,22 @@ public class MessageController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/{orderId}/dialog")
-    public List<MessageDto> getDialogMessages(@PathVariable Long orderId,
-                                              @RequestParam String user1,
-                                              @RequestParam String user2) {
-        Order order = orderService.getOrderEntity(orderId);
-        return messageService.getDialogMessages(order, user1, user2)
-                .stream().map(MessageDto::new).collect(Collectors.toList());
-    }
 
     @GetMapping("/{orderId}/admin-dialog")
     public List<MessageDto> getAdminUserDialogMessages(@PathVariable Long orderId,
                                                        @RequestParam String user) {
         Order order = orderService.getOrderEntity(orderId);
         // user — это username пользователя (не админа!)
-        return messageService.getAdminUserDialogMessages(order, user, "admin")
+        return messageService.getAdminUserDialogMessages(order, user) 
+                .stream().map(MessageDto::new).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{orderId}/dialog")
+    public List<MessageDto> getDialogMessages(@PathVariable Long orderId,
+                                              @RequestParam String user1,
+                                              @RequestParam String user2) {
+        Order order = orderService.getOrderEntity(orderId);
+        return messageService.getDialogMessages(order, user1, user2)
                 .stream().map(MessageDto::new).collect(Collectors.toList());
     }
 }

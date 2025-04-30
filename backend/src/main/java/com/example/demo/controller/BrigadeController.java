@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.UserDto;
+import com.example.demo.dto.BrigadeDto;
 import com.example.demo.model.Brigade;
 import com.example.demo.model.User;
 import com.example.demo.repo.BrigadeRepository;
@@ -62,8 +63,10 @@ public class BrigadeController {
     // Получить все бригады (для администратора)
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<Brigade> getAllBrigades() {
-        return brigadeRepository.findAll();
+    public List<BrigadeDto> getAllBrigades() {
+        return brigadeRepository.findAll().stream()
+                .map(BrigadeDto::new)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/my/masters")

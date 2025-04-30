@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react'
 import { withTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
@@ -9,6 +8,17 @@ import ApiService from '../Services/BaseService/ApiService';
 import UserService from '../Services/UserService';
 import Input from './input';
 import { updateUser } from '../redux/AuthenticationAction';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+    faSave,
+    faTimes,
+    faUser,
+    faEnvelope,
+    faPhone,
+    faLock,
+    faIdCard
+} from '@fortawesome/free-solid-svg-icons';
+import './UpdateUserForm.css';
 
 class UpdateUserForm extends Component {
     constructor(props) {
@@ -21,218 +31,257 @@ class UpdateUserForm extends Component {
             surname: '',
             patronymic: '',
             phone: '',
-
-            errors: {
-            }
+            errors: {}
         };
-        this.loadInputs = this.loadInputs.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         const { user } = this.props;
         this.loadInputs(user);
     }
-    loadInputs =  (user) =>{
-        // const { user } = props;
-        console.log("Editing user:", user);
 
+    loadInputs = (user) => {
+        console.log("Editing user:", user);
         this.setState({ ...user });
     }
-    onChangeData = (type, event) =>{
-        const stateData = this.state;
-        stateData[type] = event
-        const errors = { ...this.state.errors }
-        errors[type] = undefined;
-        this.setState({ stateData, errors: errors });
+
+    onChangeData = (type, event) => {
+        this.setState(prevState => ({
+            ...prevState,
+            [type]: event,
+            errors: {
+                ...prevState.errors,
+                [type]: undefined
+            }
+        }));
     }
+
     onClickSave = async (e) => {
         e.preventDefault();
         this.setState({ errors: {} });
-        const body = this.state;
-
-
-
-
-
-        try {
-            const response = await UserService.update(
-                this.props.user.username, // обновляемого юзера
-                body,
-                this.props.jwttoken       // токен текущего авторизованного пользователя (админа)
-            );
-
-
-            // const data = {isLoggedIn, jwttoken,password, ...response.data.body};
-            // this.props.dispatch(updateUser(data));
-            // this.props.showUpdateForm(false)
-            // this.props.history.push("/user/"+data.username)
-
-            const updatedData = response.data; // весь ответ сервера
-            if (response.status === 200 || updatedData.statusCodeValue === 200) {
-                if (this.props.isAdminEditingOtherUser) {
-                    AlertifyService.success("User updated successfully");
-                    const data = response.data.body || response.data; // поддержка обоих форматов
-                    this.props.onUserUpdated(data);
-                    this.props.showUpdateForm(false);;
-
-                    this.props.showUpdateForm(false);
-                } else {
-                    const updatedUser = {
-                        ...this.props,
-                        ...updatedData,
-                        roles: updatedData.roles ? Array.from(updatedData.roles) : []
-                    };
-                    this.props.dispatch(updateUser(updatedUser));
-                    AlertifyService.success("Profile updated successfully");
-                    this.props.showUpdateForm(false);
-
-
-            // Если изменился username, обновляем токен (если он возвращается)
-                    if (response.data.jwttoken) {
-                        ApiService.changeAuthToken(response.data.jwttoken);
-                    }
-                }
-            }
-        } catch (error) {
-            // Обработка ошибок Axios
-            if (error.response) {
-                const { status, data } = error.response;
-
-                // Ошибка доступа (403)
-                if (status === 403) {
-                    AlertifyService.error(data.message || "You don't have permission to update this user.");
-
-                    // Ошибки валидации (400)
-                } else if (status === 400 && data.validationErrors) {
-                    this.setState({ errors: data.validationErrors });
-
-                    // Другие ошибки
-                } else {
-                    AlertifyService.error(data.message || "An error occurred while updating the user.");
-                }
-
-            } else {
-                AlertifyService.error("Network error or server is unavailable.");
-            }
+    
+        // Валидация обязательных полей
+        const { name, surname, patronymic } = this.state;
+        const validationErrors = {};
+    
+        if (!name || name.trim() === '') {
+            validationErrors.name = 'Имя обязательно для заполнения';
         }
-    }
-    logoutForChangingUserData = () =>{
-        ApiService.changeAuthToken(null);
-        this.props.dispatch(logoutAction());
-    }
+        if (!surname || surname.trim() === '') {
+            validationErrors.surname = 'Фамилия обязательна для заполнения';
+        }
+        if (!patronymic || patronymic.trim() === '') {
+            validationErrors.patronymic = 'Отчество обязательно для заполнения';
+        }
+    
+        if (Object.keys(validationErrors).length > 0) {
+            this.setState({ errors: validationErrors });
+            return;
+        }
+    
+        // Подготавливаем данные для отправки
+        const { id, username, email, phone, bornDate, password, repeatPassword } = this.state;
+        const body = {
+            id,
+            username,
+            email,
+            name: name.trim(),
+            surname: surname.trim(),
+            patronymic: patronymic.trim(),
+            phone: phone || null,
+            bornDate: bornDate || null,
+            password: password || null,
+            repeatPassword: repeatPassword || null
+        };
+    
+        try {
+            await UserService.update(this.props.user.username, body, this.props.jwttoken);
+    
+            // Перезагрузка страницы после успешной отправки
+            window.location.reload();
+        } catch (error) {
+            AlertifyService.error("An error occurred while updating the user.");
+        }
+    };
+        
+
     render() {
-        const {t} = this.props;
-        const {username, email, name, surname, patronymic, phone, bornDate, password, repeatPassword} = this.state;
-        const {errors} = this.state;
+        const { t } = this.props;
+        const { username, email, name, surname, patronymic, phone, bornDate, password, repeatPassword } = this.state;
+        const { errors } = this.state;
         const isAdmin = this.props.isAdminEditingOtherUser;
 
         return (
-            <div>
-                {this.props.inEditMode &&
-                    <form>
-                        <h5 className="card-header text-center">{t("Change User Info")}</h5>
+            <div className="update-user-form-container">
+                {this.props.inEditMode && (
+                    <form className="update-user-form">
+                        <div className="form-header">
+                            <h3>
+                                <FontAwesomeIcon icon={faUser} className="header-icon" />
+                                {t("Update Profile")}
+                            </h3>
+                        </div>
 
-                        {/* Имя пользователя — только для самого себя */}
-                        {!isAdmin && (
-                            <Input
-                                label={t("Username")}
-                                error={errors.username}
-                                type="text"
-                                name="username"
-                                placeholder={t("Username")}
-                                valueName={username}
-                                onChangeData={this.onChangeData}
-                            />
-                        )}
+                        <div className="form-grid">
+                            {!isAdmin && (
+                                <div className="form-group">
+                                    <label>
+                                        <FontAwesomeIcon icon={faIdCard} />
+                                        {t("Username")}
+                                    </label>
+                                    <Input
+                                        error={errors.username}
+                                        type="text"
+                                        name="username"
+                                        placeholder={t("Username")}
+                                        valueName={username}
+                                        onChangeData={this.onChangeData}
+                                    />
+                                </div>
+                            )}
 
-                        <Input
-                            label={t("Email")}
-                            type="email"
-                            error={errors.email}
-                            name="email"
-                            placeholder={t("Email")}
-                            valueName={email}
-                            onChangeData={this.onChangeData}
-                        />
-
-                        <Input
-                            label={t("Name")}
-                            type="text"
-                            name="name"
-                            placeholder={t("Name")}
-                            valueName={name}
-                            onChangeData={this.onChangeData}
-                        />
-
-                        <Input
-                            label={t("Surname")}
-                            type="text"
-                            name="surname"
-                            placeholder={t("Surname")}
-                            valueName={surname}
-                            onChangeData={this.onChangeData}
-                        />
-
-                        <Input
-                            label={t("Patronymic")}
-                            type="text"
-                            name="patronymic"
-                            placeholder={t("Patronymic")}
-                            valueName={patronymic}
-                            onChangeData={this.onChangeData}
-                        />
-
-                        <Input
-                            label={t("Phone")}
-                            type="text"
-                            name="phone"
-                            placeholder={t("Phone")}
-                            valueName={phone}
-                            onChangeData={this.onChangeData}
-                        />
-
-                        {/* Только сам пользователь может редактировать дату рождения и пароль */}
-                        {!isAdmin && (
-                            <>
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faEnvelope} />
+                                    {t("Email")}
+                                </label>
                                 <Input
-                                    label={t("Born Date")}
-                                    type="date"
-                                    name="bornDate"
-                                    placeholder={t("Born Date")}
-                                    valueName={bornDate?.slice(0, 10)}
+                                    error={errors.email}
+                                    type="email"
+                                    name="email"
+                                    placeholder={t("Email")}
+                                    valueName={email}
                                     onChangeData={this.onChangeData}
                                 />
+                            </div>
 
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faUser} />
+                                    {t("Name")}
+                                </label>
                                 <Input
-                                    label={t("Password")}
-                                    type="password"
-                                    name="password"
-                                    placeholder={t("New Password")}
-                                    valueName={password}
+                                    error={errors.name}
+                                    type="text"
+                                    name="name"
+                                    placeholder={t("Name")}
+                                    valueName={name}
                                     onChangeData={this.onChangeData}
                                 />
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faUser} />
+                                    {t("Surname")}
+                                </label>
                                 <Input
-                                    label={t("Repeat Password")}
-                                    type="password"
-                                    name="repeatPassword"
-                                    placeholder={t("Repeat Password")}
-                                    valueName={repeatPassword}
+                                    error={errors.surname}
+                                    type="text"
+                                    name="surname"
+                                    placeholder={t("Surname")}
+                                    valueName={surname}
                                     onChangeData={this.onChangeData}
                                 />
-                            </>
-                        )}
+                            </div>
 
-                        <button
-                            className="btn btn-primary mt-2"
-                            type="button"
-                            onClick={this.onClickSave}>{t('Update')}</button>
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faUser} />
+                                    {t("Patronymic")}
+                                </label>
+                                <Input
+                                    error={errors.patronymic}
+                                    type="text"
+                                    name="patronymic"
+                                    placeholder={t("Patronymic")}
+                                    valueName={patronymic}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faPhone} />
+                                    {t("Phone")}
+                                </label>
+                                <Input
+                                    type="text"
+                                    name="phone"
+                                    placeholder={t("Phone")}
+                                    valueName={phone}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </div>
+
+                            {!isAdmin && (
+                                <>
+                                    <div className="form-group">
+                                        <label>{t("Born Date")}</label>
+                                        <Input
+                                            type="date"
+                                            name="bornDate"
+                                            placeholder={t("Born Date")}
+                                            valueName={bornDate?.slice(0, 10)}
+                                            onChangeData={this.onChangeData}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>
+                                            <FontAwesomeIcon icon={faLock} />
+                                            {t("Password (leave empty if you dont want to change it)")}
+                                        </label>
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            placeholder={t("New Password ")}
+
+                                            onChangeData={this.onChangeData}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>
+                                            <FontAwesomeIcon icon={faLock} />
+                                            {t("Repeat Password")}
+                                        </label>
+                                        <Input
+                                            type="password"
+                                            name="repeatPassword"
+                                            placeholder={t("Repeat Password")}
+
+                                            onChangeData={this.onChangeData}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="cancel-button"
+                                onClick={() => this.props.showUpdateForm(false)}>
+                                <FontAwesomeIcon icon={faTimes} />
+                                {t('Cancel')}
+                            </button>
+                            <button
+                                type="submit"
+                                className="save-button"
+                                onClick={this.onClickSave}>
+                                <FontAwesomeIcon icon={faSave} />
+                                {t('Save Changes')}
+                            </button>
+                        </div>
                     </form>
-                }
+                )}
             </div>
         );
     }
 }
-    const mapStateToProps = (store) => {
+
+const mapStateToProps = (store) => {
     return {
         isLoggedIn: store.isLoggedIn,
         username: store.username,
@@ -242,4 +291,5 @@ class UpdateUserForm extends Component {
         image: store.image
     };
 };
+
 export default connect(mapStateToProps)(withTranslation()(withRouter(UpdateUserForm)));

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import UserService from '../Services/UserService'; // Для получения списка бригадиров
-
+import AlertifyService from '../Services/AlertifyService';
 
 const AdminOrderForm = ({ onSubmit, initialData }) => {
   const { t } = useTranslation();
@@ -18,9 +18,9 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
     endDate: initialData?.endDate || '',
     price: initialData?.price || '',
     status: initialData?.status || 'NEW',
-
   });
 
+  const [errors, setErrors] = useState({});
   const [brigadiers, setBrigadiers] = useState([]);
 
   useEffect(() => {
@@ -37,26 +37,65 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
     fetchBrigadiers();
   }, []);
 
+  const validateDates = (startDate, endDate) => {
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return end >= start;
+    }
+    return true;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let newFormData;
+    
     if (name.startsWith('address.')) {
       const field = name.split('.')[1];
-      setFormData((prev) => ({
-        ...prev,
-        address: { ...prev.address, [field]: value },
-      }));
+      newFormData = {
+        ...formData,
+        address: { ...formData.address, [field]: value },
+      };
     } else {
-      setFormData({ ...formData, [name]: value });
+      newFormData = { ...formData, [name]: value };
     }
+
+    // Валидация дат
+    if (name === 'startDate' || name === 'endDate') {
+      const startDate = name === 'startDate' ? value : newFormData.startDate;
+      const endDate = name === 'endDate' ? value : newFormData.endDate;
+      
+      if (!validateDates(startDate, endDate)) {
+        setErrors(prev => ({
+          ...prev,
+          endDate: t('End date cannot be earlier than start date')
+        }));
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.endDate;
+          return newErrors;
+        });
+      }
+    }
+
+    setFormData(newFormData);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Проверка дат перед отправкой
+    if (!validateDates(formData.startDate, formData.endDate)) {
+      AlertifyService.error(t('Please correct the dates'));
+      return;
+    }
+
     onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="admin-order-form">
       <div className="form-group">
         <label>{t('Service Type')}</label>
         <select
@@ -148,10 +187,14 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
         <input
           type="date"
           name="endDate"
-          className="form-control"
+          className={`form-control ${errors.endDate ? 'is-invalid' : ''}`}
           value={formData.endDate}
           onChange={handleChange}
+          min={formData.startDate}
         />
+        {errors.endDate && (
+          <div className="invalid-feedback">{errors.endDate}</div>
+        )}
       </div>
 
       <div className="form-group">
@@ -163,6 +206,7 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
           value={formData.price}
           onChange={handleChange}
           required
+          min="0"
         />
       </div>
 
@@ -176,14 +220,14 @@ const AdminOrderForm = ({ onSubmit, initialData }) => {
           required
         >
           <option value="CREATED">{t('Created')}</option>
+          <option value="APPROVED">{t('Approved')}</option>
           <option value="IN_PROGRESS">{t('In Progress')}</option>
           <option value="COMPLETED">{t('Completed')}</option>
-          <option value="CANCELLED">{t('Cancelled')}</option>
+
           <option value="REJECTED">{t('Rejected')}</option>
         </select>
       </div>
 
-     
       <button type="submit" className="btn btn-primary">
         {t('Save')}
       </button>

@@ -17,6 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UploadImageDto {
 
-	//@FileType(types = {"image/png","image/jpeg"} )
+	@FileType(types = {"image/png","image/jpeg"} )
 	String image;
 }

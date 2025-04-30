@@ -42,7 +42,14 @@ public List<Message> getMessagesForOrder(Order order, String recipientUsername, 
         return messageRepository.findDialogMessages(order, user1, user2);
     }
 
-    public List<Message> getAdminUserDialogMessages(Order order, String user, String admin) {
-        return messageRepository.findAdminUserDialogMessages(order, user, user, admin);
+    @Override
+    public List<Message> getAdminUserDialogMessages(Order order, String user) {
+        System.out.println("Fetching messages for Order ID: " + order.getId() + ", User: " + user);
+        List<Message> messages = messageRepository.findAdminUserDialogMessages(order, user);
+        System.out.println("Messages fetched: " + messages.size());
+        for (Message message : messages) {
+            System.out.println("Message: " + message.getContent() + ", Sender: " + message.getSender().getUsername() + ", Recipient: " + message.getRecipient().getUsername());
+        }
+        return messages;
     }
 }

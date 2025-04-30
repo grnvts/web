@@ -23,10 +23,7 @@ public class FileTypeValidator  implements ConstraintValidator<FileType, String>
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		return fileService.isValidFileType(this.types, value);
-//		String fileType = fileService.detectType(value);
-//		if(fileType.equalsIgnoreCase("image/jpeg") || fileType.equalsIgnoreCase("image/png") )
-//			return true;
-//		return false;
+
 	}
 
 }

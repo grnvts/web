@@ -53,7 +53,7 @@ public class FileService {
 		try {
 			Files.deleteIfExists(Paths.get(app.getUploadPath(), oldImage));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 

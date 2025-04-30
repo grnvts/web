@@ -28,6 +28,11 @@ console.log('Authorization header after set:', Axios.defaults.headers.common['Au
             console.log('Authorization header removed');
         }
     }
+
+    clearAuthToken() {
+        delete Axios.defaults.headers.common['Authorization'];
+        localStorage.removeItem('jwtToken'); // Удаляет токен из локального хранилища
+    }
     
     changeLanguage(lg) { Axios.defaults.headers["accept-language"] = lg; }
 }

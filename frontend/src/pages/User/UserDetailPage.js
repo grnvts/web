@@ -5,9 +5,13 @@ import { useParams, withRouter } from 'react-router-dom';
 import Input from '../../components/input';
 import UpdateUserForm from '../../components/UpdateUserForm';
 import UserCard from '../../components/UserCard'
+import ApiService from '../../Services/BaseService/ApiService';
 import { updateUser } from '../../redux/AuthenticationAction';
 import AlertifyService from '../../Services/AlertifyService';
 import UserService from '../../Services/UserService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faTimes, faSave } from '@fortawesome/free-solid-svg-icons';
+import './UserDetailPage.css';
 
 const UserDetailPage = (props) => {
     const [user, setUser] = useState({});
@@ -107,8 +111,19 @@ const UserDetailPage = (props) => {
 
         try {
             const response = await UserService.deleteUserById(user.id, reduxStore.jwttoken);
+            
             AlertifyService.success(t("User account deleted"));
-            props.history.push('/'); // перенаправляем на главную
+              // Проверяем, удаляет ли пользователь свой собственный аккаунт
+            if (reduxStore.username === user.username) {
+                // Очистка данных авторизации и выход из аккаунта
+                ApiService.clearAuthToken(); // Удаляет токен из заголовков
+                dispatch({ type: 'ACTIONS.LOGOUT_ACTION' }); // Очищает данные пользователя из Redux
+                props.history.push('/login'); // Перенаправление на страницу входа
+            } else {
+                // Если администратор удаляет чужой аккаунт, просто обновляем страницу
+                props.history.push('/');
+            }
+            
         } catch (error) {
             AlertifyService.error("Failed to delete user");
             console.error(error);
@@ -150,7 +165,7 @@ const UserDetailPage = (props) => {
                     console.log(error.message);
             }
         } else {
-            AlertifyService.alert("User Image Not Updated..");
+            AlertifyService.alert("Фотография профиля не обновлена.");
         }
 
 
@@ -174,8 +189,10 @@ const UserDetailPage = (props) => {
         )
     } else if (!notFound) {
         return (
-            <div className="col-lg-12">
-                <h5>{t('User Detail')} </h5>
+            <div className="user-detail-container">
+                <div className="user-detail-header">
+                    <h5>{t('User Detail')}</h5>
+                </div>
 
                 <UserCard
                     user={user}
@@ -185,27 +202,35 @@ const UserDetailPage = (props) => {
                 />
                 {
                     editable &&
-
-                    <div className="card-body">
-                        {!inEditMode ?
+                    <div className="action-buttons">
+                        {!inEditMode ? (
                             <>
                                 <button
                                     onClick={e => showUpdateForm(true)}
-                                    className="btn btn-sm btn-success me-2">{t('Edit')}</button>
+                                    className="action-button edit-button">
+                                    <FontAwesomeIcon icon={faEdit} />
+                                    {t('Edit')}
+                                </button>
 
                                 <button
                                     onClick={deleteUser}
-                                    className="btn btn-sm btn-danger">{t('Delete Account')}</button>
+                                    className="action-button delete-button">
+                                    <FontAwesomeIcon icon={faTrash} />
+                                    {t('Delete Account')}
+                                </button>
                             </>
-                            :
+                        ) : (
                             <button
                                 onClick={e => showUpdateForm(false)}
-                                className="btn btn-sm btn-danger">{t('Cancel')} </button>
-                        }
+                                className="action-button cancel-button">
+                                <FontAwesomeIcon icon={faTimes} />
+                                {t('Cancel')}
+                            </button>
+                        )}
                     </div>
-
                 }
-                { inEditMode &&
+                
+                {inEditMode && (
                     <div className="row">
                         <div className="col-sm-7">
                             <UpdateUserForm
@@ -219,46 +244,45 @@ const UserDetailPage = (props) => {
                         </div>
                         {!isAdminEditingOtherUser && (
                             <div className="col-sm-5">
-                                <h5 className="card-header text-center"><b>{t("Change Image")}</b></h5>
-                                <ul className="list-group list-group-flush ">
-                                    <li className="list-group-item" style={{ color: "red" }}> png or jpeg format </li>
-                                    <li className="list-group-item">
+                                <div className="image-edit-section">
+                                    <div className="image-edit-header">
+                                        <h5>{t("Change Image")}</h5>
+                                    </div>
+                                    <div className="image-edit-content">
+                                        <div className="image-format-info">
+                                            {t("Supported formats: PNG or JPEG")}
+                                        </div>
                                         <Input
                                             error={errorImage}
                                             name="image"
                                             type="file"
                                             onChangeData={onChangeData}
+                                            className="image-upload-input"
                                         />
-                                    </li>
-                                    <li className="list-group-item">
-                                        <button
-                                            onClick={saveImage}
-                                            className="btn btn-sm btn-primary">{t('Save')} </button>
-                                        <button
-                                            onClick={e => showUpdateForm(false)}
-                                            className="btn btn-sm btn-danger">{t('Cancel')} </button>
-                                    </li>
-                                </ul>
+                                        <div className="image-upload-buttons">
+                                            <button
+                                                onClick={saveImage}
+                                                className="save-image-button">
+                                                <FontAwesomeIcon icon={faSave} />
+                                                {t('Save')}
+                                            </button>
+                                            <button
+                                                onClick={e => showUpdateForm(false)}
+                                                className="action-button cancel-button">
+                                                <FontAwesomeIcon icon={faTimes} />
+                                                {t('Cancel')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
-                }
-
+                )}
             </div>
         )
     }
 };
-// const mapStateToProps = (store) => {
-//     return {
-//         isLoggedIn: store.isLoggedIn,
-//         username: store.username,
-//         email: store.email,
-//         jwttoken: store.jwttoken,
-//         password: store.password,
-//         image: store.image
-//     };
-// };
-// export default connect(mapStateToProps)(withRouter(ProfileCard)) ;
-//export default connect(mapStateToProps)(serDetailPage);
+
 export default withRouter(UserDetailPage) ;
 

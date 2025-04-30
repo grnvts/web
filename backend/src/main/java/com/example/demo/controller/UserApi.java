@@ -1,4 +1,4 @@
-package com.example.demo.api;
+package com.example.demo.controller;
 
 import javax.validation.Valid;
 
@@ -21,10 +21,7 @@ import com.example.demo.util.ApiPaths;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ import java.util.Map;
 public class UserApi {
 	private final UserService service;
 	private final QualificationRepository qualificationRepository;
-	// localhost:8501/api/user/users?page=1&size=4
+
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users")
 	public ResponseEntity<Page<UserDto>> getAll(@RequestHeader("Authorization") String authHeader, Pageable page) {
@@ -78,7 +75,7 @@ public class UserApi {
 			@PathVariable String username,@RequestBody UploadImageDto dto) { 
 		return ResponseEntity.ok(service.uploadImage(authHeader, username, dto));
 	}
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
     	return ResponseEntity.ok(service.deleteUser(id));

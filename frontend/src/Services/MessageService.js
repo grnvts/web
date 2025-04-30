@@ -8,11 +8,11 @@ class MessageService {
   getMessagesForOrder(orderId, recipientUsername, senderUsername) {
     return ApiService.get(`/messages/${orderId}?recipientUsername=${recipientUsername}&senderUsername=${senderUsername}`);
   }
-  getDialogMessages(orderId, user1, user2) {
-    return ApiService.get(`/messages/${orderId}/dialog?user1=${user1}&user2=${user2}`);
-  }
   getAdminUserDialogMessages(orderId, user) {
     return ApiService.get(`/messages/${orderId}/admin-dialog?user=${user}`);
+  }
+  getDialogMessages(orderId, user1, user2) {
+    return ApiService.get(`/messages/${orderId}/dialog?user1=${user1}&user2=${user2}`);
   }
 }
 

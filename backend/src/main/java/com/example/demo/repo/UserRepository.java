@@ -13,10 +13,11 @@ import com.example.demo.dto.UserDto;
 import com.example.demo.model.User;
 import com.example.demo.model.Role;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	User findByUsername(String username);

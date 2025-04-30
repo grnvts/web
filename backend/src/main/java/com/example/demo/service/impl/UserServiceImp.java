@@ -217,7 +217,7 @@ public class UserServiceImp implements UserService {
 			String oldImage = user.getImage();
 			try {
 				if (!fileService.isValidFileType(types, dto.getImage())) {
-					ApiError error = new ApiError(400, "Image Type invalid", "api/user/upload-image/" + authHeader);
+					ApiError error = new ApiError(400, "Неверный формат файла", "api/user/upload-image/" + authHeader);
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 				}
 				String fileName = fileService.writeBase64StringToFile(dto.getImage());

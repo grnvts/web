@@ -11,5 +11,5 @@ public interface MessageService {
   //  List<Message> getMessagesForOrder(Order order);
     List<Message> getMessagesForOrder(Order order, String recipientUsername, String senderUsername);
     List<Message> getDialogMessages(Order order, String user1, String user2);
-    List<Message> getAdminUserDialogMessages(Order order, String user, String admin);
+    List<Message> getAdminUserDialogMessages(Order order, String user);
 }

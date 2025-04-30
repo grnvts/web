@@ -58,7 +58,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 
-				// 🔥 ВАЖНО: загружаем роли из токена
 				List<String> roles = jwtTokenUtil.getRolesFromToken(jwtToken);
 				var authorities = roles.stream()
 						.map(SimpleGrantedAuthority::new)

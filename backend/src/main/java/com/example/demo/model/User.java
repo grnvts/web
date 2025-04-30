@@ -61,10 +61,11 @@ public class User {
 	@NotEmpty
 	@NotNull
 	@Size(min = 8)
+	//обязательно содержит большую маленькую букву
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "{message.username.pattern}")
 	private String password;
 
-	@Transient // Убираем из БД, так как это дублирование
+	@Transient
 	private String realPassword;
 
 	@Column(name = "patronymic")
@@ -84,16 +85,16 @@ public class User {
 	private String image;
 
 	@Transient
-	private String repeatPassword; // Убираем валидацию, так как это временное поле
+	private String repeatPassword;
 
-	@Column(name = "born_date") // Приводим в соответствие с БД
+	@Column(name = "born_date")
 	private Date bornDate;
 
-	@Column(name = "created_at") // Приводим в соответствие с БД
+	@Column(name = "created_at")
 	private Date createdDate;
 
 	@Column(name = "status")
-	private Integer status; // Изменяем на Integer
+	private Integer status;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_roles",

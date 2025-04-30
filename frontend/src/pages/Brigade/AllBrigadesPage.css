@@ -1,0 +1,100 @@
+.brigades-page {
+    padding: 40px 20px;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.brigades-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brigades-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 40px;
+    font-weight: 700;
+}
+
+.brigades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.brigade-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brigade-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.brigade-info {
+    margin-bottom: 20px;
+}
+
+.brigade-name {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.brigade-details {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+.brigade-button {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.brigade-button:hover {
+    background-color: #2980b9;
+}
+
+.brigade-manage-section {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+}
+
+.error-message {
+    background-color: #e74c3c;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .brigades-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .brigades-title {
+        font-size: 2rem;
+    }
+    
+    .brigade-card {
+        padding: 15px;
+    }
+} 

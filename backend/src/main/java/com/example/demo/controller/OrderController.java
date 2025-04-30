@@ -25,15 +25,6 @@ public class OrderController {
     private final OrderService orderService;
     private final JwtTokenUtil jwtTokenUtil;
 
-
-//    @PutMapping("/{id}/status")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
-//        orderService.updateOrderStatus(id, request.getStatus());
-//        return ResponseEntity.ok("Order status updated successfully");
-//    }
-
-
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody OrderDto updatedOrder) {
@@ -73,7 +64,7 @@ public class OrderController {
         return orderService.getOrdersForBrigadier(username);
     }
 
-    //Получение одного заказа по ID
+
    // @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/{id:[0-9]+}") // Ограничиваем {id} только цифрами, чтобы "my" не срабатывал как ID
     public OrderDto getOrder(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
@@ -83,7 +74,7 @@ public class OrderController {
 
 
     @GetMapping("/brigadier/{username}/calendar")
-   // @PreAuthorize("hasRole('ADMIN')")
+   @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Long> getBrigadierOrderCalendar(
             @PathVariable String username,
             @RequestParam String month // формат: "2025-04"

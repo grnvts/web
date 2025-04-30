@@ -12,6 +12,8 @@ const OrderStatusBadge = ({ status }) => {
         return 'badge badge-success';
       case 'CANCELLED':
         return 'badge badge-danger';
+      case 'APPROVED':
+        return 'badge badge-info';
       default:
         return 'badge badge-secondary';
     }
