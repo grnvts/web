@@ -25,6 +25,47 @@
     font-size: 1.1rem;
 }
 
+.orders-filters {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sort-options {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.sort-button {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    color: #495057;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sort-button:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.sort-button.active {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.sort-button .ms-2 {
+    margin-left: 0.5rem;
+}
+
 .orders-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

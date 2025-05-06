@@ -6,6 +6,8 @@ import UserService from '../../Services/UserService';
 import { Redirect } from 'react-router-dom';
 import UserTableRow from "../../components/UserTableRow";
 import AddMasterModal from '../../components/AddMasterModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import './UsersPage.css';
 
 class UsersPage extends Component {
@@ -23,6 +25,10 @@ class UsersPage extends Component {
             isAdmin: props.roles?.includes('ROLE_ADMIN'),
             loading: true,
             showAddMasterModal: false,
+            sortConfig: {
+                key: 'surname',
+                direction: 'asc'
+            }
         };
     }
 
@@ -75,16 +81,20 @@ class UsersPage extends Component {
         this.getUsers(prevPage, this.state.page.size);
     };
 
-    render() {
-        if (!this.state.isAdmin) {
-            return <Redirect to="/index" />;
+    handleSort = (key) => {
+        let direction = 'asc';
+        if (this.state.sortConfig.key === key && this.state.sortConfig.direction === 'asc') {
+            direction = 'desc';
         }
+        this.setState({ sortConfig: { key, direction } });
+    };
 
-        const { content: users, first, last } = this.state.page;
-        const { rolesFilter, searchQuery, loading, showAddMasterModal } = this.state;
+    getSortedUsers = () => {
+        const { content: users } = this.state.page;
+        const { sortConfig } = this.state;
+        const { rolesFilter, searchQuery } = this.state;
 
-        // Фильтрация пользователей по роли и поиску
-        const filteredUsers = users
+        let filteredUsers = users
             .filter(user => !rolesFilter || user.roles.includes(rolesFilter))
             .filter(user => {
                 if (!searchQuery) return true;
@@ -96,6 +106,36 @@ class UsersPage extends Component {
                     (user.email && user.email.toLowerCase().includes(searchLower))
                 );
             });
+
+        return filteredUsers.sort((a, b) => {
+            if (!a[sortConfig.key]) return 1;
+            if (!b[sortConfig.key]) return -1;
+            
+            if (a[sortConfig.key] < b[sortConfig.key]) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (a[sortConfig.key] > b[sortConfig.key]) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    };
+
+    getSortIcon = (key) => {
+        const { sortConfig } = this.state;
+        if (sortConfig.key !== key) {
+            return faSort;
+        }
+        return sortConfig.direction === 'asc' ? faSortUp : faSortDown;
+    };
+
+    render() {
+        if (!this.state.isAdmin) {
+            return <Redirect to="/index" />;
+        }
+
+        const { loading, showAddMasterModal } = this.state;
+        const sortedUsers = this.getSortedUsers();
 
         return (
             <div className="users-page-container">
@@ -135,7 +175,7 @@ class UsersPage extends Component {
                             type="text"
                             className="search-input"
                             placeholder="Поиск по имени, email или логину..."
-                            value={searchQuery}
+                            value={this.state.searchQuery}
                             onChange={this.handleSearchChange}
                         />
                         <i className="fas fa-search search-icon"></i>
@@ -144,7 +184,7 @@ class UsersPage extends Component {
                     <div className="role-filter">
                         <select
                             className="role-select"
-                            value={rolesFilter}
+                            value={this.state.rolesFilter}
                             onChange={this.handleRoleFilterChange}
                         >
                             <option value="">Все роли</option>
@@ -168,16 +208,40 @@ class UsersPage extends Component {
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Логин</th>
-                                        <th>Имя</th>
-                                        <th>Фамилия</th>
-                                        <th>Email</th>
+                                        <th onClick={() => this.handleSort('username')}>
+                                            Логин
+                                            <FontAwesomeIcon 
+                                                icon={this.getSortIcon('username')} 
+                                                className="ms-2" 
+                                            />
+                                        </th>
+                                        <th onClick={() => this.handleSort('name')}>
+                                            Имя
+                                            <FontAwesomeIcon 
+                                                icon={this.getSortIcon('name')} 
+                                                className="ms-2" 
+                                            />
+                                        </th>
+                                        <th onClick={() => this.handleSort('surname')}>
+                                            Фамилия
+                                            <FontAwesomeIcon 
+                                                icon={this.getSortIcon('surname')} 
+                                                className="ms-2" 
+                                            />
+                                        </th>
+                                        <th onClick={() => this.handleSort('email')}>
+                                            Email
+                                            <FontAwesomeIcon 
+                                                icon={this.getSortIcon('email')} 
+                                                className="ms-2" 
+                                            />
+                                        </th>
                                         <th>Роли</th>
                                         <th>Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredUsers.map((user) => (
+                                    {sortedUsers.map((user) => (
                                         <UserTableRow 
                                             user={user}
                                             key={user.username}
@@ -189,7 +253,7 @@ class UsersPage extends Component {
                         </div>
 
                         <div className="pagination-controls">
-                            {!first && (
+                            {!this.state.page.first && (
                                 <button 
                                     onClick={this.onClickPrevious} 
                                     className="pagination-btn"
@@ -198,7 +262,7 @@ class UsersPage extends Component {
                                     Предыдущая
                                 </button>
                             )}
-                            {!last && (
+                            {!this.state.page.last && (
                                 <button 
                                     onClick={this.onClickNext} 
                                     className="pagination-btn"

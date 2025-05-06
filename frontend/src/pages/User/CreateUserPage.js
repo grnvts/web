@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
-import './CreateUserPage.css';
+import { withTranslation } from 'react-i18next';
+import UserService from "../../Services/UserService";
+import AlertifyService from "../../Services/AlertifyService";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, 
@@ -12,241 +13,316 @@ import {
   faTimes,
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
+import Input from "../../components/input";
+import './CreateUserPage.css';
 
-const CreateUserPage = () => {
-  const history = useHistory();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    patronymic: '',
-    email: '',
-    phoneNumber: '',
-    birthDate: '',
-    role: ''
-  });
-  const [error, setError] = useState('');
+class CreateUserPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      repeatPassword: "",
+      email: "",
+      name: "",
+      surname: "",
+      patronymic: "",
+      phone: "",
+      bornDate: "",
+      role: "",
+      errors: {},
+      loading: false
+    };
+  }
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    setError('');
+  onChangeData = (name, value) => {
+    const stateData = { ...this.state };
+    stateData[name] = value;
+    const errors = { ...this.state.errors };
+    errors[name] = undefined;
+
+    if (name === "password" || name === "repeatPassword") {
+      if (stateData.password !== stateData.repeatPassword) {
+        errors.repeatPassword = this.props.t("Password mismatch");
+      } else {
+        errors.repeatPassword = undefined;
+      }
+    }
+
+    this.setState({ ...stateData, errors });
   };
 
-  const handleSubmit = async (e) => {
+  handleRoleChange = (e) => {
+    this.setState({ role: e.target.value });
+  };
+
+  validateForm = () => {
+    const errors = {};
+    const { username, password, repeatPassword, email, name, surname, patronymic, role } = this.state;
+
+    if (!username.trim()) errors.username = this.props.t("Username is required");
+    if (!password.trim()) errors.password = this.props.t("Password is required");
+    if (!repeatPassword.trim()) errors.repeatPassword = this.props.t("Repeat password is required");
+    if (!email.trim()) errors.email = this.props.t("Email is required");
+    if (!name.trim()) errors.name = this.props.t("Name is required");
+    if (!surname.trim()) errors.surname = this.props.t("Surname is required");
+    if (!patronymic.trim()) errors.patronymic = this.props.t("Patronymic is required");
+    if (!role) errors.role = this.props.t("Role is required");
+
+    if (password !== repeatPassword) {
+      errors.repeatPassword = this.props.t("Password mismatch");
+    }
+
+    return errors;
+  };
+
+  onClickCreateUser = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    this.setState({ errors: {}, loading: true });
+
+    const validationErrors = this.validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      this.setState({ errors: validationErrors, loading: false });
+      return;
+    }
+
+    const {
+      username,
+      password,
+      email,
+      name,
+      surname,
+      patronymic,
+      phone,
+      bornDate,
+      role,
+    } = this.state;
+
+    const userData = {
+      username: username.trim(),
+      password: password.trim(),
+      email: email.trim(),
+      name: name.trim(),
+      surname: surname.trim(),
+      patronymic: patronymic.trim(),
+      phone: phone ? phone.trim() : null,
+      bornDate: bornDate || null,
+      roles: [role],
+      status: 1
+    };
 
     try {
-      await axios.post('/api/users/create', formData);
-      history.push('/users');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Произошла ошибка при создании пользователя');
-      setLoading(false);
+      const response = await UserService.createUserWithRoles(userData);
+      if (response && response.status === 200) {
+        AlertifyService.success(this.props.t("User created successfully!"));
+        this.props.history.push("/users");
+      } else {
+        throw new Error("Failed to create user");
+      }
+    } catch (error) {
+      if (error.response && error.response.data.validationErrors) {
+        this.setState({ errors: error.response.data.validationErrors });
+      } else {
+        AlertifyService.error(this.props.t("Failed to create user."));
+      }
+    } finally {
+      this.setState({ loading: false });
     }
   };
 
-  const handleCancel = () => {
-    history.push('/users');
+  handleCancel = () => {
+    this.props.history.push('/users');
   };
 
-  return (
-    <div className="create-user-container">
-      <div className="create-user-header">
-        <h2>Создание нового пользователя</h2>
-        <button className="back-button" onClick={handleCancel}>
-          <FontAwesomeIcon icon={faArrowLeft} />
-          Назад
-        </button>
-      </div>
+  render() {
+    const { t } = this.props;
+    const {
+      username,
+      password,
+      repeatPassword,
+      email,
+      name,
+      surname,
+      patronymic,
+      phone,
+      bornDate,
+      role,
+      errors,
+      loading
+    } = this.state;
 
-      <form onSubmit={handleSubmit} className="create-user-form">
-        <div className="form-grid">
-          <div className="form-section">
-            <h3>Основная информация</h3>
-            <div className="form-group">
-              <label htmlFor="username">Имя пользователя</label>
-              <input
+    return (
+      <div className="create-user-container">
+        <div className="create-user-header">
+          <h2>{t("Creating User")}</h2>
+          <button className="back-button" onClick={this.handleCancel}>
+            <FontAwesomeIcon icon={faArrowLeft} />
+            {t("Back")}
+          </button>
+        </div>
+
+        <form onSubmit={this.onClickCreateUser} className="create-user-form">
+          <div className="form-grid">
+            <div className="form-section">
+              <h3>{t("Basic Information")}</h3>
+              <Input
+                label={t("Username")}
+                error={errors.username}
                 type="text"
-                id="username"
                 name="username"
-                className="form-control"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                placeholder="Введите имя пользователя"
+                placeholder={t("Username")}
+                value={username}
+                onChangeData={this.onChangeData}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Пароль</label>
-              <input
+              <Input
+                label={t("Password")}
+                error={errors.password}
                 type="password"
-                id="password"
                 name="password"
-                className="form-control"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                placeholder="Введите пароль"
+                placeholder={t("Password")}
+                value={password}
+                onChangeData={this.onChangeData}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
+              <Input
+                label={t("Repeat Password")}
+                error={errors.repeatPassword}
+                type="password"
+                name="repeatPassword"
+                placeholder={t("Repeat Password")}
+                value={repeatPassword}
+                onChangeData={this.onChangeData}
+              />
+              <Input
+                label={t("Email *")}
+                error={errors.email}
                 type="email"
-                id="email"
                 name="email"
-                className="form-control"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="Введите email"
+                placeholder={t("Email *")}
+                value={email}
+                onChangeData={this.onChangeData}
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="phoneNumber">Номер телефона</label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                name="phoneNumber"
-                className="form-control"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                required
-                placeholder="+7 (XXX) XXX-XX-XX"
-              />
-            </div>
-          </div>
 
-          <div className="form-section">
-            <h3>Персональные данные</h3>
-            <div className="form-group">
-              <label htmlFor="lastName">Фамилия</label>
-              <input
+            <div className="form-section">
+              <h3>{t("Personal Information")}</h3>
+              <Input
+                label={t("Name")}
+                error={errors.name}
                 type="text"
-                id="lastName"
-                name="lastName"
-                className="form-control"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-                placeholder="Введите фамилию"
+                name="name"
+                placeholder={t("Name")}
+                value={name}
+                onChangeData={this.onChangeData}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="firstName">Имя</label>
-              <input
+              <Input
+                label={t("Surname")}
+                error={errors.surname}
                 type="text"
-                id="firstName"
-                name="firstName"
-                className="form-control"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-                placeholder="Введите имя"
+                name="surname"
+                placeholder={t("Surname")}
+                value={surname}
+                onChangeData={this.onChangeData}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="patronymic">Отчество</label>
-              <input
+              <Input
+                label={t("Patronymic")}
+                error={errors.patronymic}
                 type="text"
-                id="patronymic"
                 name="patronymic"
-                className="form-control"
-                value={formData.patronymic}
-                onChange={handleChange}
-                placeholder="Введите отчество"
+                placeholder={t("Patronymic")}
+                value={patronymic}
+                onChangeData={this.onChangeData}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="birthDate">Дата рождения</label>
-              <input
-                type="date"
-                id="birthDate"
-                name="birthDate"
-                className="form-control"
-                value={formData.birthDate}
-                onChange={handleChange}
-                required
+              <Input
+                label={t("Phone")}
+                error={errors.phone}
+                type="tel"
+                name="phone"
+                placeholder={t("Phone (e.g. +3754467890)")}
+                value={phone}
+                onChangeData={this.onChangeData}
               />
+              <div className="form-group">
+                <label>{t("Born Date")}</label>
+                <input
+                  type="date"
+                  name="bornDate"
+                  className="form-control"
+                  value={bornDate ? new Date(bornDate).toISOString().slice(0, 10) : ""}
+                  onChange={(e) => this.onChangeData("bornDate", e.target.value)}
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="form-section roles-section">
-          <h3>Роль пользователя</h3>
-          <div className="roles-grid">
-            <label className="role-option">
-              <input
-                type="radio"
-                name="role"
-                value="USER"
-                checked={formData.role === 'USER'}
-                onChange={handleChange}
-              />
-              <span className="role-label">
-                <FontAwesomeIcon icon={faUser} />
-                Пользователь
-              </span>
-            </label>
-            <label className="role-option">
-              <input
-                type="radio"
-                name="role"
-                value="MASTER"
-                checked={formData.role === 'MASTER'}
-                onChange={handleChange}
-              />
-              <span className="role-label">
-                <FontAwesomeIcon icon={faUserTie} />
-                Мастер
-              </span>
-            </label>
-            <label className="role-option">
-              <input
-                type="radio"
-                name="role"
-                value="ADMIN"
-                checked={formData.role === 'ADMIN'}
-                onChange={handleChange}
-              />
-              <span className="role-label">
-                <FontAwesomeIcon icon={faUserCog} />
-                Администратор
-              </span>
-            </label>
+          <div className="form-section roles-section">
+            <h3>{t("User Role")}</h3>
+            <div className="roles-grid">
+              <label className="role-option">
+                <input
+                  type="radio"
+                  name="role"
+                  value="ROLE_USER"
+                  checked={role === "ROLE_USER"}
+                  onChange={this.handleRoleChange}
+                />
+                <span className="role-label">
+                  <FontAwesomeIcon icon={faUser} />
+                  {t("User")}
+                </span>
+              </label>
+              <label className="role-option">
+                <input
+                  type="radio"
+                  name="role"
+                  value="ROLE_ADMIN"
+                  checked={role === "ROLE_ADMIN"}
+                  onChange={this.handleRoleChange}
+                />
+                <span className="role-label">
+                  <FontAwesomeIcon icon={faUserCog} />
+                  {t("Admin")}
+                </span>
+              </label>
+              <label className="role-option">
+                <input
+                  type="radio"
+                  name="role"
+                  value="ROLE_BRIGADIER"
+                  checked={role === "ROLE_BRIGADIER"}
+                  onChange={this.handleRoleChange}
+                />
+                <span className="role-label">
+                  <FontAwesomeIcon icon={faUserTie} />
+                  {t("Brigadier")}
+                </span>
+              </label>
+            </div>
+            {errors.role && <div className="error-message">{errors.role}</div>}
           </div>
-        </div>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+          <div className="form-actions">
+            <button type="button" className="cancel-button" onClick={this.handleCancel}>
+              <FontAwesomeIcon icon={faTimes} />
+              {t("Cancel")}
+            </button>
+            <button type="submit" className="submit-button" disabled={loading}>
+              {loading ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                  {t("Creating...")}
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faCheck} />
+                  {t("Create User")}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+}
 
-        <div className="form-actions">
-          <button type="button" className="cancel-button" onClick={handleCancel}>
-            <FontAwesomeIcon icon={faTimes} />
-            Отмена
-          </button>
-          <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? (
-              <>
-                <FontAwesomeIcon icon={faSpinner} spin />
-                Создание...
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faCheck} />
-                Создать пользователя
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-};
-
-export default CreateUserPage;
+export default withTranslation()(CreateUserPage);

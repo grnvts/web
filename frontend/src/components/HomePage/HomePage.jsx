@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker, DirectionsRenderer } from '@react-google-maps/api';
 import GoogleMapsService from '../../Services/GoogleMapsService';
 import './HomePage.css';
-
+import { useSelector } from 'react-redux'; 
+import { useHistory } from 'react-router-dom'; 
 const libraries = ['places'];
 
 const HomePage = () => {
@@ -18,6 +19,9 @@ const HomePage = () => {
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const history = useHistory();
+  const roles = useSelector((state) => state.roles || []); 
+
   
   const mapRef = useRef(null);
   const searchTimeout = useRef(null);
@@ -29,6 +33,11 @@ const HomePage = () => {
     satisfiedClients: '100%'
   };
 
+  const handleOrderClick = () => {
+    if (roles.includes('ROLE_USER')) {
+      history.push('/orders/create');
+    }
+  };
   const mapContainerStyle = {
     width: '100%',
     height: '400px'
@@ -129,7 +138,13 @@ const HomePage = () => {
         <div className="hero-content">
           <h1>РЕМОНТ-МАСТЕР</h1>
           <p>Профессиональный ремонт жилых и коммерческих помещений</p>
-          <button className="cta-button">Заказать ремонт</button>
+          <button
+            className={`cta-button ${!roles.includes('ROLE_USER') ? 'disabled' : ''}`}
+            onClick={handleOrderClick}
+            disabled={!roles.includes('ROLE_USER')}
+          >
+            Заказать ремонт
+          </button>
         </div>
       </header>
 

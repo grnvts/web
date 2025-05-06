@@ -10,8 +10,7 @@ import javax.persistence.Lob;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-import com.example.demo.model.User;
-import com.example.demo.model.annotation.UniqueData;
+
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;

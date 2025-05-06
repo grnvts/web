@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import javax.validation.Valid;
 
-import com.example.demo.dto.CreateMasterDto;
+import com.example.demo.dto.*;
 import com.example.demo.model.Qualification;
 import com.example.demo.repo.QualificationRepository;
 import org.springframework.data.domain.Page;
@@ -12,9 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.dto.UploadImageDto;
-import com.example.demo.dto.UserDto;
-import com.example.demo.dto.UserUpdateDto;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import com.example.demo.util.ApiPaths;
@@ -22,6 +19,7 @@ import com.example.demo.util.ApiPaths;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -89,8 +87,15 @@ public class UserApi {
 
 	@GetMapping("/qualifications")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<Qualification> getAllQualifications() {
-		return qualificationRepository.findAll();
+	public ResponseEntity<List<QualificationDto>> getAllQualifications() {
+		List<Qualification> qualifications = qualificationRepository.findAll();
+		System.out.println("Найдено квалификаций: " + qualifications.size());
+		
+		List<QualificationDto> qualificationDtos = qualifications.stream()
+			.map(q -> new QualificationDto(q.getId(), q.getName()))
+			.collect(Collectors.toList());
+			
+		return ResponseEntity.ok(qualificationDtos);
 	}
 
 

@@ -49,7 +49,7 @@ public class UserDto {
 	private List<QualificationDto> qualifications;
 	
 	public String getFullName() {
-		return this.name+" "+this.surname+" "+this.patronymic;
+		return this.surname +" "+this.name+" "+this.patronymic;
 	}
 	public UserDto(User user) {
 		this.id=user.getId();
@@ -68,7 +68,7 @@ public class UserDto {
 				.collect(Collectors.toSet());
 		this.qualifications = user.getQualifications() != null
 				? user.getQualifications().stream()
-				.map(QualificationDto::new)
+				.map(q -> new QualificationDto(q.getId(), q.getName()))
 				.collect(Collectors.toList())
 				: null;
 	}

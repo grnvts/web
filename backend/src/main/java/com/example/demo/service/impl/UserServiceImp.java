@@ -258,6 +258,11 @@ public class UserServiceImp implements UserService {
 		user.setUsername(dto.getUsername());
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		user.setEmail(dto.getEmail());
+		user.setName(dto.getName());
+		user.setSurname(dto.getSurname());
+		user.setPatronymic(dto.getPatronymic());
+		user.setPhone(dto.getPhone());
+		user.setBornDate(dto.getBornDate());
 		user.setCreatedDate(new Date());
 		user.setStatus(1); // Активный статус
 
@@ -270,7 +275,6 @@ public class UserServiceImp implements UserService {
 
 		// Сохраняем пользователя
 		user = repository.save(user);
-
 
 		boolean isBrigadier = roles.stream()
 				.anyMatch(role -> role.getName().equals(RoleName.ROLE_BRIGADIER));
