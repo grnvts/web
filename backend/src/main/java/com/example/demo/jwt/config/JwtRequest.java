@@ -13,6 +13,7 @@ public class JwtRequest implements Serializable {
 	
 	private String username;
 	private String password;
+	private String captchaValue;
 
 
 }

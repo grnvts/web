@@ -1,5 +1,6 @@
 import React from 'react';
 import OrderStatusBadge from './OrderStatusBadge';
+import OrderService from '../Services/OrderService';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +24,18 @@ const OrderCard = ({ order }) => {
   const roles = useSelector((state) => state.roles);
   const isUser = roles?.includes('ROLE_USER');
   const isBrigadier = roles?.includes('ROLE_BRIGADIER');
-
+  const handleCancelOrder = async () => {
+    if (window.confirm(t('Are you sure you want to cancel this order?'))) {
+      try {
+        await OrderService.updateOrderStatus(order.id, { status: 'REJECTED' });
+        alert(t('Order canceled successfully'));
+        // Здесь можно обновить состояние или вызвать перезагрузку данных
+      } catch (error) {
+        console.error('Failed to cancel order:', error);
+        alert(t('Failed to cancel order'));
+      }
+    }
+  };
   const {
     street,
     city,
@@ -36,24 +48,22 @@ const OrderCard = ({ order }) => {
 
   let brigadierContent;
 
-  if (order.brigade) {
-    if (order.brigade.brigadier) {
-      const brigadierFullName = `${order.brigade.brigadier.brigadierSurname || ''} ${order.brigade.brigadier.brigadierName || ''} ${order.brigade.brigadier.brigadierPatronymic || ''}`.trim() + ` - ${order.brigade.brigadier.brigadierPhone || t('No Phone')}`;
-      if (roles?.includes('ROLE_ADMIN')) {
-        brigadierContent = (
-          <Link to={`/user/${order.brigade.brigadier.username}`} className="order-card-link">
-            {brigadierFullName}
-          </Link>
-        );
-      } else {
-        brigadierContent = <span className="order-card-value">{brigadierFullName}</span>;
-      }
-    } else {
-      brigadierContent = <span className="order-card-value">{t('No data')}</span>;
-    }
+if (order.brigadierName || order.brigadierSurname || order.brigadierPatronymic) {
+  const brigadierFullName = `${order.brigadierSurname || ''} ${order.brigadierName || ''} ${order.brigadierPatronymic || ''}`.trim() + 
+    ` - ${order.brigadierPhone || t('No Phone')}`;
+  
+  if (roles?.includes('ROLE_ADMIN')) {
+    brigadierContent = (
+      <Link to={`/user/${order.brigadierUsername}`} className="order-card-link">
+        {brigadierFullName}
+      </Link>
+    );
   } else {
-    brigadierContent = <span className="order-card-value">{t('No data')}</span>;
+    brigadierContent = <span className="order-card-value">{brigadierFullName}</span>;
   }
+} else {
+  brigadierContent = <span className="order-card-value">{t('No data')}</span>;
+}
 
 
   return (
@@ -126,6 +136,14 @@ const OrderCard = ({ order }) => {
                 <span>{order.clientPhone || t('No Phone')}</span>
               </div>
             )}
+          </div>
+        )}
+
+{isUser && status !== 'REJECTED' && (
+          <div className="order-card-actions">
+            <button className="cancel-order-button" onClick={handleCancelOrder}>
+              {t('Cancel Order')}
+            </button>
           </div>
         )}
       </div>

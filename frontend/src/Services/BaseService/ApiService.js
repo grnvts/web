@@ -8,21 +8,38 @@ class ApiService {
 
     get(url, config = {}) {
         return Axios.get(API_BASE_URL + url, config);
-      }
-    post(url, data) { return Axios.post(API_BASE_URL + url, data); }
+    }
+    
+    post(url, data) { 
+        return Axios.post(API_BASE_URL + url, data); 
+    }
 
-    put(url, data) { return Axios.put(API_BASE_URL + url, data); }
+    put(url, data) { 
+        return Axios.put(API_BASE_URL + url, data); 
+    }
 
-    delete(url) { return Axios.delete(API_BASE_URL + url); }
+    delete(url) { 
+        return Axios.delete(API_BASE_URL + url); 
+    }
 
-    login(data) { return Axios.post(API_BASE_URL + LOGIN_URL, data); }
+    login(data) { 
+        console.log('Login request data:', data);
+        return Axios.post(API_BASE_URL + LOGIN_URL, data)
+            .then(response => {
+                console.log('Login response:', response);
+                return response;
+            })
+            .catch(error => {
+                console.error('Login error:', error.response);
+                throw error;
+            });
+    }
 
     changeAuthToken(jwt) {
         if (jwt) {
             Axios.defaults.headers.common['Authorization'] = 'Bearer ' + jwt;
-            
             console.log('JWT Token:', jwt);
-console.log('Authorization header after set:', Axios.defaults.headers.common['Authorization']);
+            console.log('Authorization header after set:', Axios.defaults.headers.common['Authorization']);
         } else {
             delete Axios.defaults.headers.common['Authorization'];
             console.log('Authorization header removed');
@@ -31,10 +48,12 @@ console.log('Authorization header after set:', Axios.defaults.headers.common['Au
 
     clearAuthToken() {
         delete Axios.defaults.headers.common['Authorization'];
-        localStorage.removeItem('jwtToken'); // Удаляет токен из локального хранилища
+        localStorage.removeItem('jwtToken');
     }
     
-    changeLanguage(lg) { Axios.defaults.headers["accept-language"] = lg; }
+    changeLanguage(lg) { 
+        Axios.defaults.headers["accept-language"] = lg; 
+    }
 }
 
 

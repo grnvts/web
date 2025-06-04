@@ -7,6 +7,7 @@ import com.example.demo.model.User;
 import com.example.demo.service.MessageService;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ public class MessageController {
     private final OrderService orderService;
     private final UserService userService;
 
+    @Operation(summary = "Send a message", description = "Send a message from the authenticated user to a recipient for a specific order")
     @PostMapping
     public ResponseEntity<?> sendMessage(@RequestBody MessageDto messageDto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -31,11 +33,11 @@ public class MessageController {
         User recipient = userService.getUserEntity(messageDto.getRecipientUsername());
         Order order = orderService.getOrderEntity(messageDto.getOrderId());
 
-        // Передаем все необходимые параметры
         Message message = messageService.sendMessage(sender, recipient, order, messageDto.getContent());
         return ResponseEntity.ok(new MessageDto(message));
     }
 
+    @Operation(summary = "Get messages for an order", description = "Retrieve messages for a specific order between a sender and recipient")
     @GetMapping("/{orderId}")
     public List<MessageDto> getMessagesForOrder(
             @PathVariable Long orderId,
@@ -47,16 +49,16 @@ public class MessageController {
                 .collect(Collectors.toList());
     }
 
-
+    @Operation(summary = "Get admin-user dialog messages", description = "Retrieve dialog messages between an admin and a user for a specific order")
     @GetMapping("/{orderId}/admin-dialog")
     public List<MessageDto> getAdminUserDialogMessages(@PathVariable Long orderId,
                                                        @RequestParam String user) {
         Order order = orderService.getOrderEntity(orderId);
-        // user — это username пользователя (не админа!)
-        return messageService.getAdminUserDialogMessages(order, user) 
+        return messageService.getAdminUserDialogMessages(order, user)
                 .stream().map(MessageDto::new).collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get dialog messages", description = "Retrieve dialog messages between two users for a specific order")
     @GetMapping("/{orderId}/dialog")
     public List<MessageDto> getDialogMessages(@PathVariable Long orderId,
                                               @RequestParam String user1,

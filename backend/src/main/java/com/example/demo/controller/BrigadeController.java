@@ -7,6 +7,7 @@ import com.example.demo.model.User;
 import com.example.demo.repo.BrigadeRepository;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class BrigadeController {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    // Получить всех мастеров бригады
+    @Operation(summary = "Get brigade masters", description = "Retrieve all masters in a specific brigade")
     @GetMapping("/{brigadeId}/masters")
     @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
     public List<UserDto> getBrigadeMasters(@PathVariable Long brigadeId) {
@@ -34,10 +35,10 @@ public class BrigadeController {
         return brigade.getMasters().stream().map(UserDto::new).collect(Collectors.toList());
     }
 
-    // Добавить мастера в бригаду
+    @Operation(summary = "Add master to brigade", description = "Add a master to a specific brigade")
     @PostMapping("/{brigadeId}/add-master")
     @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addMasterToBrigade(@PathVariable Long brigadeId, @RequestBody java.util.Map<String, Long> body) {
+    public ResponseEntity<?> addMasterToBrigade(@PathVariable Long brigadeId, @RequestBody Map<String, Long> body) {
         Long userId = body.get("userId");
         Brigade brigade = brigadeRepository.findById(brigadeId).orElseThrow();
         User master = userRepository.findById(userId).orElseThrow();
@@ -48,10 +49,10 @@ public class BrigadeController {
         return ResponseEntity.ok().build();
     }
 
-    // Удалить мастера из бригады
+    @Operation(summary = "Remove master from brigade", description = "Remove a master from a specific brigade")
     @PostMapping("/{brigadeId}/remove-master")
     @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> removeMasterFromBrigade(@PathVariable Long brigadeId, @RequestBody java.util.Map<String, Long> body) {
+    public ResponseEntity<?> removeMasterFromBrigade(@PathVariable Long brigadeId, @RequestBody Map<String, Long> body) {
         Long userId = body.get("userId");
         Brigade brigade = brigadeRepository.findById(brigadeId).orElseThrow();
         User master = userRepository.findById(userId).orElseThrow();
@@ -60,7 +61,7 @@ public class BrigadeController {
         return ResponseEntity.ok().build();
     }
 
-    // Получить все бригады (для администратора)
+    @Operation(summary = "Get all brigades", description = "Retrieve a list of all brigades (admin only)")
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<BrigadeDto> getAllBrigades() {
@@ -69,6 +70,7 @@ public class BrigadeController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get my brigade masters", description = "Retrieve all masters in the authenticated brigadier's brigade")
     @GetMapping("/my/masters")
     @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public List<UserDto> getMyBrigadeMasters(Authentication authentication) {
@@ -79,10 +81,7 @@ public class BrigadeController {
         return brigade.getMasters().stream().map(UserDto::new).collect(Collectors.toList());
     }
 
-
-
-    // BrigadeController.java
-
+    @Operation(summary = "Remove master from my brigade", description = "Remove a master from the authenticated brigadier's brigade")
     @PostMapping("/my/remove-master")
     @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public ResponseEntity<?> removeMasterFromMyBrigade(@RequestBody Map<String, Long> body, Authentication authentication) {
@@ -97,6 +96,7 @@ public class BrigadeController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Add master to my brigade", description = "Add a master to the authenticated brigadier's brigade")
     @PostMapping("/my/add-master")
     @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public ResponseEntity<?> addMasterToMyBrigade(@RequestBody Map<String, Long> body, Authentication authentication) {

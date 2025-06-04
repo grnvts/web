@@ -73,7 +73,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .cors()
         .and()
         .csrf().disable()
+
         .authorizeRequests()
+				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
         .antMatchers(HttpMethod.GET,"/images/**").permitAll()
         .antMatchers(HttpMethod.POST,"/api/login").permitAll()
         .antMatchers(HttpMethod.POST,"/api/user").authenticated()
@@ -87,6 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 				.antMatchers(HttpMethod.GET, "/api/brigade/all").hasRole("ADMIN")
 				.antMatchers(HttpMethod.GET, "/api/user/masters").hasAnyRole("ADMIN", "BRIGADIER")
 				.antMatchers("/api/user/**").authenticated()
+				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
         .and()
         .authorizeRequests().anyRequest().authenticated()
         .and()

@@ -7,8 +7,9 @@ import lombok.Data;
 
 @Data
 @Configuration
-@ConfigurationProperties  // application.properties
+@ConfigurationProperties(prefix = "app")
 public class AppConfiguration {
-	String uploadPath;
-	String appJwtSecret;
+	private String uploadPath;
+	private String jwtSecret;
+	private String recaptchaSecretKey;
 }

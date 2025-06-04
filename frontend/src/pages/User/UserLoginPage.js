@@ -11,7 +11,27 @@ class UserLoginPage extends Component {
         this.state = {
             username: '',
             password: '',
+            captchaValue: null,
             errors: {}
+        };
+    }
+
+    componentDidMount() {
+        // Загружаем скрипт reCAPTCHA
+        const script = document.createElement('script');
+        script.src = `https://www.google.com/recaptcha/api.js?render=explicit`;
+        script.async = true;
+        script.defer = true;
+        document.body.appendChild(script);
+
+        script.onload = () => {
+            window.grecaptcha.ready(() => {
+                window.grecaptcha.render('recaptcha-container', {
+                    sitekey: '6LeuUDArAAAAAGrQobdcCr8D5_QVXA44taU9lFHQ',
+                    callback: this.onCaptchaChange,
+                    theme: 'light'
+                });
+            });
         };
     }
 
@@ -23,16 +43,32 @@ class UserLoginPage extends Component {
         this.setState({ stateData, errors });
     }
 
+    onCaptchaChange = (value) => {
+        console.log('Captcha value:', value);
+        this.setState({ captchaValue: value });
+    }
+
     onClickLogin = async (e) => {
         e.preventDefault();
         this.setState({ errors: {} });
-        const { username, password } = this.state;
+        const { username, password, captchaValue } = this.state;
+        console.log('Login attempt with:', { username, password, captchaValue });
         const { dispatch, history } = this.props;
 
+        if (!captchaValue) {
+            this.setState({
+                errors: {
+                    captcha: 'Пожалуйста, подтвердите, что вы не робот'
+                }
+            });
+            return;
+        }
+
         try {
-            await dispatch(loginHandler({ username, password }));
+            await dispatch(loginHandler({ username, password, captchaValue }));
             history.push("/index");
         } catch (error) {
+            console.error('Login error:', error);
             if (error.response?.status === 401) {
                 this.setState({
                     errors: {
@@ -47,7 +83,7 @@ class UserLoginPage extends Component {
     }
 
     render() {
-        const { username, password } = this.state.errors;
+        const { username, password, captcha } = this.state.errors;
         const { t } = this.props;
 
         return (
@@ -76,6 +112,10 @@ class UserLoginPage extends Component {
                             valueName={this.state.password}
                             onChangeData={this.onChangeData}
                         />
+                        <div className="captcha-container">
+                            <div id="recaptcha-container"></div>
+                            {captcha && <div className="error-message">{captcha}</div>}
+                        </div>
                         <button
                             className="login-button"
                             type="button"

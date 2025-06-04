@@ -70,3 +70,15 @@
         gap: 0.5rem;
     }
 } 
+.cancel-order-button {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cancel-order-button:hover {
+    background-color: #ff7875;
+  }

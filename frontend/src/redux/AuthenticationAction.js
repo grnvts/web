@@ -39,11 +39,6 @@ export const loginHandler = (credentials) => async (dispatch) => {
 export const signupHandler = (user) => async (dispatch) => {
     try {
         const response = await UserService.post(user);
-        const credentials = {
-            username: user.username,
-            password: user.password
-        };
-        await dispatch(loginHandler(credentials));
         return response;
     } catch (error) {
         throw error;
