@@ -78,7 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
         .antMatchers(HttpMethod.GET,"/images/**").permitAll()
         .antMatchers(HttpMethod.POST,"/api/login").permitAll()
-        .antMatchers(HttpMethod.POST,"/api/user").authenticated()
+        .antMatchers(HttpMethod.POST,"/api/user").permitAll()
 		.antMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN") //ROLE_ из названия роли надо опустить тк автоматически убирается
 				.antMatchers("/api/orders/brigadier/active").hasRole("BRIGADIER")
 				.antMatchers(HttpMethod.GET, "/api/orders/my").authenticated()

@@ -54,10 +54,10 @@ public class User {
 	@Column(name = "surname")
 	private String surname;
 
-	@Column(name = "password")
-	@NotEmpty
-	@NotNull
-	@Size(min = 8)
+    @Column(name = "password_hash")
+    @NotEmpty
+    @NotNull
+    @Size(min = 8)
 	//обязательно содержит большую маленькую букву
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "{message.username.pattern}")
 	private String password;
