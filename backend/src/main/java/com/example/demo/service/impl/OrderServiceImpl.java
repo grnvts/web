@@ -340,8 +340,18 @@ public class OrderServiceImpl implements OrderService {
             throw new AccessDeniedException("Не удалось получить имя пользователя");
         }
 
-        if (!order.getBrigade().getBrigadier().getUsername().equals(currentUsername)) {
-            throw new AccessDeniedException("You don't have permission to view masters for this order");
+        // Проверяем, является ли текущий пользователь админом
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        // Если не админ, проверяем, является ли пользователь бригадиром этого заказа
+        if (!isAdmin) {
+            if (order.getBrigade() == null || order.getBrigade().getBrigadier() == null) {
+                throw new AccessDeniedException("Order does not have a brigadier assigned");
+            }
+            if (!order.getBrigade().getBrigadier().getUsername().equals(currentUsername)) {
+                throw new AccessDeniedException("You don't have permission to view masters for this order");
+            }
         }
 
         return order.getAssignedMasters().stream()

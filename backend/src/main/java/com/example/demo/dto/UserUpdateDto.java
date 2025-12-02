@@ -7,7 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 
@@ -30,21 +32,31 @@ public class UserUpdateDto {
 	@NotNull
 	private String username;
 	
+	@Pattern(regexp = "^[\\p{L}\\s'-]*$", message = "{validation.name.invalid}")
 	private String name;
-	
+
+	@Pattern(regexp = "^[\\p{L}\\s'-]*$", message = "{validation.name.invalid}")
 	private String surname;
+
+	@Pattern(regexp = "^[\\p{L}\\s'-]*$", message = "{validation.name.invalid}")
 	private String patronymic;
+
+	@Pattern(regexp = "^\\+\\d{11,14}$", message = "{validation.phone.invalid}")
 	private String phone;
 
 	@NotEmpty
 	@NotNull
 	@Size(min = 5, max = 200)
+	@Email(message = "{validation.email.invalid}")
 	private String email;
 	
 	private Date bornDate;
 	
 	//@ProfileImage
 	private String image;
+	
+	private String password;
+	private String repeatPassword;
 
 //	public UserUpdateDto(User user) {
 //		this.id=user.getId();

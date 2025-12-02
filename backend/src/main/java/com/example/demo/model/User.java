@@ -20,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -49,9 +50,11 @@ public class User {
 	private String username; // Оставляем имя переменной как было
 
 	@Column(name = "name")
+	@Pattern(regexp = "^[\\p{L}\\s'-]*$", message = "{validation.name.invalid}")
 	private String name;
 
 	@Column(name = "surname")
+	@Pattern(regexp = "^[\\p{L}\\s'-]*$", message = "{validation.name.invalid}")
 	private String surname;
 
     @Column(name = "password_hash")
@@ -66,10 +69,11 @@ public class User {
 	private String realPassword;
 
 	@Column(name = "patronymic")
+	@Pattern(regexp = "^[\\p{L}\\s'-]*$", message = "{validation.name.invalid}")
 	private String patronymic;
 
 	@Column(name = "phone", length = 20)
-	@Pattern(regexp = "^\\+?[0-9\\-\\s()]*$", message = "Invalid phone number format")
+	@Pattern(regexp = "^\\+\\d{11,14}$", message = "{validation.phone.invalid}")
 	private String phone;
 
 
@@ -77,6 +81,7 @@ public class User {
 	@NotEmpty
 	@NotNull
 	@Size(min = 5, max = 200)
+	@Email(message = "{validation.email.invalid}")
 	private String email;
 
 	private String image;

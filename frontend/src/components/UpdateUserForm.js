@@ -61,7 +61,7 @@ class UpdateUserForm extends Component {
         this.setState({ errors: {} });
     
         // Валидация обязательных полей
-        const { name, surname, patronymic } = this.state;
+        const { name, surname, patronymic, password, repeatPassword } = this.state;
         const validationErrors = {};
     
         if (!name || name.trim() === '') {
@@ -73,6 +73,17 @@ class UpdateUserForm extends Component {
         if (!patronymic || patronymic.trim() === '') {
             validationErrors.patronymic = 'Отчество обязательно для заполнения';
         }
+        
+        // Валидация пароля, если он указан
+        if (password && password.trim() !== '') {
+            if (!repeatPassword || repeatPassword.trim() === '') {
+                validationErrors.repeatPassword = 'Повторите пароль';
+            } else if (password !== repeatPassword) {
+                validationErrors.repeatPassword = 'Пароли не совпадают';
+            }
+        } else if (repeatPassword && repeatPassword.trim() !== '') {
+            validationErrors.password = 'Введите пароль';
+        }
     
         if (Object.keys(validationErrors).length > 0) {
             this.setState({ errors: validationErrors });
@@ -80,7 +91,7 @@ class UpdateUserForm extends Component {
         }
     
         // Подготавливаем данные для отправки
-        const { id, username, email, phone, bornDate, password, repeatPassword } = this.state;
+        const { id, username, email, phone, bornDate } = this.state;
         const body = {
             id,
             username,
@@ -123,22 +134,20 @@ class UpdateUserForm extends Component {
                         </div>
 
                         <div className="form-grid">
-                            {!isAdmin && (
-                                <div className="form-group">
-                                    <label>
-                                        <FontAwesomeIcon icon={faIdCard} />
-                                        {t("Username")}
-                                    </label>
-                                    <Input
-                                        error={errors.username}
-                                        type="text"
-                                        name="username"
-                                        placeholder={t("Username")}
-                                        valueName={username}
-                                        onChangeData={this.onChangeData}
-                                    />
-                                </div>
-                            )}
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faIdCard} />
+                                    {t("Username")}
+                                </label>
+                                <Input
+                                    error={errors.username}
+                                    type="text"
+                                    name="username"
+                                    placeholder={t("Username")}
+                                    valueName={username}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </div>
 
                             <div className="form-group">
                                 <label>
@@ -214,48 +223,44 @@ class UpdateUserForm extends Component {
                                 />
                             </div>
 
-                            {!isAdmin && (
-                                <>
-                                    <div className="form-group">
-                                        <label>{t("Born Date")}</label>
-                                        <Input
-                                            type="date"
-                                            name="bornDate"
-                                            placeholder={t("Born Date")}
-                                            valueName={bornDate?.slice(0, 10)}
-                                            onChangeData={this.onChangeData}
-                                        />
-                                    </div>
+                            <div className="form-group">
+                                <label>{t("Born Date")}</label>
+                                <Input
+                                    type="date"
+                                    name="bornDate"
+                                    placeholder={t("Born Date")}
+                                    valueName={bornDate?.slice(0, 10)}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </div>
 
-                                    <div className="form-group">
-                                        <label>
-                                            <FontAwesomeIcon icon={faLock} />
-                                            {t("Password (leave empty if you dont want to change it)")}
-                                        </label>
-                                        <Input
-                                            type="password"
-                                            name="password"
-                                            placeholder={t("New Password ")}
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faLock} />
+                                    {t("Password (leave empty if you dont want to change it)")}
+                                </label>
+                                <Input
+                                    error={errors.password}
+                                    type="password"
+                                    name="password"
+                                    placeholder={t("New Password ")}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </div>
 
-                                            onChangeData={this.onChangeData}
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label>
-                                            <FontAwesomeIcon icon={faLock} />
-                                            {t("Repeat Password")}
-                                        </label>
-                                        <Input
-                                            type="password"
-                                            name="repeatPassword"
-                                            placeholder={t("Repeat Password")}
-
-                                            onChangeData={this.onChangeData}
-                                        />
-                                    </div>
-                                </>
-                            )}
+                            <div className="form-group">
+                                <label>
+                                    <FontAwesomeIcon icon={faLock} />
+                                    {t("Repeat Password")}
+                                </label>
+                                <Input
+                                    error={errors.repeatPassword}
+                                    type="password"
+                                    name="repeatPassword"
+                                    placeholder={t("Repeat Password")}
+                                    onChangeData={this.onChangeData}
+                                />
+                            </div>
                         </div>
 
                         <div className="form-actions">

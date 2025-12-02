@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import BrigadierPickerWithCalendar from '../../components/BrigadierPickerWithCalendar';
 import { useSelector } from 'react-redux';
 import AssignMastersModal from '../../components/AssignMastersModal';
+import jsPDF from 'jspdf';
+import { format } from 'date-fns';
 import './OrderDetailPage.css';
 
 const OrderDetailPage = () => {
@@ -153,6 +155,231 @@ const OrderDetailPage = () => {
     }
   };
 
+  const generatePDF = async () => {
+    if (!order) return;
+
+    // Загружаем мастеров для заказа
+    let masters = [];
+    try {
+      const mastersResponse = await OrderService.getAssignedMasters(order.id);
+      masters = mastersResponse.data || [];
+    } catch (error) {
+      console.error('Failed to load masters for PDF:', error);
+    }
+
+    const formatDate = (dateString) => {
+      if (!dateString) return 'N/A';
+      try {
+        return format(new Date(dateString), 'dd.MM.yyyy');
+      } catch {
+        return dateString;
+      }
+    };
+
+    const formatDateTime = (dateString) => {
+      if (!dateString) return 'N/A';
+      try {
+        return format(new Date(dateString), 'dd.MM.yyyy HH:mm');
+      } catch {
+        return dateString;
+      }
+    };
+
+    const getMasterName = (master) => {
+      const name = master.name || '';
+      const surname = master.surname || '';
+      const patronymic = master.patronymic || '';
+      
+      if (name || surname) {
+        return `${surname} ${name} ${patronymic}`.trim();
+      }
+      
+      return master.username || 'N/A';
+    };
+
+    // Создаем canvas для рендеринга текста с кириллицей
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 794; // A4 width in pixels
+    canvas.height = 1123; // A4 height in pixels
+    
+    // Устанавливаем стили для текста
+    ctx.fillStyle = '#000000';
+    ctx.font = '16px Arial';
+    ctx.textBaseline = 'top';
+    
+    let yPos = 40;
+    const margin = 40;
+    const lineHeight = 20;
+    const pageWidth = canvas.width;
+    
+    // Функция для добавления текста с переносами
+    const addText = (text, x, y, maxWidth, fontSize = 12, isBold = false) => {
+      ctx.font = `${isBold ? 'bold ' : ''}${fontSize}px Arial`;
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+      
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        
+        if (testWidth > maxWidth && i > 0) {
+          ctx.fillText(line, x, currentY);
+          line = words[i] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, currentY);
+      return currentY + lineHeight;
+    };
+
+    // Заголовок
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('ЧЕК ЗАКАЗА', pageWidth / 2, yPos);
+    yPos += 40;
+    
+    // Линия
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(margin, yPos);
+    ctx.lineTo(pageWidth - margin, yPos);
+    ctx.stroke();
+    yPos += 20;
+    
+    ctx.textAlign = 'left';
+    ctx.font = '12px Arial';
+    
+    // Информация о заказе
+    yPos = addText(`Номер заказа: #${order.id}`, margin, yPos, pageWidth - 2 * margin, 12, true);
+    yPos = addText(`Дата создания: ${formatDateTime(order.createdDate)}`, margin, yPos, pageWidth - 2 * margin, 12, true);
+    yPos = addText(`Статус: ${t(order.status) || order.status}`, margin, yPos, pageWidth - 2 * margin, 12, true);
+    yPos += 10;
+    
+    // Разделитель
+    ctx.beginPath();
+    ctx.moveTo(margin, yPos);
+    ctx.lineTo(pageWidth - margin, yPos);
+    ctx.stroke();
+    yPos += 20;
+    
+    // Тип услуги
+    yPos = addText('Тип услуги:', margin, yPos, pageWidth - 2 * margin, 14, true);
+    yPos = addText(t(order.serviceType) || order.serviceType, margin, yPos, pageWidth - 2 * margin, 12, false);
+    yPos += 10;
+    
+    // Детали заказа
+    yPos = addText('Детали заказа:', margin, yPos, pageWidth - 2 * margin, 14, true);
+    yPos = addText(order.orderDetails || 'N/A', margin, yPos, pageWidth - 2 * margin, 12, false);
+    yPos += 10;
+    
+    // Разделитель
+    ctx.beginPath();
+    ctx.moveTo(margin, yPos);
+    ctx.lineTo(pageWidth - margin, yPos);
+    ctx.stroke();
+    yPos += 20;
+    
+    // Даты
+    yPos = addText(`Дата начала: ${formatDate(order.startDate)}`, margin, yPos, pageWidth - 2 * margin, 12, true);
+    yPos = addText(`Дата окончания: ${formatDate(order.endDate) || 'N/A'}`, margin, yPos, pageWidth - 2 * margin, 12, true);
+    yPos += 10;
+    
+    // Адрес
+    const address = order.address || {};
+    yPos = addText('Адрес:', margin, yPos, pageWidth - 2 * margin, 14, true);
+    yPos = addText(`Город: ${address.city || 'N/A'}`, margin, yPos, pageWidth - 2 * margin, 12, false);
+    yPos = addText(`Улица: ${address.street || 'N/A'}`, margin, yPos, pageWidth - 2 * margin, 12, false);
+    yPos = addText(`Дом: ${address.buildingNo || 'N/A'}`, margin, yPos, pageWidth - 2 * margin, 12, false);
+    yPos = addText(`Квартира: ${address.apartmentNo || 'N/A'}`, margin, yPos, pageWidth - 2 * margin, 12, false);
+    yPos += 10;
+    
+    // Клиент
+    const clientFullName = `${order.clientSurname || ''} ${order.clientName || ''} ${order.clientPatronymic || ''}`.trim() || order.clientUsername || 'N/A';
+    yPos = addText('Клиент:', margin, yPos, pageWidth - 2 * margin, 14, true);
+    yPos = addText(clientFullName, margin, yPos, pageWidth - 2 * margin, 12, false);
+    if (order.clientPhone) {
+      yPos = addText(`Телефон: ${order.clientPhone}`, margin, yPos, pageWidth - 2 * margin, 12, false);
+    }
+    yPos += 10;
+    
+    // Бригадир
+    if (order.brigadierName || order.brigadierSurname || order.brigadierUsername) {
+      const brigadierFullName = `${order.brigadierSurname || ''} ${order.brigadierName || ''} ${order.brigadierPatronymic || ''}`.trim() || order.brigadierUsername || 'N/A';
+      yPos = addText('Бригадир:', margin, yPos, pageWidth - 2 * margin, 14, true);
+      yPos = addText(brigadierFullName, margin, yPos, pageWidth - 2 * margin, 12, false);
+      if (order.brigadierPhone) {
+        yPos = addText(`Телефон: ${order.brigadierPhone}`, margin, yPos, pageWidth - 2 * margin, 12, false);
+      }
+      yPos += 10;
+    }
+    
+    // Номер бригады
+    if (order.brigadeNumber) {
+      yPos = addText(`Номер бригады: ${order.brigadeNumber}`, margin, yPos, pageWidth - 2 * margin, 12, true);
+      yPos += 10;
+    }
+    
+    // Мастера
+    if (masters && masters.length > 0) {
+      yPos = addText('Мастера:', margin, yPos, pageWidth - 2 * margin, 14, true);
+      const mastersText = masters.map(master => getMasterName(master)).join(', ');
+      yPos = addText(mastersText, margin, yPos, pageWidth - 2 * margin, 12, false);
+      yPos += 10;
+    }
+    
+    // Разделитель перед ценой
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(margin, yPos);
+    ctx.lineTo(pageWidth - margin, yPos);
+    ctx.stroke();
+    yPos += 20;
+    
+    // Цена
+    ctx.font = 'bold 18px Arial';
+    ctx.fillText('Сумма:', margin, yPos);
+    const priceText = order.price ? `${order.price} BYN` : 'N/A';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(priceText, pageWidth - margin, yPos);
+    yPos += 30;
+    
+    // Итоговая линия
+    ctx.beginPath();
+    ctx.moveTo(margin, yPos);
+    ctx.lineTo(pageWidth - margin, yPos);
+    ctx.stroke();
+    yPos += 30;
+    
+    // Подпись и дата
+    ctx.textAlign = 'center';
+    ctx.font = '10px Arial';
+    ctx.fillStyle = '#666666';
+    ctx.fillText(`Дата формирования чека: ${formatDateTime(new Date())}`, pageWidth / 2, yPos);
+    yPos += 15;
+    ctx.fillStyle = '#000000';
+    ctx.font = '12px Arial';
+
+    // Конвертируем canvas в изображение и добавляем в PDF
+    const imgData = canvas.toDataURL('image/png');
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    
+    // Сохранение PDF
+    const fileName = `order_${order.id}_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+    doc.save(fileName);
+    AlertifyService.success(t('PDF generated successfully'));
+  };
+
   if (loading) {
     return (
       <div className="order-detail-page">
@@ -257,6 +484,10 @@ const OrderDetailPage = () => {
                 <button className="btn btn-info" onClick={() => openChat('user')}>
                   <i className="fas fa-comments"></i>
                   {t('Chat with User')}
+                </button>
+                <button className="btn btn-secondary" onClick={generatePDF}>
+                  <i className="fas fa-file-pdf"></i>
+                  {t('Download Receipt')}
                 </button>
                
               </>

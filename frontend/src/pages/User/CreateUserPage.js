@@ -16,6 +16,10 @@ import {
 import Input from "../../components/input";
 import './CreateUserPage.css';
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phonePattern = /^\+\d{11,14}$/;
+const namePattern = /^[\p{L}\s'-]+$/u;
+
 class CreateUserPage extends Component {
   constructor(props) {
     super(props);
@@ -58,19 +62,34 @@ class CreateUserPage extends Component {
 
   validateForm = () => {
     const errors = {};
-    const { username, password, repeatPassword, email, name, surname, patronymic, role } = this.state;
+    const { username, password, repeatPassword, email, name, surname, patronymic, role, phone } = this.state;
+    const { t } = this.props;
 
-    if (!username.trim()) errors.username = this.props.t("Username is required");
-    if (!password.trim()) errors.password = this.props.t("Password is required");
-    if (!repeatPassword.trim()) errors.repeatPassword = this.props.t("Repeat password is required");
-    if (!email.trim()) errors.email = this.props.t("Email is required");
-    if (!name.trim()) errors.name = this.props.t("Name is required");
-    if (!surname.trim()) errors.surname = this.props.t("Surname is required");
-    if (!patronymic.trim()) errors.patronymic = this.props.t("Patronymic is required");
-    if (!role) errors.role = this.props.t("Role is required");
+    if (!username.trim()) errors.username = t("Username is required");
+    if (!password.trim()) errors.password = t("Password is required");
+    if (!repeatPassword.trim()) errors.repeatPassword = t("Repeat password is required");
+    if (!email.trim()) {
+      errors.email = t("Email is required");
+    } else if (!emailPattern.test(email.trim())) {
+      errors.email = t("Invalid email format");
+    }
+    if (!name.trim()) errors.name = t("Name is required");
+    if (!surname.trim()) errors.surname = t("Surname is required");
+    if (!patronymic.trim()) errors.patronymic = t("Patronymic is required");
+    if (!role) errors.role = t("Role is required");
+    if (phone && phone.trim() && !phonePattern.test(phone.trim())) {
+      errors.phone = t("Invalid phone format");
+    }
+
+    ['name', 'surname', 'patronymic'].forEach((field) => {
+      const value = this.state[field];
+      if (value && value.trim() && !namePattern.test(value.trim())) {
+        errors[field] = t("Name can contain only letters");
+      }
+    });
 
     if (password !== repeatPassword) {
-      errors.repeatPassword = this.props.t("Password mismatch");
+      errors.repeatPassword = t("Password mismatch");
     }
 
     return errors;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import OrderStatusBadge from './OrderStatusBadge';
 import OrderService from '../Services/OrderService';
 import { Link } from 'react-router-dom';
@@ -24,6 +24,40 @@ const OrderCard = ({ order }) => {
   const roles = useSelector((state) => state.roles);
   const isUser = roles?.includes('ROLE_USER');
   const isBrigadier = roles?.includes('ROLE_BRIGADIER');
+  const isAdmin = roles?.includes('ROLE_ADMIN');
+  const [masters, setMasters] = useState([]);
+  const [loadingMasters, setLoadingMasters] = useState(false);
+
+  useEffect(() => {
+    const fetchMasters = async () => {
+      try {
+        setLoadingMasters(true);
+        const response = await OrderService.getAssignedMasters(order.id);
+        setMasters(response.data || []);
+      } catch (error) {
+        console.error('Failed to load masters:', error);
+        setMasters([]);
+      } finally {
+        setLoadingMasters(false);
+      }
+    };
+
+    if (order.id) {
+      fetchMasters();
+    }
+  }, [order.id]);
+
+  const getMasterName = (master) => {
+    const name = master.name || '';
+    const surname = master.surname || '';
+    const patronymic = master.patronymic || '';
+    
+    if (name || surname) {
+      return `${surname} ${name} ${patronymic}`.trim();
+    }
+    
+    return master.username || t('Unknown');
+  };
   const handleCancelOrder = async () => {
     if (window.confirm(t('Are you sure you want to cancel this order?'))) {
       try {
@@ -113,6 +147,26 @@ if (order.brigadierName || order.brigadierSurname || order.brigadierPatronymic) 
           <div className="order-card-section">
             <span className="order-card-label">{t('Brigadier')}</span>
             {brigadierContent}
+          </div>
+        )}
+
+        {(isAdmin || (masters && masters.length > 0)) && (
+          <div className="order-card-section">
+            <span className="order-card-label">{t('Masters')}</span>
+            <div className="order-card-value">
+              {loadingMasters ? (
+                <span>{t('Loading...')}</span>
+              ) : masters && masters.length > 0 ? (
+                masters.map((master, index) => (
+                  <span key={master.id || index}>
+                    {getMasterName(master)}
+                    {index < masters.length - 1 ? ', ' : ''}
+                  </span>
+                ))
+              ) : (
+                <span>{t('Not Assigned')}</span>
+              )}
+            </div>
           </div>
         )}
 

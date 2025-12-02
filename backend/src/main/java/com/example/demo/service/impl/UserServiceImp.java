@@ -166,6 +166,33 @@ public class UserServiceImp implements UserService {
 		logger.info("Updating user: {}, current ID: {}", username, user.getId());
 		logger.info("Incoming data: email={}, name={}, surname={}", dto.getEmail(), dto.getName(), dto.getSurname());
 
+		// Проверка и обновление пароля, если он передан
+		if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+			// Проверка совпадения паролей
+			if (dto.getRepeatPassword() == null || !dto.getPassword().equals(dto.getRepeatPassword())) {
+				HashMap<String, String> map = new HashMap<>();
+				map.put("repeatPassword", "Passwords must be same.");
+				ApiError error = new ApiError(400, "Validation Error", null);
+				error.setValidationErrors(map);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+			}
+			// Обновление пароля
+			user.setRealPassword(dto.getPassword());
+			user.setPassword(passwordEncoder.encode(dto.getPassword()));
+			logger.info("Password updated for user {}", username);
+		}
+
+		// Проверка username на уникальность, если он изменился (для всех, включая админа)
+		if (dto.getUsername() != null && !dto.getUsername().equals(user.getUsername())) {
+			User userWithUsername = repository.findUserByUsernameWithStatusOne(dto.getUsername());
+			if (userWithUsername != null && !userWithUsername.getId().equals(user.getId())) {
+				logger.warn("Username {} already in use by another user", dto.getUsername());
+				ApiError error = new ApiError(400, "Username already exists", "/api/user/" + username);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+			}
+			user.setUsername(dto.getUsername());
+		}
+
 		// Проверка email на уникальность, если он изменился
 		if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
 			User userWithEmail = repository.findByEmail(dto.getEmail());
@@ -184,12 +211,6 @@ public class UserServiceImp implements UserService {
 		user.setSurname(dto.getSurname());
 		user.setPatronymic(dto.getPatronymic());
 		user.setPhone(dto.getPhone());
-
-		// Обновление username только если пользователь редактирует сам себя
-		if (!isAdmin || userNameFromToken.equals(username)) {
-			user.setUsername(dto.getUsername());
-		}
-
 		user.setBornDate(dto.getBornDate());
 
 		// Сохраняем
