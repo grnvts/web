@@ -56,14 +56,18 @@ public class JwtAuthenticationController {
         try {
             logger.info("Received login request for user: {}", authenticationRequest.getUsername());
             
-            // Проверяем капчу
-            if (!recaptchaService.verifyRecaptcha(authenticationRequest.getCaptchaValue())) {
-                logger.error("reCAPTCHA verification failed for user: {}", authenticationRequest.getUsername());
-                ApiError error = new ApiError(400, "Неверная капча", "/api/login");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            // Проверяем капчу только если она предоставлена (опционально для админ панели)
+            String captchaValue = authenticationRequest.getCaptchaValue();
+            if (captchaValue != null && !captchaValue.trim().isEmpty()) {
+                if (!recaptchaService.verifyRecaptcha(captchaValue)) {
+                    logger.error("reCAPTCHA verification failed for user: {}", authenticationRequest.getUsername());
+                    ApiError error = new ApiError(400, "Неверная капча", "/api/login");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+                }
+                logger.info("reCAPTCHA verification successful, proceeding with authentication");
+            } else {
+                logger.info("reCAPTCHA not provided, skipping verification (admin panel mode)");
             }
-
-            logger.info("reCAPTCHA verification successful, proceeding with authentication");
             
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(), authenticationRequest.getPassword()));

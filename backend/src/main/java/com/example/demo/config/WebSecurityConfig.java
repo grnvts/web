@@ -46,10 +46,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.addAllowedOrigin("http://localhost:3000"); // Или "*", но лучше конкретно
+		// Разрешаем все localhost порты для разработки
+		// Для Spring Boot 2.3.3 используем addAllowedOrigin с "*" для разработки
+		// В продакшене лучше указать конкретные домены
+		configuration.addAllowedOrigin("*"); // Для разработки разрешаем все origins
+		// Если нужны credentials, используйте конкретные origins:
+		// configuration.addAllowedOrigin("http://localhost:3000");
+		// configuration.addAllowedOrigin("http://localhost:50573");
 		configuration.addAllowedMethod("*");
 		configuration.addAllowedHeader("*");
-		configuration.setAllowCredentials(true); // если нужен jwt-cookie
+		// setAllowCredentials(true) не работает с "*", поэтому закомментировано
+		// configuration.setAllowCredentials(true);
+		configuration.setMaxAge(3600L); // Кэширование preflight запросов на 1 час
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;

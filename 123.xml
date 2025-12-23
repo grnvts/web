@@ -1,0 +1,441 @@
+<mxfile host="app.diagrams.net" modified="2025-04-05T15:00:00.000Z" agent="Mozilla/5.0" etag="infological-10-expanded" version="29.0.3">
+  <diagram name="Инфологическая модель (все атрибуты видны)" id="logistics-10-expanded">
+    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- 1. Пользователь (3 атрибута → высота 110) -->
+        <mxCell id="user" value="Пользователь" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=14;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="80" y="60" width="200" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="user">
+          <mxGeometry y="30" width="200" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="user_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="user_id">
+          <mxGeometry x="60" width="140" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_login" value="Имя пользователя" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="user">
+          <mxGeometry y="56" width="200" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_login_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="user_login">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_login_attr" value="Логин в системе" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="user_login">
+          <mxGeometry x="60" width="140" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_fullname" value="Полное имя" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="user">
+          <mxGeometry y="82" width="200" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_fullname_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="user_fullname">
+          <mxGeometry width="60" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_fullname_attr" value="ФИО пользователя" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="user_fullname">
+          <mxGeometry x="60" width="140" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- 2. Роль (2 атрибута → высота 80) -->
+        <mxCell id="role" value="Роль" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=14;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="80" y="220" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="role">
+          <mxGeometry y="30" width="200" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="role_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="role_id">
+          <mxGeometry x="60" width="140" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_name" value="Название" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="role">
+          <mxGeometry y="56" width="200" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_name_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="role_name">
+          <mxGeometry width="60" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="role_name_attr" value="Админ, Логист, Водитель" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="role_name">
+          <mxGeometry x="60" width="140" height="24" as="geometry"/>
+        </mxCell>
+
+        <!-- 3. Водитель (4 атрибута → высота 134) -->
+        <mxCell id="driver" value="Водитель" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=14;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="360" y="60" width="230" height="134" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="driver">
+          <mxGeometry y="30" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="driver_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_id_attr" value="Ссылка на пользователя" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_id">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_intl" value="Международный статус" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="driver">
+          <mxGeometry y="56" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_intl_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_intl">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_intl_attr" value="Допуск к междунар. перевозкам" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_intl">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_rating" value="Рейтинг" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="driver">
+          <mxGeometry y="82" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_rating_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_rating">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_rating_attr" value="Оценка от 0 до 5" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_rating">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_dob" value="Дата рождения" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="driver">
+          <mxGeometry y="108" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_dob_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_dob">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="driver_dob_attr" value="Дата рождения водителя" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="driver_dob">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- 4. Тип ТС (4 атрибута → высота 134) -->
+        <mxCell id="veh_type" value="Тип ТС" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=14;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="360" y="220" width="230" height="134" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="veh_type">
+          <mxGeometry y="30" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="veh_type_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_id">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_name" value="Название" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="veh_type">
+          <mxGeometry y="56" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_name_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_name">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_name_attr" value="Тягач, прицеп, фура и т.д." style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_name">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_capacity" value="Грузоподъёмность" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="veh_type">
+          <mxGeometry y="82" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_capacity_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_capacity">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_capacity_attr" value="Макс. вес груза (т)" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_capacity">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_volume" value="Объём кузова" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="veh_type">
+          <mxGeometry y="108" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_volume_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_volume">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="veh_type_volume_attr" value="Вместимость (м³)" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="veh_type_volume">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- 5. Транспортное средство (3 атрибута → высота 110) -->
+        <mxCell id="vehicle" value="Транспортное средство" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=14;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="660" y="60" width="230" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="vehicle">
+          <mxGeometry y="30" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="vehicle_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_id_attr" value="Уникальный идентификатор ТС" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="vehicle_id">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_plate" value="Гос. номер" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="vehicle">
+          <mxGeometry y="56" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_plate_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="vehicle_plate">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_plate_attr" value="Регистрационный номер" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="vehicle_plate">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_vin" value="VIN" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="vehicle">
+          <mxGeometry y="82" width="230" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_vin_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="vehicle_vin">
+          <mxGeometry width="60" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="vehicle_vin_attr" value="Идентификационный номер" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="vehicle_vin">
+          <mxGeometry x="60" width="170" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- 6. Заказ (4 атрибута → высота 130) -->
+        <mxCell id="order" value="Заказ" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=14;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="960" y="60" width="220" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="order">
+          <mxGeometry y="30" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="order_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_id">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_num" value="Номер заказа" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="order">
+          <mxGeometry y="56" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_num_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_num">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_num_attr" value="Внешний номер заказа" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_num">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_status" value="Статус" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="order">
+          <mxGeometry y="82" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_status_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_status">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_status_attr" value="Черновик, в работе, завершён" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_status">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_cost" value="Стоимость" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="order">
+          <mxGeometry y="108" width="220" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_cost_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_cost">
+          <mxGeometry width="60" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="order_cost_attr" value="Сумма и валюта перевозки" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="order_cost">
+          <mxGeometry x="60" width="160" height="22" as="geometry"/>
+        </mxCell>
+
+        <!-- 7. Точка загрузки (3 атрибута → высота 110) -->
+        <mxCell id="load_point" value="Точка загрузки" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=13;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="1260" y="60" width="220" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="load_point">
+          <mxGeometry y="30" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="load_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="load_id">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_addr" value="Адрес" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="load_point">
+          <mxGeometry y="56" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_addr_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="load_addr">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_addr_attr" value="Место забора груза" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="load_addr">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_time" value="Время загрузки" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="load_point">
+          <mxGeometry y="82" width="220" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_time_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="load_time">
+          <mxGeometry width="60" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="load_time_attr" value="Дата и время погрузки" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="load_time">
+          <mxGeometry x="60" width="160" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- 8. Точка разгрузки (3 атрибута → высота 110) -->
+        <mxCell id="unload_point" value="Точка разгрузки" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=13;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="1260" y="220" width="220" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="unload_point">
+          <mxGeometry y="30" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="unload_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="unload_id">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_addr" value="Адрес" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="unload_point">
+          <mxGeometry y="56" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_addr_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="unload_addr">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_addr_attr" value="Место доставки груза" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="unload_addr">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_time" value="Время разгрузки" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="unload_point">
+          <mxGeometry y="82" width="220" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_time_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="unload_time">
+          <mxGeometry width="60" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="unload_time_attr" value="Дата и время выгрузки" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="unload_time">
+          <mxGeometry x="60" width="160" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- 9. Внештатная ситуация (3 атрибута → высота 110) -->
+        <mxCell id="emergency" value="Внештатная ситуация" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=13;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="960" y="220" width="220" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="emergency">
+          <mxGeometry y="30" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="emergency_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="emergency_id">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_type" value="Тип" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="emergency">
+          <mxGeometry y="56" width="220" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_type_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="emergency_type">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_type_attr" value="ДТП, поломка, иное" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="emergency_type">
+          <mxGeometry x="60" width="160" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_date" value="Дата события" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="emergency">
+          <mxGeometry y="82" width="220" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_date_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="emergency_date">
+          <mxGeometry width="60" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="emergency_date_attr" value="Когда произошло событие" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="emergency_date">
+          <mxGeometry x="60" width="160" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- 10. Расчёт заработной платы (4 атрибута → высота 130) -->
+        <mxCell id="salary" value="Расчёт заработной платы" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontSize=13;strokeWidth=2;" vertex="1" parent="1" collapsed="0">
+          <mxGeometry x="660" y="220" width="230" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_id" value="ID" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="salary">
+          <mxGeometry y="30" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_id_pk" value="ID" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;fontStyle=1" vertex="1" parent="salary_id">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_id_attr" value="Уникальный идентификатор" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_id">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_period" value="Период" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="salary">
+          <mxGeometry y="56" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_period_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_period">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_period_attr" value="Месяц расчёта (с/по)" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_period">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_base" value="Оклад" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="salary">
+          <mxGeometry y="82" width="230" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_base_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_base">
+          <mxGeometry width="60" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_base_attr" value="Фиксированная часть ЗП" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_base">
+          <mxGeometry x="60" width="170" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_total" value="Итоговая сумма" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=13;" vertex="1" parent="salary">
+          <mxGeometry y="108" width="230" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_total_pk" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_total">
+          <mxGeometry width="60" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="salary_total_attr" value="Оклад + премии − удержания" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;strokeColor=inherit;fontSize=13;" vertex="1" parent="salary_total">
+          <mxGeometry x="60" width="170" height="22" as="geometry"/>
+        </mxCell>
+
+        <!-- === СВЯЗИ (оставлены как в предыдущей версии) === -->
+        <mxCell id="rel1" style="endArrow=classic;html=1;strokeColor=#000000;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="user_id_pk" target="driver_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="73" as="sourcePoint"/>
+            <mxPoint x="330" y="23" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel1_label" value="1:1" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel1">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel2" style="endArrow=classic;html=1;strokeColor=#000000;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="user_id_pk" target="role_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="180" y="170" as="sourcePoint"/>
+            <mxPoint x="230" y="120" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel2_label" value="N:M" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel2">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel3" style="endArrow=classic;html=1;strokeColor=#000000;exitX=1;exitY=0.5;entryX=0;entryY=0.9;" edge="1" parent="1" source="user_id_pk" target="order_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="73" as="sourcePoint"/>
+            <mxPoint x="960" y="177" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel3_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel3">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel4" style="endArrow=classic;html=1;strokeColor=#000000;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="order_id_pk" target="load_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1180" y="73" as="sourcePoint"/>
+            <mxPoint x="1260" y="73" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel4_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel4">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel5" style="endArrow=classic;html=1;strokeColor=#000000;exitX=1;exitY=0.6;entryX=0;entryY=0.5;" edge="1" parent="1" source="order_id_pk" target="unload_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1180" y="90" as="sourcePoint"/>
+            <mxPoint x="1260" y="273" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel5_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel5">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel6" style="endArrow=classic;html=1;strokeColor=#000000;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="order_id_pk" target="emergency_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1070" y="190" as="sourcePoint"/>
+            <mxPoint x="1120" y="140" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel6_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel6">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel7" style="endArrow=classic;html=1;strokeColor=#000000;exitX=0.5;exitY=1;entryX=0;entryY=0.3;" edge="1" parent="1" source="driver_id_pk" target="emergency_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="475" y="190" as="sourcePoint"/>
+            <mxPoint x="960" y="256" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel7_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel7">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel8" style="endArrow=classic;html=1;strokeColor=#000000;exitX=1;exitY=0.8;entryX=0;entryY=0.5;" edge="1" parent="1" source="driver_id_pk" target="salary_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="590" y="130" as="sourcePoint"/>
+            <mxPoint x="660" y="243" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel8_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel8">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rel9" style="endArrow=classic;html=1;strokeColor=#000000;exitX=1;exitY=0.5;entryX=0;entryY=0.9;" edge="1" parent="1" source="veh_type_id_pk" target="vehicle_id_pk">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="590" y="233" as="sourcePoint"/>
+            <mxPoint x="660" y="160" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel9_label" value="1:N" style="text;html=1;resizable=0;points=[];align=center;verticalAlign=middle;labelBackgroundColor=#ffffff;fontSize=13;" vertex="1" connectable="0" parent="rel9">
+          <mxGeometry x="-0.3" y="-10" relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
