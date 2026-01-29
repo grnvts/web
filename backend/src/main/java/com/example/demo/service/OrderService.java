@@ -4,7 +4,7 @@ import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.Order;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;

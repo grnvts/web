@@ -3,14 +3,14 @@ package com.example.demo.controller;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UpdateStatusRequest;
 import com.example.demo.dto.UserDto;
-import com.example.demo.jwt.config.JwtTokenUtil;
+import com.example.demo.jwt.config.JwtUserDetails;
 import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,7 +24,6 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
-    private final JwtTokenUtil jwtTokenUtil;
 
     @Operation(summary = "Update an order", description = "Update an existing order by ID")
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,31 +50,27 @@ public class OrderController {
 
     @Operation(summary = "Create a new order", description = "Create a new order for the authenticated user")
     @PostMapping
-    public OrderDto createOrder(@RequestBody OrderDto dto, @RequestHeader("Authorization") String authHeader) {
-        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
-        return orderService.createOrder(dto, username);
+    public OrderDto createOrder(@RequestBody OrderDto dto, @AuthenticationPrincipal JwtUserDetails user) {
+        return orderService.createOrder(dto, user.getUsername());
     }
 
     @Operation(summary = "Get client orders", description = "Retrieve orders for the authenticated client")
     @GetMapping("/my")
-    public List<OrderDto> getClientOrders(@RequestHeader("Authorization") String authHeader) {
-        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
-        return orderService.getOrdersForClient(username);
+    public List<OrderDto> getClientOrders(@AuthenticationPrincipal JwtUserDetails user) {
+        return orderService.getOrdersForClient(user.getUsername());
     }
 
     @Operation(summary = "Get brigadier orders", description = "Retrieve orders assigned to the authenticated brigadier")
     @GetMapping("/brigadier")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
-    public List<OrderDto> getBrigadierOrders(@RequestHeader("Authorization") String authHeader) {
-        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
-        return orderService.getOrdersForBrigadier(username);
+    @PreAuthorize("hasRole('BRIGADIER')")
+    public List<OrderDto> getBrigadierOrders(@AuthenticationPrincipal JwtUserDetails user) {
+        return orderService.getOrdersForBrigadier(user.getUsername());
     }
 
     @Operation(summary = "Get order by ID", description = "Retrieve an order by its ID")
     @GetMapping("/{id:[0-9]+}")
-    public OrderDto getOrder(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
-        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
-        return orderService.getOrderById(id, username);
+    public OrderDto getOrder(@PathVariable Long id, @AuthenticationPrincipal JwtUserDetails user) {
+        return orderService.getOrderById(id, user.getUsername());
     }
 
     @Operation(summary = "Get brigadier order calendar", description = "Retrieve the order calendar for a brigadier")
@@ -100,7 +95,7 @@ public class OrderController {
 
     @Operation(summary = "Update order status", description = "Update the status of an order")
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN','USER')")
     public ResponseEntity<?> updateOrderStatus(
             @PathVariable Long id,
             @RequestBody UpdateStatusRequest request
@@ -111,29 +106,28 @@ public class OrderController {
 
     @Operation(summary = "Get active orders for brigadier", description = "Retrieve active orders for the authenticated brigadier")
     @GetMapping("/brigadier/active")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
-    public List<OrderDto> getActiveOrdersForBrigadier(@RequestHeader("Authorization") String authHeader) {
-        String username = jwtTokenUtil.getUsernameFromToken(authHeader.replace("Bearer ", ""));
-        return orderService.getActiveOrdersForBrigadier(username);
+    @PreAuthorize("hasRole('BRIGADIER')")
+    public List<OrderDto> getActiveOrdersForBrigadier(@AuthenticationPrincipal JwtUserDetails user) {
+        return orderService.getActiveOrdersForBrigadier(user.getUsername());
     }
 
     @Operation(summary = "Get brigade masters", description = "Retrieve masters in a specific brigade")
     @GetMapping("/brigade/{brigadeId}/masters")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN')")
     public List<UserDto> getBrigadeMasters(@PathVariable Long brigadeId) {
         return orderService.getBrigadeMasters(brigadeId);
     }
 
     @Operation(summary = "Get assigned masters", description = "Retrieve masters assigned to a specific order")
     @GetMapping("/{orderId}/assigned-masters")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN')")
     public List<UserDto> getAssignedMasters(@PathVariable Long orderId) {
         return orderService.getAssignedMasters(orderId);
     }
 
     @Operation(summary = "Assign masters to an order", description = "Assign masters to a specific order")
     @PutMapping("/{orderId}/assign-masters")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN')")
     public ResponseEntity<?> assignMasters(@PathVariable Long orderId, @RequestBody List<Long> masterIds) {
         orderService.assignMasters(orderId, masterIds);
         return ResponseEntity.ok("Masters assigned");
@@ -141,7 +135,7 @@ public class OrderController {
 
     @Operation(summary = "Add expense to an order", description = "Add an expense to a specific order")
     @PostMapping("/{orderId}/add-expense")
-    @PreAuthorize("hasRole('ROLE_BRIGADIER')")
+    @PreAuthorize("hasRole('BRIGADIER')")
     public ResponseEntity<?> addExpense(@PathVariable Long orderId, @RequestBody Map<String, Double> body) {
         Double amount = body.get("amount");
         try {

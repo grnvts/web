@@ -4,6 +4,7 @@ import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.error.NotFoundException;
+import com.example.demo.error.ForbiddenException;
 import com.example.demo.model.*;
 import com.example.demo.repo.*;
 import com.example.demo.service.NotificationService;
@@ -11,11 +12,9 @@ import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.access.AccessDeniedException;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -75,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto getOrderById(Long id, String username) {
         Order order = orderRepository.findByIdWithBrigadier(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(NotFoundException::new);
 
         // Проверяем, является ли пользователь владельцем заказа, бригадиром или администратором
         boolean isClient = order.getClient().getUsername().equals(username);
@@ -84,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
                 .anyMatch(role -> role.getName() == RoleName.ROLE_ADMIN);
 
         if (!isClient && !isBrigadier && !isAdmin) {
-            throw new RuntimeException("Access denied: You do not have permission to view this order");
+            throw new ForbiddenException("Access denied: You do not have permission to view this order");
         }
 
         return toDto(order);
@@ -155,20 +154,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void assignBrigadier(Long orderId, String brigadierUsername) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(NotFoundException::new);
 
         User brigadier = userRepository.findByUsername(brigadierUsername);
         if (brigadier == null || brigadier.getRoles().stream().noneMatch(role -> role.getName() == RoleName.ROLE_BRIGADIER)) {
-            throw new RuntimeException("Invalid brigadier");
+            throw new BadRequestException("Invalid brigadier");
         }
 
-        // Находим бригаду по бригадиру
         Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
-                .orElseThrow(() -> new RuntimeException("Brigade not found for brigadier"));
+                .orElseThrow(() -> new NotFoundException());
 
-        // Устанавливаем бригаду в заказ
         order.setBrigade(brigade);
-
         orderRepository.save(order);
     }
 
@@ -177,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateOrder(Long id, OrderDto updatedOrder) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(NotFoundException::new);
 
         // Обновляем тип услуги
         order.setServiceType(updatedOrder.getServiceType());
@@ -213,12 +209,20 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // Обновляем бригадира
-        if (updatedOrder.getBrigadierUsername() != null) {
+            if (updatedOrder.getBrigadierUsername() != null) {
             User brigadier = userRepository.findByUsername(updatedOrder.getBrigadierUsername());
             if (brigadier != null) {
-                order.getBrigade().setBrigadier(brigadier);
+                if (order.getBrigade() == null) {
+                    Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
+                            .orElseThrow(NotFoundException::new);
+                    order.setBrigade(brigade);
+                } else {
+                    order.getBrigade().setBrigadier(brigadier);
+                }
             } else {
-                order.getBrigade().setBrigadier(null);
+                if (order.getBrigade() != null) {
+                    order.getBrigade().setBrigadier(null);
+                }
             }
         }
 
@@ -295,10 +299,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getOrdersForBrigadier(String username) {
         User brigadier = userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Brigadier not found"));
+                .orElseThrow(NotFoundException::new);
         List<Order> orders = orderRepository.findByBrigadierId(brigadier.getId());
-        System.out.println("Brigadier ID: " + brigadier.getId());
-        System.out.println("Orders: " + orders);
         return orders.stream()
                 .map(order -> mapper.map(order, OrderDto.class))
                 .collect(Collectors.toList());
@@ -308,7 +310,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order getOrderEntity(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(NotFoundException::new);
     }
 
 
@@ -331,28 +333,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<UserDto> getAssignedMasters(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException());
+                .orElseThrow(NotFoundException::new);
 
-        String currentUsername;
-        try {
-            currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        } catch (Exception e) {
-            throw new AccessDeniedException("Не удалось получить имя пользователя");
-        }
-
-        // Проверяем, является ли текущий пользователь админом
-        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        // Если не админ, проверяем, является ли пользователь бригадиром этого заказа
-        if (!isAdmin) {
-            if (order.getBrigade() == null || order.getBrigade().getBrigadier() == null) {
-                throw new AccessDeniedException("Order does not have a brigadier assigned");
-            }
-            if (!order.getBrigade().getBrigadier().getUsername().equals(currentUsername)) {
-                throw new AccessDeniedException("You don't have permission to view masters for this order");
-            }
-        }
+        // Доступ проверяется на уровне контроллера/безопасности
 
         return order.getAssignedMasters().stream()
                 .map(this::mapToUserDto)
@@ -374,11 +357,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order addExpense(Long orderId, Double amount) {
         if (amount == null || amount <= 0) {
-            throw new IllegalArgumentException("Некорректная сумма расходов");
+            throw new BadRequestException("Некорректная сумма расходов");
         }
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Заказ не найден"));
+                .orElseThrow(NotFoundException::new);
 
         order.setPrice(order.getPrice().add(BigDecimal.valueOf(amount)));
         orderRepository.save(order);

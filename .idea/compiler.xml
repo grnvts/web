@@ -10,10 +10,14 @@
         <module name="Building-Management-System" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Building-Management-System (1)" target="11" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Building-Management-System" options="-parameters" />
+      <module name="Building-Management-System (1)" options="-parameters" />
     </option>
   </component>
 </project>

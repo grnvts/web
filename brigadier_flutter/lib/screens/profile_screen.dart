@@ -301,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAvatar() {
     final imageToShow = _selectedImage;
     final serverImageUrl = _imageUrl != null && _imageUrl!.isNotEmpty
-        ? 'http://172.26.205.54:8501/images/$_imageUrl'
+        ? 'http://10.178.229.40:8501/images/$_imageUrl'
         : null;
     
     return GestureDetector(

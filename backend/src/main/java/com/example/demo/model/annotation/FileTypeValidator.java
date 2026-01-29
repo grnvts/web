@@ -1,7 +1,7 @@
 package com.example.demo.model.annotation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;

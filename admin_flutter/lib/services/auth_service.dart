@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://172.26.205.54:8501/api';
+  static const String baseUrl = 'http://10.178.229.40:8501/api';
   
   Future<Map<String, dynamic>> login(String username, String password, {String? captchaValue}) async {
     try {

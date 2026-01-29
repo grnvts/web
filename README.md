@@ -1,54 +1,45 @@
-# Building Management System - SpringBoot-React
+# Building Management System (Diploma Project)
 
-This project is simple hospital management system. 
+Моно‑репозиторий для сервиса управления заявками на ремонт/обслуживание зданий. Содержит backend (Spring Boot), веб‑клиент (`frontend`) и две Flutter‑админки (`admin_flutter`, `brigadier_flutter`).
 
-### Using Tools & Technologies
-``` 
-- Spring Boot 2.3.3
-- Spring Security
-- JWT
-- Spring Validation
-- REST API (get, post, put, delete, patch)
-- ModelMapper, DTO
-- JPA, Hibernate
-- React
-- Axios
-- Redux
-- Secure JS For localstorage
-- Bootstrap 4
-- HTML 5, CSS3
-- PostgreSQL
+## Архитектура
+- **Backend:** Java 17, Spring Boot 3.2, Spring Security (JWT), Spring Data JPA/Hibernate, Flyway, ModelMapper.
+- **DB:** PostgreSQL.
+- **API:** REST + OpenAPI (springdoc).
+- **Сборка:** Maven (wrapper в проекте), Docker/Docker Compose.
+- **Тесты:** JUnit5, Mockito, MockMvc, Testcontainers/H2.
+
+## Быстрый старт (backend)
+1) Скопировать переменные окружения:  
+`cp backend/.env.example backend/.env` и при необходимости отредактировать.
+2) Запуск в Docker:  
+`docker compose -f docker-compose.backend.yml up --build`
+3) Локально без Docker:  
 ```
-### important !!!
+cd backend
+./mvnw spring-boot:run
 ```
-https://reactdatepicker.com/
-https://www.npmjs.com/package/@material/react-checkbox
-```
-## Requirements
+Требуется JDK 17+.
 
-For building and running the application you need:
+## База и миграции
+- Схема управляется Flyway (`src/main/resources/db/migration`).
+- `spring.jpa.hibernate.ddl-auto` выключен, изменения только через миграции.
 
-- [JDK 11](https://www.oracle.com/tr/java/technologies/javase/jdk11-archive-downloads.html)
-- [Maven 3](https://maven.apache.org)
+## Клиенты
+- `frontend` – React SPA (npm install && npm start).
+- `admin_flutter`, `brigadier_flutter` – мобильные/desktop Flutter-клиенты (см. их README/документацию).
 
-## Running the application locally
-#### for backend
-There are several ways to run a Spring Boot application on your local machine. One way is to execute the `main` method in the `com.example.demo.FirstAppApplication` class from your IDE .
+## Тестирование
+- Юнит и интеграция backend: `./mvnw test`
+- В интеграциях используется H2 (PostgreSQL mode) / Testcontainers.
 
-Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html) like so:
+## Полезные команды
+- Собрать jar: `./mvnw -DskipTests package`
+- Собрать Docker образ backend: `docker build -t bms-backend ./backend`
 
-```shell
-mvn spring-boot:run
-```
-#### for Frontend
-Installation and Setup Instructions
-Example:
-Clone down this repository. You will need node and npm installed globally on your machine.
+## Директории
+- `backend/` – сервер.
+- `frontend/` – веб-клиент.
+- `admin_flutter/`, `brigadier_flutter/` – мобильные/desktop клиенты.
+- `docker-compose.backend.yml` – поднять DB + backend.
 
-Installation:         `npm install`
-
-To Run Test Suite:    `npm test`
-
-To Start Server:      `npm start`
-
-To Visit App:         `localhost:3000`

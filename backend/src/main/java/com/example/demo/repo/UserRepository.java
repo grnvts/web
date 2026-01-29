@@ -15,8 +15,8 @@ import com.example.demo.model.Role;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 

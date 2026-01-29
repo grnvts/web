@@ -1,14 +1,17 @@
 package com.example.demo.service.impl;
 
 import java.io.IOException;
-import java.util.*;
-
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-import javax.validation.Valid;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import com.example.demo.dto.CreateMasterDto;
+import com.example.demo.error.BadRequestException;
+import com.example.demo.error.ForbiddenException;
 import com.example.demo.model.*;
 import com.example.demo.repo.BrigadeRepository;
 import com.example.demo.repo.QualificationRepository;
@@ -16,21 +19,16 @@ import com.example.demo.repo.RoleRepository;
 import com.example.demo.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.UploadImageDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.dto.UserUpdateDto;
-import com.example.demo.error.ApiError;
 import com.example.demo.error.NotFoundException;
 import com.example.demo.file.FileService;
-import com.example.demo.jwt.config.JwtTokenUtil;
 import com.example.demo.repo.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -38,341 +36,265 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService {
-	public static final String TOKEN_PREFIX = "Bearer ";
-	private final UserRepository repository;
-	private final ModelMapper mapper;
-	private final Logger logger;
-	private final PasswordEncoder passwordEncoder;
-	private final JwtTokenUtil tokenUtil;
-	private final FileService fileService;
-	private final RoleRepository roleRepository;
-	private final UserRepository userRepository;
-	private final QualificationRepository qualificationRepository;
-	private String[] types = { "image/png", "image/jpeg" };
-	@Autowired
-	private BrigadeRepository brigadeRepository;
+    private final UserRepository repository;
+    private final ModelMapper mapper;
+    private final Logger logger;
+    private final PasswordEncoder passwordEncoder;
+    private final FileService fileService;
+    private final RoleRepository roleRepository;
+    private final QualificationRepository qualificationRepository;
+    private final BrigadeRepository brigadeRepository;
 
+    private final String[] allowedImageTypes = {"image/png", "image/jpeg"};
 
-	@Override
-	@Transactional
-	public Page<UserDto> getAll(Pageable page, String authHeader) {
-		Page<UserDto> pageDto = null;
-		if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
-			String username = getUsernameFromToken(authHeader);
-			Page<User> pdoUser = repository.findByUsernameNot(username, page);
-			pageDto = pdoUser.map(UserDto::new);
-			return pageDto;
-		}
-		// Page<User> pageList = repository.findAll(page).map(UserDto::new);
-		pageDto = repository.findAll(page).map(UserDto::new);
-		return pageDto;
-	}
+    @Override
+    @Transactional
+    public Page<UserDto> getAll(Pageable page, String currentUsername) {
+        if (currentUsername != null && !currentUsername.isBlank()) {
+            return repository.findByUsernameNot(currentUsername, page).map(UserDto::new);
+        }
+        return repository.findAll(page).map(UserDto::new);
+    }
 
-	@Transactional
-	public ResponseEntity<?> save(@Valid User user) {
-		//
-		if (!user.getPassword().equals(user.getRepeatPassword())) {
-			HashMap<String, String> map = new HashMap<>();
-			map.put("repeatPassword", "Passwords must be same.");
-			ApiError error = new ApiError(400, "Validation Error", null);
-			error.setValidationErrors(map);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-		}
+    @Override
+    @Transactional
+    public UserDto save(@Valid User user) {
+        if (!user.getPassword().equals(user.getRepeatPassword())) {
+            throw new BadRequestException("Passwords must be same.");
+        }
+        ensureUniqueUsername(user.getUsername(), null);
+        ensureUniqueEmail(user.getEmail(), null);
 
-		// User user = mapper.map(dto, User.class);
-		user.setCreatedDate(new Date());
-		user.setStatus(1);
-		user.setRealPassword(user.getPassword());
+        user.setCreatedDate(new Date());
+        user.setStatus(1);
+        user.setRealPassword(user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getRealPassword()));
+        if (user.getPatronymic() == null) user.setPatronymic("");
+        if (user.getPhone() == null) user.setPhone("");
 
-		user.setPassword(passwordEncoder.encode(user.getRealPassword()));
-		if (user.getPatronymic() == null)
-			user.setPatronymic("");
-		if (user.getPhone() == null)
-			user.setPhone("");
+        Role roleUser = roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow(() -> new IllegalStateException("ROLE_USER not found in DB"));
+        user.getRoles().add(roleUser);
 
-		Role role = roleRepository.findByName(RoleName.ROLE_USER)
-				.orElseThrow(() -> new IllegalStateException("ROLE_USER not found in DB"));
+        User saved = repository.save(user);
+        logger.info("User {} saved", saved.getUsername());
+        return mapper.map(saved, UserDto.class);
+    }
 
-		user.getRoles().add(role); // ← теперь это уже существующий объект
+    @Transactional
+    public UserDto getUser(String username) {
+        User user = repository.findUserByUsernameWithStatusOne(username);
+        if (user == null) {
+            logger.error("No user with username {}", username);
+            throw new NotFoundException();
+        }
+        return mapper.map(user, UserDto.class);
+    }
 
-		user = repository.save(user);
-		logger.info("User is saved");
+    @Override
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = repository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        user.setStatus(0);
+        repository.save(user);
+    }
 
-		UserDto dto = mapper.map(user, UserDto.class);
-		return ResponseEntity.ok(dto);
-	}
+    @Override
+    @Transactional
+    public UserDto updateUser(String requester, String username, UserUpdateDto dto) {
+        User requesterUser = repository.findUserByUsernameWithStatusOne(requester);
+        if (requesterUser == null) throw new ForbiddenException("Unknown requester");
 
-	@Transactional
-	public UserDto getUser(String username) {
-		User user = repository.findUserByUsernameWithStatusOne(username);
+        boolean isAdmin = requesterUser.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(RoleName.ROLE_ADMIN));
+        if (!isAdmin && !requester.equals(username)) {
+            logger.error("User {} attempted to update {}", requester, username);
+            throw new ForbiddenException("You are not authorized to update this user");
+        }
 
-		if (user == null) {
-			logger.error("There is no user with " + username);
-			throw new NotFoundException();
-			// throw new IllegalArgumentException("There is no user with " + id);
-		}
-		logger.info("User is ok");
-		UserDto dto = mapper.map(user, UserDto.class);
-		return dto;
-	}
+        User user = repository.findUserByUsernameWithStatusOne(username);
+        if (user == null) throw new NotFoundException();
 
-	@Override
-	public Boolean deleteUser(Long id) {
-		User user = repository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("There is no user with id: " + id));
-		user.setStatus(0); // Помечаем как неактивного
-		repository.save(user);
-		return true;
-	}
+        if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+            if (dto.getRepeatPassword() == null || !dto.getPassword().equals(dto.getRepeatPassword())) {
+                throw new BadRequestException("Passwords must be same.");
+            }
+            user.setRealPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
 
+        if (dto.getUsername() != null && !dto.getUsername().equals(user.getUsername())) {
+            ensureUniqueUsername(dto.getUsername(), user.getId());
+            user.setUsername(dto.getUsername());
+        }
 
-	private String getUsernameFromToken(String authHeader) {
+        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
+            ensureUniqueEmail(dto.getEmail(), user.getId());
+            user.setEmail(dto.getEmail());
+        }
 
-		String username = null;
-		if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
-			String token = authHeader.replace(TOKEN_PREFIX, "");
-			username = tokenUtil.getUsernameFromToken(token);
-		}
-		return username;
-	}
+        user.setName(dto.getName());
+        user.setSurname(dto.getSurname());
+        user.setPatronymic(dto.getPatronymic());
+        user.setPhone(dto.getPhone());
+        user.setBornDate(dto.getBornDate());
 
-	@Override
-	@Transactional
-	public ResponseEntity<?> updateUser(String authHeader, String username, UserUpdateDto dto) {
-		String userNameFromToken = getUsernameFromToken(authHeader);
+        User saved = repository.save(user);
+        return mapper.map(saved, UserDto.class);
+    }
 
-		// Админ может редактировать другого пользователя
-		boolean isAdmin = false;
-		User adminUser = repository.findUserByUsernameWithStatusOne(userNameFromToken);
-		if (adminUser != null
-				&& adminUser.getRoles().stream().anyMatch(role -> role.getName().name().equals("ROLE_ADMIN"))) {
-			isAdmin = true;
-		}
+    @Override
+    @Transactional
+    public UserDto uploadImage(String requester, String username, UploadImageDto dto) {
+        if (!requester.equals(username)) {
+            throw new ForbiddenException("You are not authorized to update this image");
+        }
+        User user = repository.findUserByUsernameWithStatusOne(username);
+        if (user == null) throw new NotFoundException();
 
-		// Если не админ, но пытается редактировать не себя — ошибка
-		if (!isAdmin && !userNameFromToken.equals(username)) {
-			logger.error("User {} attempted to update user {} but is not allowed", userNameFromToken, username);
-			ApiError error = new ApiError(403, "You are not authorized to update this user", "/api/user/" + username);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-		}
+        if (dto.getImage() != null) {
+            String oldImage = user.getImage();
+            if (!fileService.isValidFileType(allowedImageTypes, dto.getImage())) {
+                throw new BadRequestException("Неверный формат файла");
+            }
+            try {
+                String fileName = fileService.writeBase64StringToFile(dto.getImage());
+                user.setImage(fileName);
+                fileService.deleteFile(oldImage);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to store image", e);
+            }
+        }
+        User saved = repository.save(user);
+        return mapper.map(saved, UserDto.class);
+    }
 
-		User user = repository.findUserByUsernameWithStatusOne(username);
-		if (user == null) {
-			logger.error("No user found with username {}", username);
-			throw new NotFoundException();
-		}
+    @Override
+    @Transactional
+    public void restoreUser(Long id) {
+        User user = repository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        user.setStatus(1);
+        repository.save(user);
+    }
 
-		// Логирование входных данных
-		logger.info("Updating user: {}, current ID: {}", username, user.getId());
-		logger.info("Incoming data: email={}, name={}, surname={}", dto.getEmail(), dto.getName(), dto.getSurname());
+    @Override
+    @Transactional
+    public UserDto createUserWithRoles(UserDto dto) {
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            throw new BadRequestException("Password is required");
+        }
+        ensureUniqueUsername(dto.getUsername(), null);
+        ensureUniqueEmail(dto.getEmail(), null);
 
-		// Проверка и обновление пароля, если он передан
-		if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
-			// Проверка совпадения паролей
-			if (dto.getRepeatPassword() == null || !dto.getPassword().equals(dto.getRepeatPassword())) {
-				HashMap<String, String> map = new HashMap<>();
-				map.put("repeatPassword", "Passwords must be same.");
-				ApiError error = new ApiError(400, "Validation Error", null);
-				error.setValidationErrors(map);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-			}
-			// Обновление пароля
-			user.setRealPassword(dto.getPassword());
-			user.setPassword(passwordEncoder.encode(dto.getPassword()));
-			logger.info("Password updated for user {}", username);
-		}
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setEmail(dto.getEmail());
+        user.setName(dto.getName());
+        user.setSurname(dto.getSurname());
+        user.setPatronymic(dto.getPatronymic());
+        user.setPhone(dto.getPhone());
+        user.setBornDate(dto.getBornDate());
+        user.setCreatedDate(new Date());
+        user.setStatus(1);
 
-		// Проверка username на уникальность, если он изменился (для всех, включая админа)
-		if (dto.getUsername() != null && !dto.getUsername().equals(user.getUsername())) {
-			User userWithUsername = repository.findUserByUsernameWithStatusOne(dto.getUsername());
-			if (userWithUsername != null && !userWithUsername.getId().equals(user.getId())) {
-				logger.warn("Username {} already in use by another user", dto.getUsername());
-				ApiError error = new ApiError(400, "Username already exists", "/api/user/" + username);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-			}
-			user.setUsername(dto.getUsername());
-		}
+        Set<Role> roles = dto.getRoles().stream()
+                .map(roleName -> roleRepository.findByName(RoleName.valueOf(roleName))
+                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName)))
+                .collect(Collectors.toSet());
+        user.setRoles(roles);
 
-		// Проверка email на уникальность, если он изменился
-		if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
-			User userWithEmail = repository.findByEmail(dto.getEmail());
+        User saved = repository.save(user);
 
-			if (userWithEmail != null && !userWithEmail.getId().equals(user.getId())) {
-				logger.warn("Email {} already in use by another user", dto.getEmail());
-				ApiError error = new ApiError(400, "Email already exists", "/api/user/" + username);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-			}
+        boolean isBrigadier = roles.stream()
+                .anyMatch(role -> role.getName().equals(RoleName.ROLE_BRIGADIER));
+        if (isBrigadier) {
+            createBrigadeForBrigadier(saved);
+        }
+        return new UserDto(saved);
+    }
 
-			user.setEmail(dto.getEmail());
-		}
+    private void createBrigadeForBrigadier(User brigadier) {
+        Brigade brigade = new Brigade();
+        brigade.setBrigadier(brigadier);
+        brigade.setNumber(brigadier.getId().toString());
+        brigade.setMasters(List.of());
+        brigadeRepository.save(brigade);
+    }
 
-		// Обновление остальных полей
-		user.setName(dto.getName());
-		user.setSurname(dto.getSurname());
-		user.setPatronymic(dto.getPatronymic());
-		user.setPhone(dto.getPhone());
-		user.setBornDate(dto.getBornDate());
+    @Override
+    public User getUserEntity(String username) {
+        return repository.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
-		// Сохраняем
-		user = repository.save(user);
+    @Override
+    public List<UserDto> findAllMasters() {
+        return repository.findAll().stream()
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getName().equals(RoleName.ROLE_MASTER)))
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
 
-		logger.info("User {} updated successfully", user.getUsername());
-		UserDto result = mapper.map(user, UserDto.class);
-		return ResponseEntity.ok(result);
-	}
+    @Override
+    @Transactional
+    public UserDto createMaster(CreateMasterDto dto) {
+        if (dto.getName() == null || dto.getName().isBlank() ||
+                dto.getSurname() == null || dto.getSurname().isBlank() ||
+                dto.getPatronymic() == null || dto.getPatronymic().isBlank() ||
+                dto.getQualificationIds() == null || dto.getQualificationIds().isEmpty()) {
+            throw new BadRequestException("Все поля обязательны");
+        }
 
-	public ResponseEntity<?> uploadImage(String authHeader, String username, UploadImageDto dto) {
-		String userNameFromToken = getUsernameFromToken(authHeader);
-		if (!userNameFromToken.equals(username)) {
-			logger.error("User Names cannot match");
-			ApiError error = new ApiError(403, "User Names cannot match", "api/user/" + authHeader);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-		}
-		User user = repository.findUserByUsernameWithStatusOne(username);
-		if (user == null) {
-			logger.error("There is no user with " + username);
-			throw new NotFoundException();
-			// throw new IllegalArgumentException("There is no user with " + id);
-		}
-		if (dto.getImage() != null) {
-			String oldImage = user.getImage();
-			try {
-				if (!fileService.isValidFileType(types, dto.getImage())) {
-					ApiError error = new ApiError(400, "Неверный формат файла", "api/user/upload-image/" + authHeader);
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-				}
-				String fileName = fileService.writeBase64StringToFile(dto.getImage());
-				user.setImage(fileName);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			fileService.deleteFile(oldImage);
-		}
-		user = repository.save(user);
-		UserDto result = mapper.map(user, UserDto.class);
-		logger.info("Image updated");
-		return ResponseEntity.ok(result);
-	}
-	@Override
-	public Boolean restoreUser(Long id) {
-		User user = repository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("There is no user with id: " + id));
-		user.setStatus(1); // Восстанавливаем пользователя
-		repository.save(user);
-		return true;
-	}
-	@Override
-	@Transactional
-	public ResponseEntity<?> createUserWithRoles(UserDto dto) {
-		// Проверка на уникальность username и email
-		if (repository.findByUsername(dto.getUsername()) != null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ApiError(400, "Username already exists", "/api/user"));
-		}
-		if (repository.findByEmail(dto.getEmail()) != null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ApiError(400, "Email already exists", "/api/user"));
-		}
+        String username = generateUniqueMasterUsername();
 
-		// Создание нового пользователя
-		User user = new User();
-		user.setUsername(dto.getUsername());
-		user.setPassword(passwordEncoder.encode(dto.getPassword()));
-		user.setEmail(dto.getEmail());
-		user.setName(dto.getName());
-		user.setSurname(dto.getSurname());
-		user.setPatronymic(dto.getPatronymic());
-		user.setPhone(dto.getPhone());
-		user.setBornDate(dto.getBornDate());
-		user.setCreatedDate(new Date());
-		user.setStatus(1); // Активный статус
+        User master = new User();
+        master.setUsername(username);
+        master.setName(dto.getName());
+        master.setSurname(dto.getSurname());
+        master.setPatronymic(dto.getPatronymic());
+        master.setStatus(1);
+        String generatedPassword = "Temporary";
+        master.setRealPassword(generatedPassword);
+        master.setPassword(passwordEncoder.encode(generatedPassword));
 
-		// Присваивание ролей
-		Set<Role> roles = dto.getRoles().stream()
-				.map(roleName -> roleRepository.findByName(RoleName.valueOf(roleName))
-						.orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName)))
-				.collect(Collectors.toSet());
-		user.setRoles(roles);
+        Role masterRole = roleRepository.findByName(RoleName.ROLE_MASTER)
+                .orElseThrow(() -> new RuntimeException("ROLE_MASTER not found"));
+        master.setRoles(Set.of(masterRole));
 
-		// Сохраняем пользователя
-		user = repository.save(user);
+        List<Qualification> qualifications = qualificationRepository.findAllById(dto.getQualificationIds());
+        master.setQualifications(qualifications);
 
-		boolean isBrigadier = roles.stream()
-				.anyMatch(role -> role.getName().equals(RoleName.ROLE_BRIGADIER));
-		if (isBrigadier) {
-			createBrigadeForBrigadier(user);
-		}
+        User saved = repository.save(master);
+        return new UserDto(saved);
+    }
 
-		return ResponseEntity.ok(new UserDto(user));
-	}
+    private String generateUniqueMasterUsername() {
+        String baseUsername = "master";
+        int counter = 1;
+        String username;
+        while (true) {
+            username = baseUsername + counter;
+            if (repository.findByUsername(username) == null) break;
+            counter++;
+        }
+        return username;
+    }
 
+    private void ensureUniqueUsername(String username, Long currentId) {
+        User existing = repository.findUserByUsernameWithStatusOne(username);
+        if (existing != null && (currentId == null || !existing.getId().equals(currentId))) {
+            throw new BadRequestException("Username already exists");
+        }
+    }
 
-	private void createBrigadeForBrigadier(User brigadier) {
-		Brigade brigade = new Brigade();
-		brigade.setBrigadier(brigadier);
-		brigade.setNumber(brigadier.getId().toString()); // Например: "BR-17"
-		brigade.setMasters(List.of()); // Изначально без мастеров
-		brigadeRepository.save(brigade);
-	}
-
-
-	@Override
-	public User getUserEntity(String username) {
-		return userRepository.findUserByUsername(username)
-				.orElseThrow(() -> new RuntimeException("User not found"));
-	}
-
-	@Override
-	public List<UserDto> findAllMasters() {
-		List<User> masters = userRepository.findAll().stream()
-				.filter(user -> user.getRoles().stream()
-						.anyMatch(role -> role.getName().name().equals("ROLE_MASTER")))
-				.collect(Collectors.toList());
-		return masters.stream().map(UserDto::new).collect(Collectors.toList());
-	}
-
-
-	@Override
-	@Transactional
-	public ResponseEntity<?> createMaster(CreateMasterDto dto) {
-		if (dto.getName() == null || dto.getName().isBlank() ||
-				dto.getSurname() == null || dto.getSurname().isBlank() ||
-				dto.getPatronymic() == null || dto.getPatronymic().isBlank() ||
-				dto.getQualificationIds() == null || dto.getQualificationIds().isEmpty()) {
-			return ResponseEntity.badRequest().body("Все поля обязательны");
-		}
-
-		// Генерация уникального username
-		String baseUsername = "master";
-		int counter = 1;
-		String username;
-		while (true) {
-			username = baseUsername + counter;
-			if (userRepository.findByUsername(username) == null) break;
-			counter++;
-		}
-
-		// Создание пользователя-мастера
-		User master = new User();
-		master.setUsername(username);
-		master.setName(dto.getName());
-		master.setSurname(dto.getSurname());
-		master.setPatronymic(dto.getPatronymic());
-		master.setStatus(1);
-		String generatedPassword = "Temporary";//временный пароль
-		master.setRealPassword(generatedPassword);
-		master.setPassword(passwordEncoder.encode(generatedPassword));
-		// Присваиваем роль мастера
-		Role masterRole = roleRepository.findByName(RoleName.ROLE_MASTER)
-				.orElseThrow(() -> new RuntimeException("ROLE_MASTER not found"));
-		master.setRoles(Set.of(masterRole));
-
-		// Привязка квалификаций
-		List<Qualification> qualifications = qualificationRepository.findAllById(dto.getQualificationIds());
-		master.setQualifications(qualifications);
-
-		userRepository.save(master);
-		return ResponseEntity.ok(new UserDto(master));
-	}
-
+    private void ensureUniqueEmail(String email, Long currentId) {
+        User existing = repository.findByEmail(email);
+        if (existing != null && (currentId == null || !existing.getId().equals(currentId))) {
+            throw new BadRequestException("Email already exists");
+        }
+    }
 }

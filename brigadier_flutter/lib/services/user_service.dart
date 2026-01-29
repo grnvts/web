@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'auth_service.dart';
 
 class UserService {
-  static const String baseUrl = 'http://172.26.205.54:8501/api';
+  static const String baseUrl = 'http://10.178.229.40:8501/api';
   final AuthService _authService = AuthService();
   
   Future<Map<String, String>> _getHeaders() async {
