@@ -12,8 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 
 import com.example.demo.model.User;
-import com.sun.istack.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
