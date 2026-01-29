@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.*;
 import com.example.demo.service.UserService;
+import com.example.demo.jwt.config.JwtUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,21 +34,20 @@ class UserApiTest {
     @Test
     void testGetAllUsers() {
         Page<UserDto> mockPage = mock(Page.class);
-        String authHeader = "Bearer token";
+        JwtUserDetails principal = mock(JwtUserDetails.class);
+        when(principal.getUsername()).thenReturn("user1");
         Pageable pageable = mock(Pageable.class);
-        when(userService.getAll(pageable, authHeader)).thenReturn(mockPage);
+        when(userService.getAll(pageable, "user1")).thenReturn(mockPage);
 
-        ResponseEntity<Page<UserDto>> response = userApi.getAll(authHeader, pageable);
+        ResponseEntity<Page<UserDto>> response = userApi.getAll(principal, pageable);
 
         assertEquals(mockPage, response.getBody());
-        verify(userService, times(1)).getAll(pageable, authHeader);
+        verify(userService, times(1)).getAll(pageable, "user1");
     }
 
     @Test
     void testRestoreUser() {
         Long userId = 1L;
-        when(userService.restoreUser(userId)).thenReturn(true);
-
         ResponseEntity<Boolean> response = userApi.restoreUser(userId);
 
         assertEquals(true, response.getBody());

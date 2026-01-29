@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.dto.UpdateStatusRequest;
 import com.example.demo.dto.UserDto;
-import com.example.demo.jwt.config.JwtTokenUtil;
+import com.example.demo.jwt.config.JwtUserDetails;
 import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +24,6 @@ class OrderControllerTest {
 
     @Mock
     private OrderService orderService;
-
-    @Mock
-    private JwtTokenUtil jwtTokenUtil;
 
     @InjectMocks
     private OrderController orderController;
@@ -74,26 +71,25 @@ class OrderControllerTest {
     @Test
     void testCreateOrder() {
         OrderDto orderDto = new OrderDto();
-        String authHeader = "Bearer token";
-        String username = "user1";
-        when(jwtTokenUtil.getUsernameFromToken("token")).thenReturn(username);
-        when(orderService.createOrder(orderDto, username)).thenReturn(orderDto);
+        JwtUserDetails principal = mock(JwtUserDetails.class);
+        when(principal.getUsername()).thenReturn("user1");
+        when(orderService.createOrder(orderDto, "user1")).thenReturn(orderDto);
 
-        OrderDto response = orderController.createOrder(orderDto, authHeader);
+        OrderDto response = orderController.createOrder(orderDto, principal);
 
         assertEquals(orderDto, response);
-        verify(orderService, times(1)).createOrder(orderDto, username);
+        verify(orderService, times(1)).createOrder(orderDto, "user1");
     }
 
     @Test
     void testGetClientOrders() {
-        String authHeader = "Bearer token";
+        JwtUserDetails principal = mock(JwtUserDetails.class);
         String username = "client1";
+        when(principal.getUsername()).thenReturn(username);
         List<OrderDto> orders = Arrays.asList(new OrderDto(), new OrderDto());
-        when(jwtTokenUtil.getUsernameFromToken("token")).thenReturn(username);
         when(orderService.getOrdersForClient(username)).thenReturn(orders);
 
-        List<OrderDto> response = orderController.getClientOrders(authHeader);
+        List<OrderDto> response = orderController.getClientOrders(principal);
 
         assertEquals(2, response.size());
         verify(orderService, times(1)).getOrdersForClient(username);
@@ -101,13 +97,13 @@ class OrderControllerTest {
 
     @Test
     void testGetBrigadierOrders() {
-        String authHeader = "Bearer token";
+        JwtUserDetails principal = mock(JwtUserDetails.class);
         String username = "brigadier1";
+        when(principal.getUsername()).thenReturn(username);
         List<OrderDto> orders = Arrays.asList(new OrderDto(), new OrderDto());
-        when(jwtTokenUtil.getUsernameFromToken("token")).thenReturn(username);
         when(orderService.getOrdersForBrigadier(username)).thenReturn(orders);
 
-        List<OrderDto> response = orderController.getBrigadierOrders(authHeader);
+        List<OrderDto> response = orderController.getBrigadierOrders(principal);
 
         assertEquals(2, response.size());
         verify(orderService, times(1)).getOrdersForBrigadier(username);
@@ -127,13 +123,13 @@ class OrderControllerTest {
 
     @Test
     void testGetActiveOrdersForBrigadier() {
-        String authHeader = "Bearer token";
+        JwtUserDetails principal = mock(JwtUserDetails.class);
         String username = "brigadier1";
+        when(principal.getUsername()).thenReturn(username);
         List<OrderDto> orders = Arrays.asList(new OrderDto(), new OrderDto());
-        when(jwtTokenUtil.getUsernameFromToken("token")).thenReturn(username);
         when(orderService.getActiveOrdersForBrigadier(username)).thenReturn(orders);
 
-        List<OrderDto> response = orderController.getActiveOrdersForBrigadier(authHeader);
+        List<OrderDto> response = orderController.getActiveOrdersForBrigadier(principal);
 
         assertEquals(2, response.size());
         verify(orderService, times(1)).getActiveOrdersForBrigadier(username);
