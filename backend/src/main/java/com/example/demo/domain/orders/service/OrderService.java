@@ -1,0 +1,33 @@
+package com.example.demo.domain.orders.service;
+
+import com.example.demo.domain.orders.dto.OrderDto;
+import com.example.demo.domain.users.dto.UserDto;
+import com.example.demo.domain.orders.model.Order;
+
+import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+public interface OrderService {
+    OrderDto createOrder(OrderDto dto, String username);
+    List<OrderDto> getOrdersForClient(String username);
+    OrderDto getOrderById(Long id, String username);
+    void updateOrder(Long id, OrderDto updatedOrder);
+    void assignBrigadier(Long orderId, String brigadierUsername);
+   // void updateOrderStatus(Long id, String status);
+    List<OrderDto> getAllOrders();
+    Map<String, Long> getOrderCountPerDay(String username, LocalDate start, LocalDate end);
+    List<UserDto> getAllBrigadiers();
+    List<OrderDto> getOrdersForBrigadier(String username);
+    @Transactional
+    void updateOrderStatus(Long id, String status, String message);
+    List<OrderDto> getActiveOrdersForBrigadier(String username);
+    Order getOrderEntity(Long orderId);
+
+    List<UserDto> getBrigadeMasters(Long brigadeId);
+    void assignMasters(Long orderId, List<Long> masterIds);
+
+    List<UserDto> getAssignedMasters(Long orderId);
+    Order addExpense(Long orderId, Double amount);
+}

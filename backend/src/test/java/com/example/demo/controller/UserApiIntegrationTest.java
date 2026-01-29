@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Role;
-import com.example.demo.model.RoleName;
-import com.example.demo.repo.RoleRepository;
+import com.example.demo.domain.users.model.Role;
+import com.example.demo.domain.users.model.RoleName;
+import com.example.demo.domain.users.repo.RoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

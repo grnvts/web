@@ -1,28 +1,22 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.MessageDto;
-import com.example.demo.model.Message;
-import com.example.demo.model.Order;
-import com.example.demo.model.User;
-import com.example.demo.service.MessageService;
-import com.example.demo.service.OrderService;
-import com.example.demo.service.UserService;
+import com.example.demo.domain.notifications.controller.MessageController;
+import com.example.demo.domain.notifications.dto.MessageDto;
+import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.notifications.service.impl.MessageService;
+import com.example.demo.domain.orders.service.OrderService;
+import com.example.demo.domain.users.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class MessageControllerTest {

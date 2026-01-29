@@ -1,8 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.*;
-import com.example.demo.service.UserService;
-import com.example.demo.jwt.config.JwtUserDetails;
+import com.example.demo.domain.users.controller.UserApi;
+import com.example.demo.domain.users.dto.UserDto;
+import com.example.demo.domain.users.service.UserService;
+import com.example.demo.domain.common.config.jwt.JwtUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

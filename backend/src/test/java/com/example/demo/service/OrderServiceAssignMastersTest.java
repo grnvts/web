@@ -1,10 +1,10 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Order;
-import com.example.demo.model.User;
-import com.example.demo.repo.OrderRepository;
-import com.example.demo.repo.UserRepository;
-import com.example.demo.service.impl.OrderServiceImpl;
+import com.example.demo.domain.orders.model.Order;
+import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.orders.repo.OrderRepository;
+import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.orders.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

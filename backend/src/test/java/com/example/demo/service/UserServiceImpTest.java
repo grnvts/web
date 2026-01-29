@@ -1,13 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.UserDto;
-import com.example.demo.error.BadRequestException;
-import com.example.demo.model.User;
-import com.example.demo.repo.BrigadeRepository;
-import com.example.demo.repo.QualificationRepository;
-import com.example.demo.repo.RoleRepository;
-import com.example.demo.repo.UserRepository;
-import com.example.demo.service.impl.UserServiceImp;
+import com.example.demo.domain.users.dto.UserDto;
+import com.example.demo.domain.common.error.BadRequestException;
+import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.orders.repo.BrigadeRepository;
+import com.example.demo.domain.users.repo.QualificationRepository;
+import com.example.demo.domain.users.repo.RoleRepository;
+import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.service.impl.UserServiceImp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,14 +1,14 @@
 package com.example.demo.service;
 
-import com.example.demo.service.impl.UserServiceImp;
+import com.example.demo.domain.users.service.impl.UserServiceImp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.example.demo.model.User;
-import com.example.demo.repo.UserRepository;
+import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.users.repo.UserRepository;
 
 import static org.mockito.Mockito.mock;
 

@@ -1,10 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.error.NotFoundException;
-import com.example.demo.repo.BrigadeRepository;
-import com.example.demo.repo.OrderRepository;
-import com.example.demo.repo.UserRepository;
-import com.example.demo.service.impl.OrderServiceImpl;
+import com.example.demo.domain.notifications.service.NotificationService;
+import com.example.demo.domain.common.error.NotFoundException;
+import com.example.demo.domain.orders.repo.BrigadeRepository;
+import com.example.demo.domain.orders.repo.OrderRepository;
+import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.orders.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
+import com.example.demo.domain.common.config.AppConfiguration;
+import com.example.demo.domain.common.config.WebConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

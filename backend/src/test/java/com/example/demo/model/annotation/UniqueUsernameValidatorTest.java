@@ -1,13 +1,12 @@
 package com.example.demo.model.annotation;
 
-import com.example.demo.model.User;
-import com.example.demo.repo.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.demo.domain.common.validation.UniqueUsernameValidator;
+import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.users.repo.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.validation.ConstraintValidatorContext;

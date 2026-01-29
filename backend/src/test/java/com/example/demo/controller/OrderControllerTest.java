@@ -1,11 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.OrderDto;
-import com.example.demo.dto.UpdateStatusRequest;
-import com.example.demo.dto.UserDto;
-import com.example.demo.jwt.config.JwtUserDetails;
-import com.example.demo.model.Order;
-import com.example.demo.service.OrderService;
+import com.example.demo.domain.orders.controller.OrderController;
+import com.example.demo.domain.orders.dto.OrderDto;
+import com.example.demo.domain.orders.dto.UpdateStatusRequest;
+import com.example.demo.domain.common.config.jwt.JwtUserDetails;
+import com.example.demo.domain.orders.model.Order;
+import com.example.demo.domain.orders.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
