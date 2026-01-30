@@ -9,6 +9,12 @@
 - **Сборка:** Maven (wrapper в проекте), Docker/Docker Compose.
 - **Тесты:** JUnit5, Mockito, MockMvc, Testcontainers/H2.
 
+### Домены и порты
+- `domain/users` (модели/DTO/репо/сервисы) предоставляет порт `UserAccessPort`.
+- `domain/orders` использует `UserAccessPort` и `NotificationPort` для связи с users/notifications.
+- `domain/notifications` реализует `NotificationPort`.
+- Общие компоненты в `domain/common` (config, security/JWT, error, util).
+
 ## Быстрый старт (backend)
 1) Скопировать переменные окружения:  
 `cp backend/.env.example backend/.env` и при необходимости отредактировать.
@@ -43,3 +49,5 @@ cd backend
 - `admin_flutter/`, `brigadier_flutter/` – мобильные/desktop клиенты.
 - `docker-compose.backend.yml` – поднять DB + backend.
 
+## Документация API
+Swagger UI (с JWT Bearer схемой) доступен в dev-профиле на `/swagger-ui.html`.

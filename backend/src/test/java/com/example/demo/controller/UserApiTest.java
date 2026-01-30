@@ -34,6 +34,7 @@ class UserApiTest {
 
     @Test
     void testGetAllUsers() {
+        @SuppressWarnings("unchecked")
         Page<UserDto> mockPage = mock(Page.class);
         JwtUserDetails principal = mock(JwtUserDetails.class);
         when(principal.getUsername()).thenReturn("user1");

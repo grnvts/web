@@ -6,16 +6,16 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.port.UserAccessPort;
 
 public class UniqueUsernameValidator implements ConstraintValidator<UniqueData, String> {
 
 	@Autowired
-	UserRepository repository; 
+	UserAccessPort userAccessPort; 
 	
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
-		User user = repository.findByUsername(value);
+		User user = userAccessPort.findByUsername(value);
 		if(user != null) return false;
 		return true;
 	}
