@@ -8,7 +8,7 @@ import com.example.demo.domain.common.error.NotFoundException;
 import com.example.demo.domain.common.config.jwt.JwtTokenUtil;
 import com.example.demo.domain.users.model.User;
 
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.port.UserAccessPort;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ public class ControlService {
 	public static final String TOKEN_PREFIX = "Bearer ";
 	private final Logger logger;
 	private final JwtTokenUtil tokenUtil;
-	private final UserRepository userRepository;
+	private final UserAccessPort userAccessPort;
 	
 	public void controlUsername(String authHeader,String username) {
 		String userNameFromToken = getUsernameFromToken(authHeader);
@@ -28,7 +28,7 @@ public class ControlService {
 		}
 	}
 	public User getUser(String username) {
-		User user = userRepository.findUserByUsernameWithStatusOne(username);
+		User user = userAccessPort.findActiveByUsername(username);
 		if (user==null) {
 			logger.error("There is no user with {}", username);
 			throw new NotFoundException();

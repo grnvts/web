@@ -9,15 +9,14 @@ import com.example.demo.domain.orders.repo.BrigadeRepository;
 import com.example.demo.domain.orders.repo.OrderRepository;
 import com.example.demo.domain.users.model.RoleName;
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.users.repo.RoleRepository;
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.orders.port.NotificationPort;
+import com.example.demo.domain.users.port.UserAccessPort;
 import com.example.demo.domain.orders.dto.AddressDto;
 import com.example.demo.domain.orders.dto.OrderDto;
 import com.example.demo.domain.users.dto.UserDto;
 import com.example.demo.domain.common.error.BadRequestException;
 import com.example.demo.domain.common.error.NotFoundException;
 import com.example.demo.domain.common.error.ForbiddenException;
-import com.example.demo.domain.notifications.service.NotificationService;
 import com.example.demo.domain.orders.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -36,20 +35,18 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final UserAccessPort userAccessPort;
     private final ModelMapper mapper;
-    private final NotificationService notificationService;
+    private final NotificationPort notificationPort;
     private final BrigadeRepository brigadeRepository;
-
     @Autowired
     private AddressRepository addressRepository;
-    private RoleRepository roleRepository;
 
 
     @Override
     @Transactional
     public OrderDto createOrder(OrderDto dto, String username) {
-        User client = userRepository.findUserByUsernameWithStatusOne(username);
+        User client = userAccessPort.findActiveByUsername(username);
         AddressDto addressDto = dto.getAddress();
 
         Address address = new Address();
@@ -77,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrdersForClient(String username) {
-        User user = userRepository.findUserByUsernameWithStatusOne(username);
+        User user = userAccessPort.findActiveByUsername(username);
         return orderRepository.findByClient(user).stream().map(this::toDto).collect(Collectors.toList());
     }
 
@@ -89,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
         // Проверяем, является ли пользователь владельцем заказа, бригадиром или администратором
         boolean isClient = order.getClient().getUsername().equals(username);
         boolean isBrigadier = order.getBrigade() != null && order.getBrigade().getBrigadier() != null && order.getBrigade().getBrigadier().getUsername().equals(username);
-        boolean isAdmin = userRepository.findByUsername(username).getRoles().stream()
+        boolean isAdmin = userAccessPort.findByUsername(username).getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_ADMIN);
 
         if (!isClient && !isBrigadier && !isAdmin) {
@@ -166,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(NotFoundException::new);
 
-        User brigadier = userRepository.findByUsername(brigadierUsername);
+        User brigadier = userAccessPort.findByUsername(brigadierUsername);
         if (brigadier == null || brigadier.getRoles().stream().noneMatch(role -> role.getName() == RoleName.ROLE_BRIGADIER)) {
             throw new BadRequestException("Invalid brigadier");
         }
@@ -219,8 +216,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // Обновляем бригадира
-            if (updatedOrder.getBrigadierUsername() != null) {
-            User brigadier = userRepository.findByUsername(updatedOrder.getBrigadierUsername());
+        if (updatedOrder.getBrigadierUsername() != null) {
+            User brigadier = userAccessPort.findByUsername(updatedOrder.getBrigadierUsername());
             if (brigadier != null) {
                 if (order.getBrigade() == null) {
                     Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
@@ -261,10 +258,7 @@ public class OrderServiceImpl implements OrderService {
     }
     @Override
     public List<UserDto> getAllBrigadiers() {
-        List<User> brigadiers = userRepository.findAll().stream()
-                .filter(user -> user.getRoles().stream()
-                        .anyMatch(role -> role.getName().name().equals("ROLE_BRIGADIER")))
-                .collect(Collectors.toList());
+        List<User> brigadiers = userAccessPort.findAllByRole(RoleName.ROLE_BRIGADIER);
 
         return brigadiers.stream().map(UserDto::new).collect(Collectors.toList());
     }
@@ -290,7 +284,7 @@ public class OrderServiceImpl implements OrderService {
            );
 
            // Создаем уведомление
-           notificationService.createNotification(order, client, notificationMessage);
+           notificationPort.notifyOrderStatus(order, client, notificationMessage);
 
        } catch (IllegalArgumentException e) {
            throw new RuntimeException("Invalid order status: " + status);
@@ -308,8 +302,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrdersForBrigadier(String username) {
-        User brigadier = userRepository.findUserByUsername(username)
-                .orElseThrow(NotFoundException::new);
+        User brigadier = userAccessPort.findByUsername(username);
+        if (brigadier == null) {
+            throw new NotFoundException();
+        }
         List<Order> orders = orderRepository.findByBrigadierId(brigadier.getId());
         return orders.stream()
                 .map(order -> mapper.map(order, OrderDto.class))
@@ -335,7 +331,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void assignMasters(Long orderId, List<Long> masterIds) {
         Order order = orderRepository.findById(orderId).orElseThrow();
-        List<User> masters = userRepository.findAllById(masterIds);
+        List<User> masters = userAccessPort.findAllByIds(masterIds);
         order.setAssignedMasters(masters);
         orderRepository.save(order);
     }

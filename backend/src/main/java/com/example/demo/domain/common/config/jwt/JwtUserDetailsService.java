@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.users.port.UserAccessPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,18 +13,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.domain.users.repo.UserRepository;
-
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
-    UserRepository userRepository;
+    UserAccessPort userAccessPort;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByUsernameWithStatusOne(username);
+        User user = userAccessPort.findActiveByUsername(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");

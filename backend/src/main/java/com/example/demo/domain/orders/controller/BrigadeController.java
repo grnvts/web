@@ -1,17 +1,17 @@
 package com.example.demo.domain.orders.controller;
 
-import com.example.demo.domain.users.dto.UserDto;
 import com.example.demo.domain.orders.dto.BrigadeDto;
 import com.example.demo.domain.orders.model.Brigade;
-import com.example.demo.domain.users.model.User;
 import com.example.demo.domain.orders.repo.BrigadeRepository;
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.dto.UserDto;
+import com.example.demo.domain.users.model.User;
+import com.example.demo.domain.users.port.UserAccessPort;
 import com.example.demo.domain.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class BrigadeController {
 
     private final BrigadeRepository brigadeRepository;
-    private final UserRepository userRepository;
+    private final UserAccessPort userAccessPort;
     private final UserService userService;
 
     @Operation(summary = "Get brigade masters", description = "Retrieve all masters in a specific brigade")
@@ -41,7 +41,8 @@ public class BrigadeController {
     public ResponseEntity<?> addMasterToBrigade(@PathVariable Long brigadeId, @RequestBody Map<String, Long> body) {
         Long userId = body.get("userId");
         Brigade brigade = brigadeRepository.findById(brigadeId).orElseThrow();
-        User master = userRepository.findById(userId).orElseThrow();
+        User master = userAccessPort.findById(userId);
+        if (master == null) throw new RuntimeException("User not found");
         if (!brigade.getMasters().contains(master)) {
             brigade.getMasters().add(master);
             brigadeRepository.save(brigade);
@@ -55,7 +56,8 @@ public class BrigadeController {
     public ResponseEntity<?> removeMasterFromBrigade(@PathVariable Long brigadeId, @RequestBody Map<String, Long> body) {
         Long userId = body.get("userId");
         Brigade brigade = brigadeRepository.findById(brigadeId).orElseThrow();
-        User master = userRepository.findById(userId).orElseThrow();
+        User master = userAccessPort.findById(userId);
+        if (master == null) throw new RuntimeException("User not found");
         brigade.getMasters().remove(master);
         brigadeRepository.save(brigade);
         return ResponseEntity.ok().build();
@@ -74,8 +76,8 @@ public class BrigadeController {
     @GetMapping("/my/masters")
     @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public List<UserDto> getMyBrigadeMasters(Authentication authentication) {
-        User brigadier = userRepository.findUserByUsername(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User brigadier = userAccessPort.findByUsername(authentication.getName());
+        if (brigadier == null) throw new RuntimeException("User not found");
         Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
                 .orElseThrow(() -> new RuntimeException("Brigade not found for brigadier"));
         return brigade.getMasters().stream().map(UserDto::new).collect(Collectors.toList());
@@ -86,11 +88,13 @@ public class BrigadeController {
     @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public ResponseEntity<?> removeMasterFromMyBrigade(@RequestBody Map<String, Long> body, Authentication authentication) {
         String username = authentication.getName();
-        User brigadier = userRepository.findByUsername(username);
+        User brigadier = userAccessPort.findByUsername(username);
+        if (brigadier == null) throw new RuntimeException("User not found");
         Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
                 .orElseThrow(() -> new RuntimeException("Brigade not found for brigadier"));
         Long userId = body.get("userId");
-        User master = userRepository.findById(userId).orElseThrow();
+        User master = userAccessPort.findById(userId);
+        if (master == null) throw new RuntimeException("User not found");
         brigade.getMasters().remove(master);
         brigadeRepository.save(brigade);
         return ResponseEntity.ok().build();
@@ -101,11 +105,13 @@ public class BrigadeController {
     @PreAuthorize("hasRole('ROLE_BRIGADIER')")
     public ResponseEntity<?> addMasterToMyBrigade(@RequestBody Map<String, Long> body, Authentication authentication) {
         String username = authentication.getName();
-        User brigadier = userRepository.findByUsername(username);
+        User brigadier = userAccessPort.findByUsername(username);
+        if (brigadier == null) throw new RuntimeException("User not found");
         Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
                 .orElseThrow(() -> new RuntimeException("Brigade not found for brigadier"));
         Long userId = body.get("userId");
-        User master = userRepository.findById(userId).orElseThrow();
+        User master = userAccessPort.findById(userId);
+        if (master == null) throw new RuntimeException("User not found");
         if (!brigade.getMasters().contains(master)) {
             brigade.getMasters().add(master);
             brigadeRepository.save(brigade);

@@ -9,7 +9,7 @@ import com.example.demo.domain.common.config.jwt.JwtResponse;
 import com.example.demo.domain.common.config.jwt.JwtTokenUtil;
 import com.example.demo.domain.common.config.jwt.JwtUserDetailsService;
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.port.UserAccessPort;
 import com.example.demo.domain.auth.service.RecaptchaService;
 import com.example.demo.domain.common.util.ApiPaths;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public class JwtAuthenticationController {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private final UserRepository userRepository;
+    private final UserAccessPort userAccessPort;
 
     @Autowired
     private final JwtUserDetailsService userDetailsService;
@@ -73,7 +73,7 @@ public class JwtAuthenticationController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtTokenUtil.generateToken(authentication);
             String username = authenticationRequest.getUsername();
-            User user = userRepository.findByUsername(username);
+            User user = userAccessPort.findByUsername(username);
             Set<String> roleNames = user.getRoles().stream()
                     .map(role -> role.getName().name())
                     .collect(Collectors.toSet());
