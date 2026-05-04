@@ -1,10 +1,14 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.orders.model.Order;
+import com.example.demo.domain.orders.port.AddressRepositoryPort;
+import com.example.demo.domain.orders.port.BrigadeRepositoryPort;
+import com.example.demo.domain.orders.port.NotificationPort;
+import com.example.demo.domain.orders.port.OrderRepositoryPort;
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.orders.repo.OrderRepository;
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.port.UserAccessPort;
 import com.example.demo.domain.orders.service.impl.OrderServiceImpl;
+import org.modelmapper.ModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,10 +29,21 @@ public class OrderServiceAssignMastersTest {
     private OrderServiceImpl orderService;
 
     @Mock
-    private OrderRepository orderRepository;
+    private OrderRepositoryPort orderRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserAccessPort userAccessPort;
+
+    @Mock
+    private NotificationPort notificationPort;
+
+    @Mock
+    private BrigadeRepositoryPort brigadeRepository;
+
+    @Mock
+    private AddressRepositoryPort addressRepository;
+
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Test
     public void testAssignMasters() {
@@ -50,7 +65,16 @@ public class OrderServiceAssignMastersTest {
         List<User> masters = Arrays.asList(master1, master2);
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-        when(userRepository.findAllById(masterIds)).thenReturn(masters);
+        when(userAccessPort.findAllByIds(masterIds)).thenReturn(masters);
+
+        orderService = new OrderServiceImpl(
+                orderRepository,
+                userAccessPort,
+                modelMapper,
+                notificationPort,
+                brigadeRepository,
+                addressRepository
+        );
 
         // Act
         orderService.assignMasters(orderId, masterIds);

@@ -42,6 +42,7 @@ public class WebSecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
@@ -52,6 +53,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/orders").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/orders/brigadier/my").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/orders/brigadier").authenticated()
+                        .requestMatchers("/api/reviews/**").authenticated()
+                        .requestMatchers("/api/notifications/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/brigade/all").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/user/masters").hasAnyRole("ADMIN", "BRIGADIER")
                         .requestMatchers("/api/user/**").authenticated()

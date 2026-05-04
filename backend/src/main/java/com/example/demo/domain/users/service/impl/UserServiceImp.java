@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.example.demo.domain.orders.model.Brigade;
+import com.example.demo.domain.users.dto.QualificationDto;
 import com.example.demo.domain.users.model.Qualification;
 import com.example.demo.domain.users.model.Role;
 import com.example.demo.domain.users.model.RoleName;
@@ -17,9 +18,9 @@ import jakarta.validation.Valid;
 import com.example.demo.domain.orders.dto.CreateMasterDto;
 import com.example.demo.domain.common.error.BadRequestException;
 import com.example.demo.domain.common.error.ForbiddenException;
-import com.example.demo.domain.orders.repo.BrigadeRepository;
-import com.example.demo.domain.users.repo.QualificationRepository;
-import com.example.demo.domain.users.repo.RoleRepository;
+import com.example.demo.domain.orders.port.BrigadeRepositoryPort;
+import com.example.demo.domain.users.port.QualificationRepositoryPort;
+import com.example.demo.domain.users.port.RoleRepositoryPort;
 import com.example.demo.domain.users.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -33,21 +34,21 @@ import com.example.demo.domain.users.dto.UserDto;
 import com.example.demo.domain.users.dto.UserUpdateDto;
 import com.example.demo.domain.common.error.NotFoundException;
 import com.example.demo.domain.common.util.file.FileService;
-import com.example.demo.domain.users.repo.UserRepository;
+import com.example.demo.domain.users.port.UserRepositoryPort;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService {
-    private final UserRepository repository;
+    private final UserRepositoryPort repository;
     private final ModelMapper mapper;
     private final Logger logger;
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
-    private final RoleRepository roleRepository;
-    private final QualificationRepository qualificationRepository;
-    private final BrigadeRepository brigadeRepository;
+    private final RoleRepositoryPort roleRepository;
+    private final QualificationRepositoryPort qualificationRepository;
+    private final BrigadeRepositoryPort brigadeRepository;
 
     private final String[] allowedImageTypes = {"image/png", "image/jpeg"};
 
@@ -240,6 +241,30 @@ public class UserServiceImp implements UserService {
                 .filter(user -> user.getRoles().stream()
                         .anyMatch(role -> role.getName().equals(RoleName.ROLE_MASTER)))
                 .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findAllByRole(String roleName) {
+        RoleName parsedRole;
+        try {
+            parsedRole = RoleName.valueOf(roleName);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Unknown role: " + roleName);
+        }
+
+        return repository.findAll().stream()
+                .filter(user -> user.getStatus() != null && user.getStatus() == 1)
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getName().equals(parsedRole)))
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QualificationDto> getAllQualifications() {
+        return qualificationRepository.findAll().stream()
+                .map(q -> new QualificationDto(q.getId(), q.getName()))
                 .collect(Collectors.toList());
     }
 

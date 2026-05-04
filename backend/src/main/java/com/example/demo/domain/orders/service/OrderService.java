@@ -21,13 +21,13 @@ public interface OrderService {
     List<UserDto> getAllBrigadiers();
     List<OrderDto> getOrdersForBrigadier(String username);
     @Transactional
-    void updateOrderStatus(Long id, String status, String message);
+    void updateOrderStatus(Long id, String username, String status, String message);
     List<OrderDto> getActiveOrdersForBrigadier(String username);
     Order getOrderEntity(Long orderId);
 
     List<UserDto> getBrigadeMasters(Long brigadeId);
     void assignMasters(Long orderId, List<Long> masterIds);
 
-    List<UserDto> getAssignedMasters(Long orderId);
-    Order addExpense(Long orderId, Double amount);
+    List<UserDto> getAssignedMasters(Long orderId, String username);
+    Order addExpense(Long orderId, String username, Double amount);
 }

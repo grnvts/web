@@ -1,0 +1,121 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Функциональная модель" id="0">
+    <mxGraphModel dx="2020" dy="1061" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="in1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;" value="Заявка клиента&#xa;на ремонт" vertex="1">
+          <mxGeometry height="80" width="180" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="in2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;" value="Данные пользователя&#xa;и адрес объекта" vertex="1">
+          <mxGeometry height="80" width="220" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Правила обработки&#xa;заказов" vertex="1">
+          <mxGeometry height="60" width="170" x="270" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Роли и права&#xa;доступа" vertex="1">
+          <mxGeometry height="60" width="150" x="610" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Статусы заказов&#xa;и сценарии работы" vertex="1">
+          <mxGeometry height="60" width="190" x="820" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Настройки&#xa;уведомлений" vertex="1">
+          <mxGeometry height="60" width="160" x="1100" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="mech1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Клиентское приложение&#xa;Flutter" vertex="1">
+          <mxGeometry height="70" width="190" x="230" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="mech2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Spring Boot API" vertex="1">
+          <mxGeometry height="40" width="160" x="560" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="mech3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="База данных&#xa;PostgreSQL" vertex="1">
+          <mxGeometry height="70" width="170" x="900" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="mech4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;" value="Сервисы карт и&#xa;формирования PDF" vertex="1">
+          <mxGeometry height="70" width="190" x="1220" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="out1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;" value="Созданный заказ&#xa;и данные клиента" vertex="1">
+          <mxGeometry height="80" width="220" x="1680" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="out2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;" value="Актуальные уведомления,&#xa;статусы и отчеты" vertex="1">
+          <mxGeometry height="80" width="220" x="1680" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=24;spacingTop=16;" value="Принять и&#xa;валидировать&#xa;заявку" vertex="1">
+          <mxGeometry height="150" width="230" x="240" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=24;spacingTop=16;" value="Зарегистрировать&#xa;адрес и заказ" vertex="1">
+          <mxGeometry height="150" width="230" x="540" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=24;spacingTop=16;" value="Назначить&#xa;бригадира и&#xa;мастеров" vertex="1">
+          <mxGeometry height="150" width="230" x="860" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="b4" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=24;spacingTop=16;" value="Обновлять&#xa;состояние заказа" vertex="1">
+          <mxGeometry height="150" width="230" x="860" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="b5" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=24;spacingTop=16;" value="Формировать&#xa;уведомления и&#xa;сообщения" vertex="1">
+          <mxGeometry height="150" width="230" x="1180" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="b6" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=24;spacingTop=16;" value="Отобразить&#xa;результаты в&#xa;интерфейсе" vertex="1">
+          <mxGeometry height="150" width="230" x="1480" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="b1" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="b2" target="b3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="b3" target="b5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="b2" target="b4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="b4" target="b5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="b5" target="b6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="b4" target="b6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inEdge1" edge="1" parent="1" source="in1" style="endArrow=classic;html=1;" target="b1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inEdge2" edge="1" parent="1" source="in2" style="endArrow=classic;html=1;" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrlEdge1" edge="1" parent="1" source="ctrl1" style="endArrow=classic;html=1;rounded=1;" target="b1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrlEdge2" edge="1" parent="1" source="ctrl2" style="endArrow=classic;html=1;rounded=1;" target="b3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrlEdge3" edge="1" parent="1" source="ctrl3" style="endArrow=classic;html=1;rounded=1;" target="b4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrlEdge4" edge="1" parent="1" source="ctrl4" style="endArrow=classic;html=1;rounded=1;" target="b5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mechEdge1" edge="1" parent="1" source="mech1" style="endArrow=classic;html=1;rounded=1;" target="b1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mechEdge2" edge="1" parent="1" source="mech2" style="endArrow=classic;html=1;rounded=1;" target="b4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mechEdge3" edge="1" parent="1" source="mech3" style="endArrow=classic;html=1;rounded=1;" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mechEdge4" edge="1" parent="1" source="mech4" style="endArrow=classic;html=1;rounded=1;" target="b6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="outEdge1" edge="1" parent="1" source="b3" style="endArrow=classic;html=1;" target="out1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="outEdge2" edge="1" parent="1" source="b6" style="endArrow=classic;html=1;" target="out2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

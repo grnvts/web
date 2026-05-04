@@ -7,8 +7,11 @@ import com.example.demo.domain.users.model.User;
 import java.util.List;
 
 public interface NotificationService {
-    public void createNotification(Order order, User user, String message);
+    void createNotification(Order order, User user, String message);
+
     List<NotificationDto> getNotificationsForUser(Long userId);
 
+    void markAsRead(Long notificationId, Long userId);
 
+    long getUnreadCount(Long userId);
 }

@@ -1,47 +1,45 @@
 package com.example.demo.domain.orders.service.impl;
 
+import com.example.demo.domain.common.error.BadRequestException;
+import com.example.demo.domain.common.error.ForbiddenException;
+import com.example.demo.domain.common.error.NotFoundException;
+import com.example.demo.domain.orders.dto.AddressDto;
+import com.example.demo.domain.orders.dto.OrderDto;
 import com.example.demo.domain.orders.model.Address;
 import com.example.demo.domain.orders.model.Brigade;
 import com.example.demo.domain.orders.model.Order;
 import com.example.demo.domain.orders.model.OrderStatus;
-import com.example.demo.domain.orders.repo.AddressRepository;
-import com.example.demo.domain.orders.repo.BrigadeRepository;
-import com.example.demo.domain.orders.repo.OrderRepository;
+import com.example.demo.domain.orders.port.AddressRepositoryPort;
+import com.example.demo.domain.orders.port.BrigadeRepositoryPort;
+import com.example.demo.domain.orders.port.NotificationPort;
+import com.example.demo.domain.orders.port.OrderRepositoryPort;
+import com.example.demo.domain.orders.service.OrderService;
+import com.example.demo.domain.users.dto.UserDto;
 import com.example.demo.domain.users.model.RoleName;
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.orders.port.NotificationPort;
 import com.example.demo.domain.users.port.UserAccessPort;
-import com.example.demo.domain.orders.dto.AddressDto;
-import com.example.demo.domain.orders.dto.OrderDto;
-import com.example.demo.domain.users.dto.UserDto;
-import com.example.demo.domain.common.error.BadRequestException;
-import com.example.demo.domain.common.error.NotFoundException;
-import com.example.demo.domain.common.error.ForbiddenException;
-import com.example.demo.domain.orders.service.OrderService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository orderRepository;
+    private final OrderRepositoryPort orderRepository;
     private final UserAccessPort userAccessPort;
     private final ModelMapper mapper;
     private final NotificationPort notificationPort;
-    private final BrigadeRepository brigadeRepository;
-    @Autowired
-    private AddressRepository addressRepository;
-
+    private final BrigadeRepositoryPort brigadeRepository;
+    private final AddressRepositoryPort addressRepository;
 
     @Override
     @Transactional
@@ -67,15 +65,15 @@ public class OrderServiceImpl implements OrderService {
         order.setStartDate(dto.getStartDate());
 
         Order saved = orderRepository.save(order);
-
         return toDto(saved);
     }
-
 
     @Override
     public List<OrderDto> getOrdersForClient(String username) {
         User user = userAccessPort.findActiveByUsername(username);
-        return orderRepository.findByClient(user).stream().map(this::toDto).collect(Collectors.toList());
+        return orderRepository.findByClient(user).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -83,11 +81,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByIdWithBrigadier(id)
                 .orElseThrow(NotFoundException::new);
 
-        // Проверяем, является ли пользователь владельцем заказа, бригадиром или администратором
         boolean isClient = order.getClient().getUsername().equals(username);
-        boolean isBrigadier = order.getBrigade() != null && order.getBrigade().getBrigadier() != null && order.getBrigade().getBrigadier().getUsername().equals(username);
-        boolean isAdmin = userAccessPort.findByUsername(username).getRoles().stream()
-                .anyMatch(role -> role.getName() == RoleName.ROLE_ADMIN);
+        boolean isBrigadier = order.getBrigade() != null
+                && order.getBrigade().getBrigadier() != null
+                && order.getBrigade().getBrigadier().getUsername().equals(username);
+        User requester = userAccessPort.findByUsername(username);
+        if (requester == null) {
+            throw new NotFoundException();
+        }
+        boolean isAdmin = hasRole(requester, RoleName.ROLE_ADMIN);
 
         if (!isClient && !isBrigadier && !isAdmin) {
             throw new ForbiddenException("Access denied: You do not have permission to view this order");
@@ -110,7 +112,6 @@ public class OrderServiceImpl implements OrderService {
             dto.setBrigadeId(order.getBrigade().getId());
             dto.setBrigadeNumber(order.getBrigade().getNumber());
             if (order.getBrigade().getBrigadier() != null) {
-
                 dto.setBrigadierUsername(order.getBrigade().getBrigadier().getUsername());
                 dto.setBrigadierName(order.getBrigade().getBrigadier().getName());
                 dto.setBrigadierSurname(order.getBrigade().getBrigadier().getSurname());
@@ -119,24 +120,7 @@ public class OrderServiceImpl implements OrderService {
                 dto.setBrigadierId(order.getBrigade().getBrigadier().getId());
             }
         }
-//        dto.setAssignedMasters(
-//                order.getAssignedMasters().stream()
-//                        .map(UserDto::new)
-//                        .collect(Collectors.toList())
-//        );
 
-
-
-//        if (order.getBrigadier() != null) {
-//            dto.setBrigadierId(order.getBrigadier().getId() );
-//            dto.setBrigadierUsername(order.getBrigadier().getUsername());
-//            dto.setBrigadierName(order.getBrigadier().getName());
-//            dto.setBrigadierSurname(order.getBrigadier().getSurname());
-//            dto.setBrigadierPatronymic(order.getBrigadier().getPatronymic());
-//            dto.setBrigadierPhone(order.getBrigadier().getPhone());
-//        }
-
-        // Convert Address entity to AddressDto
         Address address = order.getAddress();
         if (address != null) {
             AddressDto addressDto = new AddressDto(order.getAddress());
@@ -158,23 +142,23 @@ public class OrderServiceImpl implements OrderService {
 
         return dto;
     }
+
     @Override
     public void assignBrigadier(Long orderId, String brigadierUsername) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(NotFoundException::new);
 
         User brigadier = userAccessPort.findByUsername(brigadierUsername);
-        if (brigadier == null || brigadier.getRoles().stream().noneMatch(role -> role.getName() == RoleName.ROLE_BRIGADIER)) {
+        if (brigadier == null || !hasRole(brigadier, RoleName.ROLE_BRIGADIER)) {
             throw new BadRequestException("Invalid brigadier");
         }
 
         Brigade brigade = brigadeRepository.findByBrigadier(brigadier)
-                .orElseThrow(() -> new NotFoundException());
+                .orElseThrow(NotFoundException::new);
 
         order.setBrigade(brigade);
         orderRepository.save(order);
     }
-
 
     @Override
     @Transactional
@@ -182,29 +166,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
 
-        // Обновляем тип услуги
         order.setServiceType(updatedOrder.getServiceType());
-
-        // Обновляем детали заказа
         order.setOrderDetails(updatedOrder.getOrderDetails());
-
-        // Обновляем статус
         order.setStatus(updatedOrder.getStatus());
 
-        // Обновляем дату начала и окончания
         if (updatedOrder.getStartDate() != null) {
             order.setStartDate(updatedOrder.getStartDate());
         }
         if (updatedOrder.getEndDate() != null) {
             order.setEndDate(updatedOrder.getEndDate());
         }
-
-        // Обновляем цену
         if (updatedOrder.getPrice() != null) {
             order.setPrice(updatedOrder.getPrice());
         }
 
-        // Обновляем адрес
         if (updatedOrder.getAddress() != null) {
             Address address = order.getAddress();
             AddressDto addressDto = updatedOrder.getAddress();
@@ -215,7 +190,6 @@ public class OrderServiceImpl implements OrderService {
             addressRepository.save(address);
         }
 
-        // Обновляем бригадира
         if (updatedOrder.getBrigadierUsername() != null) {
             User brigadier = userAccessPort.findByUsername(updatedOrder.getBrigadierUsername());
             if (brigadier != null) {
@@ -226,17 +200,13 @@ public class OrderServiceImpl implements OrderService {
                 } else {
                     order.getBrigade().setBrigadier(brigadier);
                 }
-            } else {
-                if (order.getBrigade() != null) {
-                    order.getBrigade().setBrigadier(null);
-                }
+            } else if (order.getBrigade() != null) {
+                order.getBrigade().setBrigadier(null);
             }
         }
 
         orderRepository.save(order);
     }
-
-//
 
     @Override
     public List<OrderDto> getAllOrders() {
@@ -245,51 +215,51 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public Map<String, Long> getOrderCountPerDay(String username, LocalDate start, LocalDate end) {
         return orderRepository.countOrdersByBrigadierPerDay(username, start, end)
                 .stream()
                 .map(row -> (Object[]) row)
                 .collect(Collectors.toMap(
-                        row -> row[0].toString(),         // дата как строка
-                        row -> ((Number) row[1]).longValue() // кол-во заказов
+                        row -> row[0].toString(),
+                        row -> ((Number) row[1]).longValue()
                 ));
     }
+
     @Override
     public List<UserDto> getAllBrigadiers() {
-        List<User> brigadiers = userAccessPort.findAllByRole(RoleName.ROLE_BRIGADIER);
-
-        return brigadiers.stream().map(UserDto::new).collect(Collectors.toList());
+        return userAccessPort.findAllByRole(RoleName.ROLE_BRIGADIER).stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
     }
-   @Override
-   @Transactional
-   public void updateOrderStatus(Long id, String status, String message) {
-       Order order = orderRepository.findById(id)
-               .orElseThrow(() -> new RuntimeException("Order not found"));
 
-       User client = order.getClient(); // Получаем клиента заказа
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long id, String username, String status, String message) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        User requester = userAccessPort.findByUsername(username);
+        if (requester == null) {
+            throw new ForbiddenException("Unknown requester");
+        }
 
-       try {
-           OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-           order.setStatus(orderStatus);
-           orderRepository.save(order);
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            validateStatusUpdatePermission(order, requester, orderStatus);
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
 
-           // Формируем сообщение для уведомления
-           String notificationMessage = String.format(
-                   "Order #%d status changed to %s. %s",
-                   order.getId(),
-                   orderStatus.name(),
-                   message != null ? message : ""
-           );
-
-           // Создаем уведомление
-           notificationPort.notifyOrderStatus(order, client, notificationMessage);
-
-       } catch (IllegalArgumentException e) {
-           throw new RuntimeException("Invalid order status: " + status);
-       }
-   }
+            String notificationMessage = String.format(
+                    "Order #%d status changed to %s. %s",
+                    order.getId(),
+                    orderStatus.name(),
+                    message != null ? message : ""
+            );
+            notificationPort.notifyOrderStatus(order, order.getClient(), notificationMessage);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+    }
 
     @Override
     public List<OrderDto> getActiveOrdersForBrigadier(String username) {
@@ -306,11 +276,9 @@ public class OrderServiceImpl implements OrderService {
         if (brigadier == null) {
             throw new NotFoundException();
         }
-        List<Order> orders = orderRepository.findByBrigadierId(brigadier.getId());
-        return orders.stream()
+        return orderRepository.findByBrigadierId(brigadier.getId()).stream()
                 .map(order -> mapper.map(order, OrderDto.class))
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -318,8 +286,6 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(orderId)
                 .orElseThrow(NotFoundException::new);
     }
-
-
 
     @Override
     public List<UserDto> getBrigadeMasters(Long brigadeId) {
@@ -337,11 +303,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<UserDto> getAssignedMasters(Long orderId) {
+    public List<UserDto> getAssignedMasters(Long orderId, String username) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(NotFoundException::new);
+        User requester = userAccessPort.findByUsername(username);
+        if (requester == null) {
+            throw new ForbiddenException("Unknown requester");
+        }
 
-        // Доступ проверяется на уровне контроллера/безопасности
+        boolean isAdmin = hasRole(requester, RoleName.ROLE_ADMIN);
+        boolean isBrigadier = order.getBrigade() != null
+                && order.getBrigade().getBrigadier() != null
+                && order.getBrigade().getBrigadier().getId() != null
+                && order.getBrigade().getBrigadier().getId().equals(requester.getId());
+        boolean isClientOwner = order.getClient() != null
+                && order.getClient().getId() != null
+                && order.getClient().getId().equals(requester.getId());
+        if (!isAdmin && !isBrigadier && !isClientOwner) {
+            throw new ForbiddenException("You are not allowed to view assigned masters for this order");
+        }
 
         return order.getAssignedMasters().stream()
                 .map(this::mapToUserDto)
@@ -361,19 +341,73 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order addExpense(Long orderId, Double amount) {
+    public Order addExpense(Long orderId, String username, Double amount) {
         if (amount == null || amount <= 0) {
             throw new BadRequestException("Некорректная сумма расходов");
         }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(NotFoundException::new);
+        User requester = userAccessPort.findByUsername(username);
+        if (requester == null) {
+            throw new ForbiddenException("Unknown requester");
+        }
+        validateExpensePermission(order, requester);
 
-        order.setPrice(order.getPrice().add(BigDecimal.valueOf(amount)));
+        BigDecimal currentPrice = order.getPrice() != null ? order.getPrice() : BigDecimal.ZERO;
+        order.setPrice(currentPrice.add(BigDecimal.valueOf(amount)));
         orderRepository.save(order);
 
         return order;
     }
 
+    private void validateStatusUpdatePermission(Order order, User requester, OrderStatus targetStatus) {
+        if (hasRole(requester, RoleName.ROLE_ADMIN)) {
+            return;
+        }
 
+        boolean isClientOwner = order.getClient() != null
+                && order.getClient().getId() != null
+                && order.getClient().getId().equals(requester.getId());
+        if (isClientOwner) {
+            if (order.getStatus() != OrderStatus.COMPLETED) {
+                throw new ForbiddenException("Client can only approve or reject completed work");
+            }
+            if (Set.of(OrderStatus.APPROVED, OrderStatus.REJECTED).contains(targetStatus)) {
+                return;
+            }
+            throw new ForbiddenException("Client can only approve or reject completed work");
+        }
+
+        boolean isAssignedBrigadier = order.getBrigade() != null
+                && order.getBrigade().getBrigadier() != null
+                && order.getBrigade().getBrigadier().getId() != null
+                && order.getBrigade().getBrigadier().getId().equals(requester.getId());
+        if (isAssignedBrigadier) {
+            if (Set.of(OrderStatus.IN_PROGRESS, OrderStatus.COMPLETED).contains(targetStatus)) {
+                return;
+            }
+            throw new ForbiddenException("Brigadier can only start or complete assigned orders");
+        }
+
+        throw new ForbiddenException("You are not allowed to update this order status");
+    }
+
+    private void validateExpensePermission(Order order, User requester) {
+        if (hasRole(requester, RoleName.ROLE_ADMIN)) {
+            return;
+        }
+
+        boolean isAssignedBrigadier = order.getBrigade() != null
+                && order.getBrigade().getBrigadier() != null
+                && order.getBrigade().getBrigadier().getId() != null
+                && order.getBrigade().getBrigadier().getId().equals(requester.getId());
+        if (!isAssignedBrigadier) {
+            throw new ForbiddenException("Only admin or assigned brigadier can add expenses");
+        }
+    }
+
+    private boolean hasRole(User user, RoleName roleName) {
+        return user.getRoles().stream().anyMatch(role -> role.getName() == roleName);
+    }
 }

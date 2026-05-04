@@ -1,0 +1,120 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Контекстная модель из 6 блоков" id="0">
+    <mxGraphModel dx="2357" dy="1238" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="func" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;shadow=1;fontSize=34;align=center;verticalAlign=middle;spacing=8;fontFamily=GOST type B;strokeWidth=2;" value="Обеспечить управление&#xa;оказанием услуги по ремонту&#xa;помещения" vertex="1">
+          <mxGeometry height="420" width="760" x="860" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="in1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Заявка клиента&#xa;на ремонт" vertex="1">
+          <mxGeometry height="80" width="230" x="280" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="in2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="ТЗ на ремонт" vertex="1">
+          <mxGeometry height="60" width="210" x="300" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="in3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Исходные данные&#xa;об объекте" vertex="1">
+          <mxGeometry height="80" width="260" x="300" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Бизнес-правила&#xa;оформления заказа" vertex="1">
+          <mxGeometry height="80" width="240" x="700" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Роли и права&#xa;доступа" vertex="1">
+          <mxGeometry height="80" width="190" x="930" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Статусы заказа" vertex="1">
+          <mxGeometry height="60" width="180" x="1110" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Правила&#xa;уведомлений" vertex="1">
+          <mxGeometry height="70" width="190" x="1280" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=30;fontFamily=GOST type B;strokeWidth=2;" value="Правила формирования&#xa;отчётов" vertex="1">
+          <mxGeometry height="80" width="230" x="1470" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=27;fontFamily=GOST type B;strokeWidth=2;" value="Клиентское&#xa;приложение" vertex="1">
+          <mxGeometry height="80" width="200" x="810" y="1015" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=27;fontFamily=GOST type B;strokeWidth=2;" value="Spring Boot API" vertex="1">
+          <mxGeometry height="50" width="180" x="990" y="1005" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=27;fontFamily=GOST type B;strokeWidth=2;" value="База данных" vertex="1">
+          <mxGeometry height="50" width="170" x="1160" y="1005" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=27;fontFamily=GOST type B;strokeWidth=2;" value="Система ролей&#xa;и авторизации" vertex="1">
+          <mxGeometry height="80" width="220" x="1320" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="out1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=29;fontFamily=GOST type B;strokeWidth=2;" value="&lt;font&gt;Созданный заказ,&lt;br&gt;адрес и данные клиента&lt;/font&gt;&lt;div&gt;&lt;font&gt;уведомления, сообщения,&lt;br&gt;отчёты и отображение&lt;br&gt;результатов&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="320" x="1770" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="e_in1" edge="1" parent="1" source="in1" style="endArrow=classic;html=1;entryX=0;entryY=0.298;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="860" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_in2" edge="1" parent="1" source="in2" style="endArrow=classic;html=1;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="860" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_in3" edge="1" parent="1" source="in3" style="endArrow=classic;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="860" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_c1" edge="1" parent="1" source="c1" style="endArrow=classic;html=1;entryX=0.026;entryY=0.005;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="930" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_c2" edge="1" parent="1" source="c2" style="endArrow=classic;html=1;exitX=0.604;exitY=0.942;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1050" y="340" />
+            </Array>
+            <mxPoint x="1000" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_c3" edge="1" parent="1" source="c3" style="endArrow=classic;html=1;entryX=0.449;entryY=-0.007;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1170" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_c4" edge="1" parent="1" source="c4" style="endArrow=classic;html=1;entryX=0.677;entryY=-0.007;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1325" y="337" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_c5" edge="1" parent="1" source="c5" style="endArrow=classic;html=1;entryX=0.956;entryY=0.001;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1450" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_m1" edge="1" parent="1" source="m1" style="endArrow=classic;html=1;entryX=0.068;entryY=1.005;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1030" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_m2" edge="1" parent="1" source="m2" style="endArrow=classic;html=1;entryX=0.291;entryY=0.997;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1130" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_m3" edge="1" parent="1" source="m3" style="endArrow=classic;html=1;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1240" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_m4" edge="1" parent="1" source="m4" style="endArrow=classic;html=1;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="func">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1360" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_out1" edge="1" parent="1" source="func" style="endArrow=classic;html=1;fontFamily=GOST type B;fontSize=25;strokeWidth=3;" target="out1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1620" y="345" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

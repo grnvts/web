@@ -7,8 +7,6 @@ import com.example.demo.domain.users.dto.UserDto;
 import com.example.demo.domain.users.dto.UserUpdateDto;
 import jakarta.validation.Valid;
 
-import com.example.demo.domain.users.model.Qualification;
-import com.example.demo.domain.users.repo.QualificationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,7 +22,6 @@ import com.example.demo.domain.common.util.ApiPaths;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.Operation;
 import com.example.demo.domain.common.config.jwt.JwtUserDetails;
@@ -35,7 +32,6 @@ import com.example.demo.domain.common.config.jwt.JwtUserDetails;
 @CrossOrigin
 public class UserApi {
     private final UserService service;
-    private final QualificationRepository qualificationRepository;
 
     @Operation(summary = "Get all users", description = "Retrieve a paginated list of all users")
     @PreAuthorize("hasRole('ADMIN')")
@@ -100,18 +96,18 @@ public class UserApi {
         return service.findAllMasters();
     }
 
+    @Operation(summary = "Get all admins", description = "Retrieve a list of all admins")
+    @GetMapping("/admins")
+    @PreAuthorize("isAuthenticated()")
+    public List<UserDto> getAllAdmins() {
+        return service.findAllByRole("ROLE_ADMIN");
+    }
+
     @Operation(summary = "Get all qualifications", description = "Retrieve a list of all qualifications")
     @GetMapping("/qualifications")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<QualificationDto>> getAllQualifications() {
-        List<Qualification> qualifications = qualificationRepository.findAll();
-        System.out.println("Найдено квалификаций: " + qualifications.size());
-
-        List<QualificationDto> qualificationDtos = qualifications.stream()
-                .map(q -> new QualificationDto(q.getId(), q.getName()))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(qualificationDtos);
+        return ResponseEntity.ok(service.getAllQualifications());
     }
 
     @Operation(summary = "Create a new master", description = "Create a new master with the provided details")

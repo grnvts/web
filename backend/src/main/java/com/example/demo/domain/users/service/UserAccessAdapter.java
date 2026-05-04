@@ -2,8 +2,8 @@ package com.example.demo.domain.users.service;
 
 import com.example.demo.domain.users.model.RoleName;
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.users.repo.UserRepository;
 import com.example.demo.domain.users.port.UserAccessPort;
+import com.example.demo.domain.users.port.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserAccessAdapter implements UserAccessPort {
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepository;
 
     @Override
     public User findActiveByUsername(String username) {

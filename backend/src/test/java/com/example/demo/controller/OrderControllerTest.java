@@ -112,13 +112,17 @@ class OrderControllerTest {
     @Test
     void testUpdateOrderStatus() {
         Long orderId = 1L;
+        JwtUserDetails principal = mock(JwtUserDetails.class);
+        when(principal.getUsername()).thenReturn("client1");
         UpdateStatusRequest request = new UpdateStatusRequest("COMPLETED", "Order completed");
-        doNothing().when(orderService).updateOrderStatus(orderId, "COMPLETED", "Order completed");
+        doNothing().when(orderService)
+                .updateOrderStatus(orderId, "client1", "COMPLETED", "Order completed");
 
-        ResponseEntity<?> response = orderController.updateOrderStatus(orderId, request);
+        ResponseEntity<?> response = orderController.updateOrderStatus(orderId, principal, request);
 
         assertEquals("Order status updated", response.getBody());
-        verify(orderService, times(1)).updateOrderStatus(orderId, "COMPLETED", "Order completed");
+        verify(orderService, times(1))
+                .updateOrderStatus(orderId, "client1", "COMPLETED", "Order completed");
     }
 
     @Test
@@ -150,14 +154,16 @@ class OrderControllerTest {
     @Test
     void testAddExpense() {
         Long orderId = 1L;
+        JwtUserDetails principal = mock(JwtUserDetails.class);
+        when(principal.getUsername()).thenReturn("brigadier1");
         Map<String, Double> body = Map.of("amount", 100.0);
         Order order = new Order();
         OrderDto orderDto = new OrderDto(order);
-        when(orderService.addExpense(orderId, 100.0)).thenReturn(order);
+        when(orderService.addExpense(orderId, "brigadier1", 100.0)).thenReturn(order);
 
-        ResponseEntity<?> response = orderController.addExpense(orderId, body);
+        ResponseEntity<?> response = orderController.addExpense(orderId, principal, body);
 
         assertEquals(orderDto, response.getBody());
-        verify(orderService, times(1)).addExpense(orderId, 100.0);
+        verify(orderService, times(1)).addExpense(orderId, "brigadier1", 100.0);
     }
 }

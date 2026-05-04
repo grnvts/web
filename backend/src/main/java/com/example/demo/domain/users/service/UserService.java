@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.example.demo.domain.orders.dto.CreateMasterDto;
+import com.example.demo.domain.users.dto.QualificationDto;
 import com.example.demo.domain.users.dto.UploadImageDto;
 import com.example.demo.domain.users.dto.UserDto;
 import com.example.demo.domain.users.dto.UserUpdateDto;
@@ -34,4 +35,8 @@ public interface UserService {
 	User getUserEntity(String username);
 
 	List<UserDto> findAllMasters();
+
+	List<UserDto> findAllByRole(String roleName);
+
+	List<QualificationDto> getAllQualifications();
 }

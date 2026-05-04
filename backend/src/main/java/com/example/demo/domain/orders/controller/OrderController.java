@@ -98,9 +98,10 @@ public class OrderController {
     @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN','USER')")
     public ResponseEntity<?> updateOrderStatus(
             @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserDetails user,
             @RequestBody UpdateStatusRequest request
     ) {
-        orderService.updateOrderStatus(id, request.getStatus(), request.getMessage());
+        orderService.updateOrderStatus(id, user.getUsername(), request.getStatus(), request.getMessage());
         return ResponseEntity.ok("Order status updated");
     }
 
@@ -120,9 +121,11 @@ public class OrderController {
 
     @Operation(summary = "Get assigned masters", description = "Retrieve masters assigned to a specific order")
     @GetMapping("/{orderId}/assigned-masters")
-    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN')")
-    public List<UserDto> getAssignedMasters(@PathVariable Long orderId) {
-        return orderService.getAssignedMasters(orderId);
+    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN','USER')")
+    public List<UserDto> getAssignedMasters(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal JwtUserDetails user) {
+        return orderService.getAssignedMasters(orderId, user.getUsername());
     }
 
     @Operation(summary = "Assign masters to an order", description = "Assign masters to a specific order")
@@ -135,11 +138,14 @@ public class OrderController {
 
     @Operation(summary = "Add expense to an order", description = "Add an expense to a specific order")
     @PostMapping("/{orderId}/add-expense")
-    @PreAuthorize("hasRole('BRIGADIER')")
-    public ResponseEntity<?> addExpense(@PathVariable Long orderId, @RequestBody Map<String, Double> body) {
+    @PreAuthorize("hasAnyRole('BRIGADIER','ADMIN')")
+    public ResponseEntity<?> addExpense(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal JwtUserDetails user,
+            @RequestBody Map<String, Double> body) {
         Double amount = body.get("amount");
         try {
-            Order order = orderService.addExpense(orderId, amount);
+            Order order = orderService.addExpense(orderId, user.getUsername(), amount);
             OrderDto dto = new OrderDto(order);
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {

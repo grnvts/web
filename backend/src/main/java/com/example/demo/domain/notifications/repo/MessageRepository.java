@@ -1,6 +1,7 @@
 package com.example.demo.domain.notifications.repo;
 
 import com.example.demo.domain.notifications.model.Message;
+import com.example.demo.domain.notifications.port.MessageRepositoryPort;
 import com.example.demo.domain.orders.model.Order;
 import com.example.demo.domain.users.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 @Repository
-public interface MessageRepository extends JpaRepository<Message, Long> {
+public interface MessageRepository extends JpaRepository<Message, Long>, MessageRepositoryPort {
     List<Message> findByOrderAndRecipient(Order order, User recipient);
     List<Message> findByOrderAndSender(Order order, User sender);
     List<Message> findByOrder(Order order);

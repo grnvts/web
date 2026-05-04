@@ -2,6 +2,7 @@ package com.example.demo.domain.orders.repo;
 
 import com.example.demo.domain.orders.model.Brigade;
 import com.example.demo.domain.orders.model.Order;
+import com.example.demo.domain.orders.port.OrderRepositoryPort;
 import com.example.demo.domain.users.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryPort {
     List<Order> findByClient(User client);
    // List<Order> findByBrigadier(User brigadier);
     List<Order> findByBrigade(Brigade brigade);

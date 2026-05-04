@@ -1,0 +1,180 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Алгоритм обработки заказа" id="0">
+    <mxGraphModel dx="1488" dy="782" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="start" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Начало" vertex="1">
+          <mxGeometry height="50" width="140" x="350" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="step1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Получение данных&#xa;заказа от клиента" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="check1" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Данные заполнены&#xa;корректно?" vertex="1">
+          <mxGeometry height="100" width="200" x="320" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="error1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Возврат ошибки" vertex="1">
+          <mxGeometry height="60" width="170" x="40" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="step2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Получение текущего&#xa;пользователя" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="check2" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Пользователь&#xa;найден?" vertex="1">
+          <mxGeometry height="100" width="200" x="320" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="error2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Возврат ошибки" vertex="1">
+          <mxGeometry height="60" width="170" x="630" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="step3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Создание и сохранение&#xa;адреса" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="check3" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Адрес сохранен&#xa;успешно?" vertex="1">
+          <mxGeometry height="100" width="200" x="320" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="error3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Откат / возврат&#xa;ошибки" vertex="1">
+          <mxGeometry height="60" width="170" x="630" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="step4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Создание заказа и&#xa;заполнение полей" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="step5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Присвоение статуса&#xa;CREATED" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="step6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Сохранение заказа&#xa;в базе данных" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="check4" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Заказ сохранен&#xa;успешно?" vertex="1">
+          <mxGeometry height="100" width="200" x="320" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="error4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Откат / возврат&#xa;ошибки" vertex="1">
+          <mxGeometry height="60" width="170" x="570" y="1120" as="geometry" />
+        </mxCell>
+        <mxCell id="step7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Формирование DTO&#xa;результата" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="1240" as="geometry" />
+        </mxCell>
+        <mxCell id="step8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Возврат данных&#xa;клиенту" vertex="1">
+          <mxGeometry height="60" width="300" x="270" y="1330" as="geometry" />
+        </mxCell>
+        <mxCell id="end" parent="1" style="ellipse;whiteSpace=wrap;html=1;fontFamily=GOST type B;fontSize=20;" value="Конец" vertex="1">
+          <mxGeometry height="50" width="140" x="350" y="1430" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="start" style="fontFamily=GOST type B;fontSize=20;" target="step1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="step1" style="fontFamily=GOST type B;fontSize=20;" target="check1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="check1" style="fontFamily=GOST type B;fontSize=20;" target="error1" value="Нет">
+          <mxGeometry relative="1" x="-0.6364" y="-20" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="check1" style="fontFamily=GOST type B;fontSize=20;" target="step2" value="Да">
+          <mxGeometry relative="1" x="-0.7391" y="20" as="geometry">
+            <mxPoint x="-1" as="offset" />
+            <Array as="points">
+              <mxPoint x="600" y="250" />
+              <mxPoint x="600" y="370" />
+              <mxPoint x="570" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="error1" style="fontFamily=GOST type B;fontSize=20;" target="step1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="250" />
+              <mxPoint x="20" y="130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="step2" style="fontFamily=GOST type B;fontSize=20;" target="check2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="check2" style="fontFamily=GOST type B;fontSize=20;" target="error2" value="Нет">
+          <mxGeometry relative="1" x="-0.8182" y="20" as="geometry">
+            <mxPoint x="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="check2" style="fontFamily=GOST type B;fontSize=20;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="step3" value="Да">
+          <mxGeometry relative="1" x="-0.8065" y="-20" as="geometry">
+            <mxPoint x="-1" as="offset" />
+            <Array as="points">
+              <mxPoint x="200" y="490" />
+              <mxPoint x="200" y="610" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="error2" style="exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontFamily=GOST type B;fontSize=20;" target="end">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="828" y="490" />
+              <mxPoint x="828" y="1455" />
+            </Array>
+            <mxPoint x="827.5" y="530" as="sourcePoint" />
+            <mxPoint x="602.5" y="1465" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="step3" style="fontFamily=GOST type B;fontSize=20;" target="check3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="check3" style="fontFamily=GOST type B;fontSize=20;" target="error3" value="Нет">
+          <mxGeometry relative="1" x="-0.2727" y="20" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="check3" style="fontFamily=GOST type B;fontSize=20;" target="step4" value="Да">
+          <mxGeometry relative="1" x="-0.8286" y="-20" as="geometry">
+            <mxPoint x="-1" as="offset" />
+            <Array as="points">
+              <mxPoint x="180" y="730" />
+              <mxPoint x="180" y="850" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="error3" style="exitX=0.75;exitY=1;exitDx=0;exitDy=0;fontFamily=GOST type B;fontSize=20;" target="end">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="760" y="1455" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="step4" style="fontFamily=GOST type B;fontSize=20;" target="step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="step5" style="fontFamily=GOST type B;fontSize=20;" target="step6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="step6" style="fontFamily=GOST type B;fontSize=20;" target="check4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="check4" style="fontFamily=GOST type B;fontSize=20;" target="error4" value="Нет">
+          <mxGeometry relative="1" x="-0.6" y="20" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="check4" style="fontFamily=GOST type B;fontSize=20;" target="step7" value="Да">
+          <mxGeometry relative="1" x="-0.8857" y="-20" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="180" y="1150" />
+              <mxPoint x="180" y="1270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="error4" style="fontFamily=GOST type B;fontSize=20;" target="end">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="655" y="1455" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="step7" style="fontFamily=GOST type B;fontSize=20;" target="step8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="step8" style="fontFamily=GOST type B;fontSize=20;" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

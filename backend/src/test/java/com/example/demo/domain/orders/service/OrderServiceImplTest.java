@@ -2,10 +2,11 @@ package com.example.demo.domain.orders.service;
 
 import com.example.demo.domain.common.error.NotFoundException;
 import com.example.demo.domain.orders.model.Order;
+import com.example.demo.domain.orders.port.AddressRepositoryPort;
+import com.example.demo.domain.orders.port.BrigadeRepositoryPort;
 import com.example.demo.domain.orders.port.NotificationPort;
+import com.example.demo.domain.orders.port.OrderRepositoryPort;
 import com.example.demo.domain.users.model.User;
-import com.example.demo.domain.orders.repo.OrderRepository;
-import com.example.demo.domain.orders.repo.BrigadeRepository;
 import com.example.demo.domain.users.port.UserAccessPort;
 import com.example.demo.domain.orders.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,20 +26,29 @@ import static org.mockito.Mockito.when;
 class OrderServiceImplTest {
 
     @Mock
-    OrderRepository orderRepository;
+    OrderRepositoryPort orderRepository;
     @Mock
     UserAccessPort userAccessPort;
     @Mock
     NotificationPort notificationPort;
     @Mock
-    BrigadeRepository brigadeRepository;
+    BrigadeRepositoryPort brigadeRepository;
+    @Mock
+    AddressRepositoryPort addressRepository;
 
     @InjectMocks
     OrderServiceImpl service;
 
     @BeforeEach
     void init() {
-        service = new OrderServiceImpl(orderRepository, userAccessPort, new ModelMapper(), notificationPort, brigadeRepository);
+        service = new OrderServiceImpl(
+                orderRepository,
+                userAccessPort,
+                new ModelMapper(),
+                notificationPort,
+                brigadeRepository,
+                addressRepository
+        );
     }
 
     @Test
@@ -50,7 +60,7 @@ class OrderServiceImplTest {
     @Test
     void addExpense_whenOrderMissing_shouldThrow() {
         when(orderRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> service.addExpense(1L, 10.0));
+        assertThrows(NotFoundException.class, () -> service.addExpense(1L, "brigadier", 10.0));
     }
 
     @Test
